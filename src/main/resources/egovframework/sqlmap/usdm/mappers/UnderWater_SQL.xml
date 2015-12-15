@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.usdm.service.impl.UnderWaterMapper">
+
+	<resultMap id="underWater" type="egovframework.usdm.service.UnderWaterVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="tdID" column="tdID"/>
+		<result property="measureTime" column="measureTime"/>
+		<result property="waterLevel" column="waterLevel"/>
+		<result property="waterTemp" column="waterTemp"/>
+		<result property="waterConduct" column="waterConduct"/>
+		<result property="waterTurb" column="waterTurb"/>
+		<result property="upperSoilMoist" column="upperSoilMoist"/>
+		<result property="upperSoilConduct" column="upperSoilConduct"/>
+		<result property="upperSoilTemp" column="upperSoilTemp"/>
+		<result property="lowerSoilMoist" column="lowerSoilMoist"/>
+		<result property="lowerSoilConduct" column="lowerSoilConduct"/>
+		<result property="lowerSoilTemp" column="lowerSoilTemp"/>
+	</resultMap>
+
+	<insert id="insertUnderWaterData" parameterType="UnderWaterVO">
+		<![CDATA[
+			INSERT INTO sdm_UndergroundWater (
+					    gwID
+					  , panID
+					  , snID
+					  , tdID
+					  , measureDate
+					  , measureTime
+					  , waterLevel
+					  , waterTemp
+					  , waterConduct
+					  , waterTurb
+					  , upperSoilMoist
+					  , upperSoilConduct 
+					  , upperSoilTemp
+					  , lowerSoilMoist
+					  , lowerSoilConduct 
+					  , lowerSoilTemp
+					  )
+				VALUES (
+						#{gwID}
+					  , #{panID}
+					  , #{snID}
+					  , #{tdID}
+					  , #{measureDate}
+					  , #{measureTime}
+					  , #{waterLevel}
+					  , #{waterTemp}
+					  , #{waterConduct}
+					  , #{waterTurb}
+					  , #{upperSoilMoist}
+					  , #{upperSoilConduct} 
+					  , #{upperSoilTemp}
+					  , #{lowerSoilMoist}
+					  , #{lowerSoilConduct} 
+					  , #{lowerSoilTemp}
+					  )  
+		]]>
+	</insert>
+	
+	<select id="selectUnderWaterData" parameterType="usdmSearchVO" resultType="egovMap">
+		<![CDATA[
+			SELECT gwID || ':' || panID || ':' || snID || ':' || tdID AS sensorId
+				 , measureDate
+			  	 , measureTime
+				 , waterLevel
+				 , waterTemp
+				 , waterConduct
+				 , waterTurb
+				 , upperSoilMoist
+				 , upperSoilConduct 
+				 , upperSoilTemp
+				 , lowerSoilMoist
+				 , lowerSoilConduct 
+				 , lowerSoilTemp
+			  FROM sdm_UndergroundWater
+			 WHERE 1=1
+			 ORDER BY measureDate, measureTime
+		]]>
+	</select>
+
+</mapper>

@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.usdm.service.impl.DrainPipeMapper">
+
+	<resultMap id="drainPipeVideo" type="egovframework.usdm.service.DrainPipeVideoVO">
+		<result property="videoId" column="videoId"/>
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="tdID" column="tdID"/>
+		<result property="filePath" column="filePath"/>
+		<result property="fileName" column="fileName"/>
+		<result property="fileRealName" column="fileRealName"/>
+		<result property="resolutionW" column="resolutionW"/>
+		<result property="resolutionH" column="resolutionH"/>
+		<result property="numPixel" column="numPixel"/>
+		<result property="positionX" column="positionX"/>
+		<result property="positionY" column="positionY"/>
+		<result property="positionZ" column="positionZ"/>
+		<result property="pipeIdList" column="pipeIdList"/>
+		<result property="manholeId" column="manholeId"/>
+		<result property="directionAngle" column="directionAngle"/>
+		<result property="addr1" column="addr1"/>
+		<result property="addr2" column="addr2"/>
+		<result property="addr3" column="addr3"/>
+		<result property="recStartTime" column="recStartTime"/>
+		<result property="recEndTime" column="recEndTime"/>
+		<result property="damage" column="damage"/>
+		<result property="POI" column="POI"/>
+	</resultMap>
+
+	<resultMap id="drainPipeImage" type="egovframework.usdm.service.DrainPipeImageVO">
+		<result property="imageId" column="imageId"/>
+		<result property="filePath" column="filePath"/>
+		<result property="fileName" column="fileName"/>
+		<result property="fileRealName" column="fileRealName"/>
+		<result property="resolutionW" column="resolutionW"/>
+		<result property="resolutionH" column="resolutionH"/>
+		<result property="numPixel" column="numPixel"/>
+		<result property="positionX" column="positionX"/>
+		<result property="positionY" column="positionY"/>
+		<result property="positionZ" column="positionZ"/>
+		<result property="pipeId" column="pipeId"/>
+		<result property="manholeId" column="manholeId"/>
+		<result property="directionAngle" column="directionAngle"/>
+		<result property="offset" column="offset"/>
+		<result property="addr1" column="addr1"/>
+		<result property="addr2" column="addr2"/>
+		<result property="addr3" column="addr3"/>
+		<result property="recTime" column="recTime"/>
+		<result property="videoId" column="videoId"/>
+		<result property="damage" column="damage"/>
+		<result property="POI" column="POI"/>
+	</resultMap>
+
+	<insert id="insertDrainPipeVideo" parameterType="DrainPipeVideoVO">
+		<![CDATA[
+			INSERT INTO sdm_DrainPipeVideo (
+						gwID
+					  , panID
+					  , snID
+					  , tdID
+					  , filePath
+					  , fileName
+					  , fileRealName
+					  , resolutionW
+					  , resolutionH
+					  , numPixel
+					  , positionX
+					  , positionY
+					  , positionZ
+					  , position
+					  , pipeIdList
+					  , manholeId
+					  , directionAngle
+					  , addr1
+					  , addr2
+					  , addr3
+					  , recStartTime
+					  , recEndTime
+					  , damage
+					  , POI
+					  )
+				VALUES (
+						#{gwID}
+					  , #{panID}
+					  , #{snID}
+					  , #{tdID}
+					  , #{filePath}
+					  , #{fileName}
+					  , #{fileRealName}
+					  , #{resolutionW}
+					  , #{resolutionH}
+					  , #{numPixel}
+					  , #{positionX}
+					  , #{positionY}
+					  , #{positionZ}
+					  , ST_GEOMFROMTEXT('POINT(${positionX} ${positionY})',0)
+					  , #{pipeIdList}
+					  , #{manholeId}
+					  , #{directionAngle}
+					  , #{addr1}
+					  , #{addr2}
+					  , #{addr3}
+					  , #{recStartTime}
+					  , #{recEndTime}
+					  , #{damage}
+					  , #{POI}
+					  )  
+		]]>
+	</insert>
+	
+	<insert id="insertDrainPipeImage" parameterType="DrainPipeImageVO">
+		<![CDATA[
+			INSERT INTO sdm_DrainPipeImage (
+						filePath
+					  , fileName
+					  , fileRealName
+					  , resolutionW
+					  , resolutionH
+					  , numPixel
+					  , positionX
+					  , positionY
+					  , positionZ
+					  , position
+					  , pipeId
+					  , manholeId
+					  , directionAngle
+					  , offset
+					  , addr1
+					  , addr2
+					  , addr3
+					  , recTime
+					  , videoId
+					  , damage
+					  , POI
+					  )
+				VALUES (
+						#{filePath}
+					  , #{fileName}
+					  , #[fileRealName}
+					  , #{resolutionW}
+					  , #{resolutionH}
+					  , #{numPixel}
+					  , #{positionX}
+					  , #{positionY}
+					  , #{positionZ}
+					  , ST_GEOMFROMTEXT('POINT(${positionX} ${positionY})',0)
+					  , #{pipeId}
+					  , #{manholeId}
+					  , #{directionAngle}
+					  , #{offset}
+					  , #{addr1}
+					  , #{addr2}
+					  , #{addr3}
+					  , #{recDate} || ' ' || #{recTime}
+					  , #{videoId}
+					  , #{damage}
+					  , #{POI}
+					  )  
+		]]>
+	</insert>
+	
+	<update id="updateDrainPipeVideo">
+		<![CDATA[
+			UPDATE sdm_DrainPipeVideo
+			   SET gwID				= NVL(#{gwID}, gwID)
+				 , panID			= NVL(#{panID}, panID)
+				 , snID				= NVL(#{snID}, snID)
+				 , tdID				= NVL(#{tdID}, tdID)
+				 , filePath 		= NVL(#{filePath}, filePath)
+				 , fileName 		= NVL(#{fileName}, fileName)
+				 , fileRealName 	= NVL(#{fileRealName}, fileRealName)
+				 , resolutionW 		= NVL(#{resolutionW}, resolutionW)
+				 , resolutionH		= NVL(#{resolutionH}, resolutionH)
+				 , numPixel			= NVL(#{numPixel}, numPixel)
+				 , positionX		= NVL(#{positionX}, positionX)
+				 , positionY		= NVL(#{positionY}, positionY)
+				 , positionZ		= NVL(#{positionZ}, positionZ)
+				 , position			= ST_GEOMFROMTEXT('POINT(${positionX} ${positionY})',0)
+				 , pipeIdList		= NVL(#{pipeIdList}, pipeIdList)
+				 , manholeId		= NVL(#{manholeId}, manholeId)
+				 , directionAngle	= NVL(#{directionAngle}, directionAngle)
+				 , addr1			= NVL(#{addr1}, addr1)
+				 , addr2			= NVL(#{addr2}, addr2)
+				 , addr3			= NVL(#{addr3}, addr3)
+				 , recStartTime		= NVL(#{recStartTime}, recStartTime)
+				 , recEndTime		= NVL(#{recEndTime}, recEndTime)
+				 , damage			= NVL(#{damage}, damage)
+				 , POI				= NVL(#{POI}, POI)
+			 WHERE videoId = #searchId#
+		]]>
+	</update>
+	
+	<update id="updateDrainPipeImage">
+		<![CDATA[
+			UPDATE sdm_DrainPipeImage
+			   SET filePath 		= NVL(#{filePath}, filePath)
+				 , fileName 		= NVL(#{fileName}, fileName)
+				 , fileRealName 	= NVL(#{fileRealName}, fileRealName)
+				 , resolutionW 		= NVL(#{resolutionW}, resolutionW)
+				 , resolutionH		= NVL(#{resolutionH}, resolutionH)
+				 , numPixel			= NVL(#{numPixel}, numPixel)
+				 , positionX		= NVL(#{positionX}, positionX)
+				 , positionY		= NVL(#{positionY}, positionY)
+				 , positionZ		= NVL(#{positionZ}, positionZ)
+				 , position			= ST_GEOMFROMTEXT('POINT(${positionX} ${positionY})',0)
+				 , pipeId			= NVL(#{pipeId}, pipeId)
+				 , manholeId		= NVL(#{manholeId}, manholeId)
+				 , directionAngle	= NVL(#{directionAngle}, directionAngle)
+				 , offset			= NVL(#{offset}, offset)
+				 , addr1			= NVL(#{addr1}, addr1)
+				 , addr2			= NVL(#{addr2}, addr2)
+				 , addr3			= NVL(#{addr3}, addr3)
+				 , recTime			= NVL(#{recTime}, recTime)
+				 , videoId			= NVL(#{videoId}, videoId)
+				 , damage			= NVL(#{damage}, damage)
+				 , POI				= NVL(#{POI}, POI)
+			 WHERE videoId = #searchId#
+		]]>
+	</update>
+	
+	<delete id="deleteDrainPipeVideo">
+		<![CDATA[
+			DELETE sdm_DrainPipeVideo
+			 WHERE videoId = #{searchId} 
+		]]>
+	</delete>
+	
+	<delete id="deleteDrainPipeImage">
+		<![CDATA[
+			DELETE sdm_DrainPipeImage
+			 WHERE imageId = #{searchId} 
+		]]>
+	</delete>
+	
+	<select id="selectDrainPipeFileList" parameterType="usdmSearchVO" resultType="egovMap">
+		<![CDATA[
+			SELECT fileId
+				 , filePath
+				 , fileName
+				 , fileType
+				 , CASE WHEN fileType = 'V' THEN '동영상' ELSE '이미지' END AS fileTypeName
+				 , positionX
+				 , positionY
+				 , positionZ
+				 , addr1
+				 , addr2
+				 , addr3
+				 , recTime
+			  FROM (SELECT videoId AS fileId
+						 , filePath
+						 , fileName
+						 , fileRealName
+						 , 'V' AS fileType
+						 , positionX
+				 		 , positionY
+				 		 , positionZ
+						 , addr1
+						 , addr2
+						 , addr3
+						 , recStartTime AS recTime
+					  FROM sdm_DrainPipeVideo
+					 WHERE ('' = #{fromDate} OR SUBSTR(recStartTime,1,10) >= #{fromDate})
+					   AND ('' = #{toDate}   OR SUBSTR(recStartTime,1,10) <= #{toDate})
+					   AND (0.0 = #{centerX} OR SQRT(POWER(ABS(positionX-NVL(${centerX},0))*90000,2) + POWER(ABS(positionY-NVL(${centerY},0))*108000,2)) <= NVL(#{radius},0))
+					   AND addr1 ||' '|| addr2 ||' '|| addr3 LIKE '%${addr}%'
+					   AND poi LIKE '%${poi}%'
+					 
+					 UNION ALL
+					 
+					SELECT imageId AS fileId
+						 , filePath
+						 , fileName
+						 , fileRealName
+						 , 'I' AS fileType
+						 , positionX
+				 		 , positionY
+				 		 , positionZ
+						 , addr1
+						 , addr2
+						 , addr3
+						 , recTime
+					  FROM sdm_DrainPipeImage
+					 WHERE ('' = #{fromDate} OR SUBSTR(recTime,1,10) >= #{fromDate})
+					   AND ('' = #{toDate}   OR SUBSTR(recTime,1,10) <= #{toDate})
+					   AND (0.0 = #{centerX} OR SQRT(POWER(ABS(positionX-NVL(${centerX},0))*90000,2) + POWER(ABS(positionY-NVL(${centerY},0))*108000,2)) <= NVL(#{radius},0))
+					   AND addr1 ||' '|| addr2 ||' '|| addr3 LIKE '%${addr}%'
+					   AND poi LIKE '%${poi}%'
+					)
+			 ORDER BY recTime
+		]]>
+	</select>
+	
+	<select id="selectDrainPipeVideoList" parameterType="usdmSearchVO" resultType="egovMap">
+		<![CDATA[
+			SELECT videoId
+				 , gwID
+				 , panID
+				 , snID
+				 , tdID
+				 , filePath
+				 , fileName
+				 , fileRealName
+				 , resolutionW
+				 , resolutionH
+				 , numPixel
+				 , positionX
+				 , positionY
+				 , positionZ
+				 , pipeIdList
+				 , manholeId
+				 , directionAngle
+				 , addr1
+				 , addr2
+				 , addr3
+				 , recStartTime
+				 , recEndTime
+				 , damage
+				 , POI
+			  FROM sdm_DrainPipeVideo
+			 WHERE 1=1
+			 ORDER BY recStartTime
+		]]>
+	</select>
+	
+	<select id="selectDrainPipeImageList" parameterType="usdmSearchVO" resultType="egovMap">
+		<![CDATA[
+			SELECT imageId
+				 , filePath
+				 , fileName
+				 , fileRealName
+				 , resolutionW
+				 , resolutionH
+				 , numPixel
+				 , positionX
+				 , positionY
+				 , positionZ
+				 , pipeId
+				 , manholeId
+				 , directionAngle
+				 , offset
+				 , addr1
+				 , addr2
+				 , addr3
+				 , recTime
+				 , videoId
+				 , damage
+				 , POI
+			  FROM sdm_DrainPipeImage
+			 WHERE 1=1
+			 ORDER BY recTime
+		]]>
+	</select>
+	
+	<select id="selectDrainPipeVideoDetail" resultMap="drainPipeVideo">
+		<![CDATA[
+			SELECT videoId
+				 , gwID
+				 , panID
+				 , snID
+				 , tdID
+				 , filePath
+				 , fileName
+				 , fileRealName
+				 , resolutionW
+				 , resolutionH
+				 , numPixel
+				 , positionX
+				 , positionY
+				 , positionZ
+				 , pipeIdList
+				 , manholeId
+				 , directionAngle
+				 , addr1
+				 , addr2
+				 , addr3
+				 , recStartTime
+				 , recEndTime
+				 , damage
+				 , POI
+			  FROM sdm_DrainPipeVideo
+			 WHERE videoId = #{videoId}
+		]]>
+	</select>
+	
+	<select id="selectDrainPipeImageDetail" resultMap="drainPipeImage">
+		<![CDATA[
+			SELECT imageId
+				 , filePath
+				 , fileName
+				 , fileRealName
+				 , resolutionW
+				 , resolutionH
+				 , numPixel
+				 , positionX
+				 , positionY
+				 , positionZ
+				 , pipeId
+				 , manholeId
+				 , directionAngle
+				 , offset
+				 , addr1
+				 , addr2
+				 , addr3
+				 , recTime
+				 , videoId
+				 , damage
+				 , POI
+			  FROM sdm_DrainPipeImage
+			 WHERE imageId = #{imageId}
+		]]>
+	</select>
+
+</mapper>

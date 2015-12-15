@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Railroad">
+
+	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias alias="usdmSearchVO" type="egovframework.usdm.service.UsdmDefaultVO"/>
+	<typeAlias alias="railroadVideoVO" type="egovframework.usdm.service.RailroadVideoVO"/>
+
+	<resultMap id="railroadVideo" class="railroadVideoVO">
+		<result property="videoId" column="videoId"/>
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="tdID" column="tdID"/>
+		<result property="videoType" column="videoType"/>
+		<result property="videoTypeName" column="videoTypeName"/>
+		<result property="filePath" column="filePath"/>
+		<result property="fileName" column="fileName"/>
+		<result property="fileRealName" column="fileRealName"/>
+		<result property="resolutionW" column="resolutionW"/>
+		<result property="resolutionH" column="resolutionH"/>
+		<result property="numPixel" column="numPixel"/>
+		<result property="startPosX" column="startPosX"/>
+		<result property="startPosY" column="startPosY"/>
+		<result property="startPosZ" column="startPosZ"/>
+		<result property="endPosX" column="endPosX"/>
+		<result property="endPosY" column="endPosY"/>
+		<result property="endPosZ" column="endPosZ"/>
+		<result property="recStartTime" column="recStartTime"/>
+		<result property="recEndTime" column="recEndTime"/>
+		<result property="workSectionStart" column="workSectionStart"/>
+		<result property="workSectionEnd" column="workSectionEnd"/>
+		<result property="measureType" column="measureType"/>
+		<result property="measureTypeName" column="measureTypeName"/>
+		<result property="damage" column="damage"/>
+		<result property="POI" column="POI"/>
+	</resultMap>
+
+	<insert id="railroadDAO.insertRailroadVideo">
+		<![CDATA[
+			INSERT INTO sdm_RailroadVideo (
+						gwID
+					  , panID
+					  , snID
+					  , tdID
+					  , videoType
+					  , filePath
+					  , fileName
+					  , fileRealName
+					  , resolutionW
+					  , resolutionH
+					  , numPixel
+					  , startPosX
+					  , startPosY
+					  , startPosZ
+					  , endPosX
+					  , endPosY
+					  , endPosZ
+					  , startPos
+					  , endPos
+					  , recStartTime
+					  , recEndTime
+					  , workSectionStart
+					  , workSectionEnd
+					  , measureType
+					  , damage
+					  , POI
+					  )
+				VALUES (
+					    #gwID#
+					  , #panID#
+					  , #snID#
+					  , #tdID#
+					  , #videoType#
+					  , #filePath#
+					  , #fileName#
+					  , #fileRealName#
+					  , #resolutionW#
+					  , #resolutionH#
+					  , #numPixel#
+					  , #startPosX#
+					  , #startPosY#
+					  , #startPosZ#
+					  , #endPosX#
+					  , #endPosY#
+					  , #endPosZ#
+					  , ST_GEOMFROMTEXT('POINT($startPosX$ $startPosY$)',0)
+					  , ST_GEOMFROMTEXT('POINT($endPosX$ $endPosY$)',0)
+					  , #recStartTime#
+					  , #recEndTime#
+					  , #workSectionStart#
+					  , #workSectionEnd#
+					  , #measureType#
+					  , #damage#
+					  , #POI#
+					  )  
+		]]>
+	</insert>
+	
+	<update id="railroadDAO.updateRailroadVideo">
+		<![CDATA[
+			UPDATE sdm_RailroadVideo
+			   SET gwID				= NVL(#gwID#, gwID)
+				 , panID			= NVL(#panID#, panID)
+				 , snID				= NVL(#snID#, snID)
+				 , tdID				= NVL(#tdID#, tdID)
+				 , videoType		= NVL(#videoType#, videoType)
+			   	 , filePath 		= NVL(#filePath#, filePath)
+				 , fileName 		= NVL(#fileName#, fileName)
+				 , fileRealName 	= NVL(#fileRealName#, fileRealName)
+				 , resolutionW 		= NVL(#resolutionW#, resolutionW)
+				 , resolutionH		= NVL(#resolutionH#, resolutionH)
+				 , numPixel			= NVL(#numPixel#, numPixel)
+				 , startPosX		= NVL(#startPosX#, startPosX)
+				 , startPosY		= NVL(#startPosY#, startPosY)
+				 , startPosZ		= NVL(#startPosZ#, startPosZ)
+				 , endPosX			= NVL(#endPosX#, endPosX)
+				 , endPosY			= NVL(#endPosY#, endPosY)
+				 , endPosZ			= NVL(#endPosZ#, endPosZ)
+				 , startPos			= ST_GEOMFROMTEXT('POINT($startPosX$ $startPosY$)',0)
+				 , endPos			= ST_GEOMFROMTEXT('POINT($endPosX$ $endPosY$)',0)
+				 , recStartTime		= NVL(#recStartTime#, recStartTime)
+				 , recEndTime		= NVL(#recEndTime#, recEndTime)
+				 , workSectionStart	= NVL(#workSectionStart#, workSectionStart)
+				 , workSectionEnd	= NVL(#workSectionEnd#, workSectionEnd)
+				 , measureType		= NVL(#measureType#, measureType)
+				 , damage			= NVL(#damage#, damage)
+				 , POI				= NVL(#POI#, POI)
+			 WHERE videoId = #videoId#
+		]]>
+	</update>
+	
+	<delete id="railroadDAO.deleteRailroadVideo">
+		<![CDATA[
+			DELETE sdm_RailroadVideo
+			 WHERE videoId = #videoId# 
+		]]>
+	</delete>
+	
+	<select id="railroadDAO.selectRailroadVideoList" parameterClass="usdmSearchVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.videoId 				AS videoId
+				 , a.gwID					AS gwID
+				 , a.panID					AS panID
+				 , a.snID					AS snID
+				 , a.tdID					AS tdID
+				 , a.videoType 				AS videoType
+				 , CASE a.videoType WHEN 'SURFACE' THEN '지반지표'
+				 				    WHEN 'SLAB'    THEN '궤도슬라브' 
+				 				    WHEN 'LINING'  THEN '터널라이닝'
+				    END 					AS videoTypeName 
+				 , a.filePath 				AS filePath
+				 , a.fileName 				AS fileName
+				 , a.fileRealName 			AS fileRealName
+				 , a.resolutionW 			AS resolutionW
+				 , a.resolutionH 			AS resolutionH
+				 , a.numPixel 				AS numPixel
+				 , a.startPosX				AS startPosX
+				 , a.startPosY				AS startPosY
+				 , a.startPosZ				AS startPosZ
+				 , a.endPosX				AS endPosX
+				 , a.endPosY				AS endPosY
+				 , a.endPosZ				AS endPosZ
+				 , a.recStartTime 			AS recStartTime
+				 , a.recEndTime 			AS recEndTime
+				 , a.workSectionStart 		AS workSectionStart
+				 , a.workSectionEnd 		AS workSectionEnd
+				 , b.typeName 				AS measureTypeName
+				 , a.damage					AS damage
+				 , a.POI					AS POI
+			  FROM sdm_RailroadVideo a
+			     , sdm_MeasureInstTest b
+			 WHERE ('' = #fromDate# OR SUBSTR(recStartTime,1,10) >= #fromDate#)
+			   AND ('' = #toDate#   OR SUBSTR(recEndTime,1,10)   <= #toDate#)
+			   AND (0.0 = #centerX# OR SQRT(POWER(ABS(startPosX-NVL($centerX$,0))*90000,2) + POWER(ABS(startPosY-NVL($centerY$,0))*108000,2)) <= NVL(#radius#,0))
+			   AND poi LIKE '%$poi$%'
+			   AND a.measureType = b.typeId
+			 ORDER BY recStartTime
+		]]>
+	</select>
+	
+	<select id="railroadDAO.selectRailroadVideoDetail" resultMap="railroadVideo">
+		<![CDATA[
+			SELECT a.videoId 				AS videoId
+				 , a.gwID					AS gwID
+				 , a.panID					AS panID
+				 , a.snID					AS snID
+				 , a.tdID					AS tdID
+				 , a.videoType 				AS videoType
+				 , CASE a.videoType WHEN 'SURFACE' THEN '지반지표'
+				 				    WHEN 'SLAB'    THEN '궤도슬라브' 
+				 				    WHEN 'LINING'  THEN '터널라이닝'
+				    END 					AS videoTypeName 
+				 , a.filePath 				AS filePath
+				 , a.fileName 				AS fileName
+				 , a.fileRealName 			AS fileRealName
+				 , a.resolutionW 			AS resolutionW
+				 , a.resolutionH 			AS resolutionH
+				 , a.numPixel 				AS numPixel
+				 , a.startPosX				AS startPosX
+				 , a.startPosY				AS startPosY
+				 , a.startPosZ				AS startPosZ
+				 , a.endPosX				AS endPosX
+				 , a.endPosY				AS endPosY
+				 , a.endPosZ				AS endPosZ
+				 , a.recStartTime 			AS recStartTime
+				 , a.recEndTime 			AS recEndTime
+				 , a.workSectionStart 		AS workSectionStart
+				 , a.workSectionEnd 		AS workSectionEnd
+				 , a.measureType 			AS measureType
+				 , b.typeName 				AS measureTypeName
+				 , a.damage					AS damage
+				 , a.POI					AS POI
+			  FROM sdm_RailroadVideo a
+			     , sdm_MeasureInstTest b
+			 WHERE a.videoId     = #videoId#
+			   AND a.measureType = b.typeId
+		]]>
+	</select>
+	
+	<select id="railroadDAO.selectMeasureTypeCombo" resultClass="egovMap">
+		<![CDATA[
+			SELECT typeId
+				 , typeName
+			  FROM sdm_measureinsttest
+		]]>
+	</select>
+	
+</sqlMap>

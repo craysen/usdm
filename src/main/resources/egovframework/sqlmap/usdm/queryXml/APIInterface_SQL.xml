@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="APIInterface">
+
+	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	
+	<typeAlias alias="loginSessionVO" 	type="egovframework.usdm.service.LoginSessionVO"/>
+	<typeAlias alias="snGatewayVO"    	type="egovframework.usdm.service.SNGatewayVO"/>
+	<typeAlias alias="snPanVO"        	type="egovframework.usdm.service.SNPanVO"/>
+	<typeAlias alias="snNodeVO"       	type="egovframework.usdm.service.SNNodeVO"/>
+	<typeAlias alias="snTransducerVO" 	type="egovframework.usdm.service.SNTransducerVO"/>
+	<typeAlias alias="snSensingValueVO" type="egovframework.usdm.service.SNSensingValueVO"/>
+	<typeAlias alias="snAssessValueVO" 	type="egovframework.usdm.service.SNAssessValueVO"/>
+
+	<resultMap id="loginSession" class="loginSessionVO">
+		<result property="userID" column="userID"/>
+		<result property="userPW" column="userPW"/>
+		<result property="sessionKey" column="sessionKey"/>
+	</resultMap>
+	
+	<resultMap id="snGateway" class="snGatewayVO">
+		<result property="gwID" column="gwID"/>
+		<result property="url" column="url"/>
+		<result property="manufacturer" column="manufacturer"/>
+		<result property="productNo" column="productNo"/>
+		<result property="location" column="location"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="altitude" column="altitude"/>
+		<result property="dateTime" column="numPixel"/>
+		<result property="supportedTransportProtocolList" column="supportedTransportProtocolList"/>
+		<result property="supportedTransportConnectionControlList" column="supportedTransportConnectionControlList"/>
+		<result property="supportedTransportDirectionList" column="supportedTransportDirectionList"/>
+		<result property="supportedOperationList" column="supportedOperationList"/>
+		<result property="supportedAttributeList" column="supportedAttributeList"/>
+		<result property="supportedSensorServiceCenterList" column="supportedSensorServiceCenterList"/>
+		<result property="monitoringMode" column="monitoringMode"/>
+		<result property="monitoringPeriod" column="monitoringPeriod"/>
+		<result property="statusCode" column="statusCode"/>
+		<result property="deleteCode" column="deleteCode"/>
+	</resultMap>
+
+	<resultMap id="snPan" class="snPanVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="topology" column="topology"/>
+		<result property="protocolStack" column="protocolStack"/>
+		<result property="panChannel" column="panChannel"/>
+		<result property="supportedChannelList" column="supportedChannelList"/>
+		<result property="supportedTopologyList" column="supportedTopologyList"/>
+		<result property="supportedProtocolStackList" column="supportedProtocolStackList"/>
+		<result property="supportedOperationList" column="supportedOperationList"/>
+		<result property="supportedAttributeList" column="supportedAttributeList"/>
+		<result property="statusCode" column="statusCode"/>
+		<result property="deleteCode" column="deleteCode"/>
+	</resultMap>
+	
+	<resultMap id="snNode" class="snNodeVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="globalID" column="globalID"/>
+		<result property="manufacturer" column="manufacturer"/>
+		<result property="productNo" column="productNo"/>
+		<result property="location" column="location"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="altitude" column="altitude"/>
+		<result property="role" column="role"/>
+		<result property="roleList" column="roleList"/>
+		<result property="parentNodeIDList" column="parentNodeIDList"/>
+		<result property="supportedOperationList" column="supportedOperationList"/>
+		<result property="supportedAttributeList" column="supportedAttributeList"/>
+		<result property="monitoringMode" column="monitoringMode"/>
+		<result property="monitoringPeriod" column="monitoringPeriod"/>
+		<result property="statusCode" column="statusCode"/>
+		<result property="deleteCode" column="deleteCode"/>
+	</resultMap>
+	
+	<resultMap id="snTransducer" class="snTransducerVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="tdID" column="tdID"/>
+		<result property="manufacturer" column="manufacturer"/>
+		<result property="productNo" column="productNo"/>
+		<result property="transducerCategory" column="transducerCategory"/>
+		<result property="transducerType" column="transducerType"/>
+		<result property="unit" column="unit"/>
+		<result property="dataType" column="dataType"/>
+		<result property="rangeMin" column="rangeMin"/>
+		<result property="rangeMax" column="rangeMax"/>
+		<result property="rangeOffset" column="rangeOffset"/>
+		<result property="level" column="level"/>
+		<result property="supportedOperationList" column="supportedOperationList"/>
+		<result property="supportedAttributeList" column="supportedAttributeList"/>
+		<result property="statusCode" column="statusCode"/>
+		<result property="actuationResult" column="actuationResult"/>
+		<result property="deleteCode" column="deleteCode"/>
+	</resultMap>
+	
+	<resultMap id="snSensingValue" class="SNSensingValueVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="tdID" column="tdID"/>
+		<result property="reportTime" column="reportTime"/>
+		<result property="sensingTime" column="sensingTime"/>
+		<result property="sensorType" column="sensorType"/>
+		<result property="sensingValue" column="sensingValue"/>
+		<result property="additionalCondition" column="additionalCondition"/>
+	</resultMap>
+	
+	<resultMap id="snAssessValue" class="SNAssessValueVO">
+		<result property="category" column="category"/>
+		<result property="type" column="type"/>
+		<result property="date" column="date"/>
+		<result property="value" column="value"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="altitude" column="altitude"/>
+	</resultMap>
+	
+	<select id="apiInterfaceDAO.validateSessionKey" parameterClass="loginSessionVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS validYn
+			  FROM sdm_LoginSession
+			 WHERE sessionKey = #sessionKey#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectSensingValueQuery" parameterClass="snSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.gwID || ':' || a.panID || ':' || a.snID || ':' || a.tdID AS tdAddress
+				 , a.sensingTime 	AS sensingTime 
+				 , a.sensorType 	AS sensorType
+				 , a.sensingValue 	AS sensingValue
+			  FROM sdm_SensingValue a
+			     , sdm_Node b
+			 WHERE ('FF' = #gwID#  OR a.gwID  = #gwID#)
+			   AND ('FF' = #panID# OR a.panID = #panID#)
+			   AND ('FF' = #snID#  OR a.snID  = #snID#)
+			   AND ('FF' = #tdID#  OR a.tdID  = #tdID#)
+			   AND a.sensorType  = #sensorType#
+			   AND a.gwID		 = b.gwID
+			   and a.panID		 = b.panID
+			   and a.snID		 = b.snID
+			   AND a.sensingTime = (SELECT MAX(sensingTime)
+									  FROM sdm_SensingValue
+									 WHERE gwID  = a.gwID
+									   AND panID = a.panID
+									   AND snID  = a.snID
+									   AND tdID  = a.tdID )
+			   $additionalCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectSensingValueSpatioTemporal" parameterClass="snSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.gwID || ':' || a.panID || ':' || a.snID || ':' || a.tdID AS tdAddress
+				 , a.sensingTime 	AS sensingTime 
+				 , a.sensorType 	AS sensorType
+				 , a.sensingValue 	AS sensingValue
+			  FROM sdm_SensingValue a
+			     , sdm_Node b
+			 WHERE ('FF' = #gwID#  OR a.gwID  = #gwID#)
+			   AND ('FF' = #panID# OR a.panID = #panID#)
+			   AND ('FF' = #snID#  OR a.snID  = #snID#)
+			   AND ('FF' = #tdID#  OR a.tdID  = #tdID#)
+			   AND a.sensorType  = #sensorType#
+			   AND a.gwID		 = b.gwID
+			   and a.panID		 = b.panID
+			   and a.snID		 = b.snID
+			   $additionalCondition$
+			   $temporalCondition$
+			   $spatialCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectGatewayIDList" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID
+			  FROM sdm_Gateway
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectGatewayDescription" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID
+				 , url, manufacturer, productNo, location
+				 , longitude, latitude, altitude, dateTime
+				 , supportedTransportProtocolList, supportedTransportConnectionControlList
+				 , supportedTransportDirectionList, supportedOperationList
+				 , supportedAttributeList, supportedSensorServiceCenterList
+				 , panIDList, monitoringMode, monitoringPeriod
+			  FROM sdm_Gateway
+			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectPanDescriptionByGwID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID
+				 , topology, protocolStack, panChannel, supportedChannelList
+				 , supportedTopologyList, supportedProtocolStackList, supportedOperationList
+				 , supportedAttributeList, snIDList
+			  FROM sdm_Pan
+			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectNodeDescriptionByGwID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID
+				 , globalID, manufacturer, productNo, location
+				 , longitude, latitude, altitude, role, roleList
+				 , parentNodeIDList, supportedOperationList, supportedAttributeList
+				 , tdIDList, monitoringMode, monitoringPeriod
+			  FROM sdm_Node
+			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerDescriptionByGwID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID, tdID
+				 , manufacturer, productNo, transducerCategory, transducerType
+				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
+				 , supportedOperationList, supportedAttributeList
+			  FROM sdm_Transducer
+			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectPanDescription" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID
+				 , topology, protocolStack, panChannel, supportedChannelList
+				 , supportedTopologyList, supportedProtocolStackList, supportedOperationList
+				 , supportedAttributeList, snIDList
+			  FROM sdm_Pan
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectNodeDescriptionByPanID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID
+				 , globalID, manufacturer, productNo, location
+				 , longitude, latitude, altitude, role, roleList
+				 , parentNodeIDList, supportedOperationList, supportedAttributeList
+				 , tdIDList, monitoringMode, monitoringPeriod
+			  FROM sdm_Node
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerDescriptionByPanID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID, tdID
+				 , manufacturer, productNo, transducerCategory, transducerType
+				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
+				 , supportedOperationList, supportedAttributeList
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectNodeDescription" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID
+				 , globalID, manufacturer, productNo, location
+				 , longitude, latitude, altitude, role, roleList
+				 , parentNodeIDList, supportedOperationList, supportedAttributeList
+				 , tdIDList, monitoringMode, monitoringPeriod
+			  FROM sdm_Node
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerDescriptionBySnID" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID, tdID
+				 , manufacturer, productNo, transducerCategory, transducerType
+				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
+				 , supportedOperationList, supportedAttributeList
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectTransducerDescription" parameterClass="SNTransducerVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID, tdID
+				 , manufacturer, productNo, transducerCategory, transducerType
+				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
+				 , supportedOperationList, supportedAttributeList
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectGatewayStatus" parameterClass="snGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID || ':0:0:0' AS address
+			     , statusCode
+			  FROM sdm_Gateway
+			 WHERE gwID = #gwID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectGatewayStatusDescent" parameterClass="snGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID || ':0:0:0' AS address
+			     , statusCode
+			  FROM sdm_Gateway
+			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+			 
+			 UNION ALL
+			 
+			SELECT gwID || ':' || panID || ':0:0' AS address
+				 , statusCode
+			  FROM sdm_Pan
+			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+			 
+			 UNION ALL
+
+			SELECT gwID || ':' || panID || ':' || snID || ':0' AS address
+				 , statusCode
+			  FROM sdm_Node
+			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+			 
+			 UNION ALL
+
+			SELECT gwID || ':' || panID || ':' || snID || ':' || tdID AS address
+				 , statusCode
+			  FROM sdm_Transducer
+			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectPanStatus" parameterClass="snPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID || ':' || panID || ':0:0' AS address
+				 , statusCode
+			  FROM sdm_Pan
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectPanStatusDescent" parameterClass="snPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID || ':' || panID || ':0:0' AS address
+				 , statusCode
+			  FROM sdm_Pan
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   
+			 UNION ALL
+			 
+			SELECT gwID || ':' || panID || ':' || snID || ':0' AS address
+				 , statusCode
+			  FROM sdm_Node
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   
+			 UNION ALL
+			 
+			SELECT gwID || ':' || panID || ':' || snID || ':' || tdID AS address
+				 , statusCode
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectNodeStatus" parameterClass="snNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID || ':' || panID || ':' || snID || ':0' AS address
+				 , statusCode
+			  FROM sdm_Node
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectNodeStatusDescent" parameterClass="snNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID || ':' || panID || ':' || snID || ':0' AS address
+				 , statusCode
+			  FROM sdm_Node
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   
+			 UNION ALL
+			 
+			SELECT gwID || ':' || panID || ':' || snID || ':' || tdID AS address
+				 , statusCode
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectTransducerStatus" parameterClass="snTransducerVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID || ':' || panID || ':' || snID || ':' || tdID AS address
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</select>
+	
+	<insert id="apiInterfaceDAO.insertAssessValues" parameterClass="SNAssessValueVO">
+		<![CDATA[
+			INSERT INTO sdm_AssessValue (
+						category
+					  , type
+					  , date
+					  , value
+					  , longitude
+					  , latitude
+					  , altitude
+					  , position
+					  )
+				VALUES (
+					    #category#
+					  , #type#
+					  , #date#
+					  , #value#
+					  , #longitude#
+					  , #latitude#
+					  , #altitude#
+					  , ST_POINTFROMTEXT('POINT($longitude$ $latitude$)',0)
+					  )  
+		]]>
+	</insert>
+	
+	<select id="apiInterfaceDAO.retrieveAssessValues" parameterClass="SNAssessValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT type
+				 , date
+				 , value
+				 , longitude
+				 , latitude
+				 , altitude
+			  FROM sdm_AssessValue
+			 WHERE category = #category#
+			   AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON(($minX$ $minY$, $maxX$ $minY$, $maxX$ $maxY$, $minX$ $maxY$, $minX$ $minY$))',0), position) = 1
+			   AND type != 'risk'
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.retrieveRiskValues" parameterClass="SNAssessValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT category
+				 , date
+				 , value
+				 , longitude
+				 , latitude
+				 , altitude
+			  FROM sdm_AssessValue
+			 WHERE category IN ($category$)
+			   AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON(($minX$ $minY$, $maxX$ $minY$, $maxX$ $maxY$, $minX$ $maxY$, $minX$ $minY$))',0), position) = 1
+			   AND type = 'risk'
+		]]>
+	</select>
+	
+</sqlMap>

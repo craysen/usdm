@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+
+    <formset>
+        <form name="sampleVO">
+        	<field property="name" depends="required">
+        		<arg0 key="title.sample.name" />
+			</field>
+			<field property="description" depends="required">
+                <arg0 key="title.sample.description" />
+            </field>
+        	<field property="regUser" depends="required">
+        		<arg0 key="title.sample.regUser" />
+			</field>
+        </form>
+        <form name="fileinfoVO">
+        	<field property="fileId"/>
+        	<field property="fileName"/>
+        	<field property="filePath"/>
+        	<field property="fileType"/>
+        	<field property="authGroupCd"/>
+        	<field property="sensorId"/>
+        	<field property="resolutionX"/>
+        	<field property="resolutionY"/>
+        	<field property="pixel"/>
+        	<field property="address1"/>
+        	<field property="address2"/>
+        	<field property="address3"/>
+        	<field property="latitude"/>
+        	<field property="longitude"/>
+        	<field property="altitude"/>
+        	<field property="sewerId"/>
+        	<field property="manholeId"/>
+        	<field property="directionAngle"/>
+        	<field property="startTime"/>
+        	<field property="endTime"/>
+        </form>
+    </formset>
+
+</form-validation>

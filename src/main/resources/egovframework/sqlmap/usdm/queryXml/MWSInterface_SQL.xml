@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MWSInterface">
+
+	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	
+	<typeAlias alias="loginSessionVO" type="egovframework.usdm.service.LoginSessionVO"/>
+	<typeAlias alias="snGatewayVO"    type="egovframework.usdm.service.SNGatewayVO"/>
+	<typeAlias alias="snPanVO"        type="egovframework.usdm.service.SNPanVO"/>
+	<typeAlias alias="snNodeVO"       type="egovframework.usdm.service.SNNodeVO"/>
+	<typeAlias alias="snTransducerVO" type="egovframework.usdm.service.SNTransducerVO"/>
+	<typeAlias alias="snSensingValueVO" type="egovframework.usdm.service.SNSensingValueVO"/>
+
+	<resultMap id="loginSession" class="loginSessionVO">
+		<result property="userID" column="userID"/>
+		<result property="userPW" column="userPW"/>
+		<result property="sessionKey" column="sessionKey"/>
+	</resultMap>
+	
+	<resultMap id="snGateway" class="snGatewayVO">
+		<result property="gwID" column="gwID"/>
+		<result property="url" column="url"/>
+		<result property="manufacturer" column="manufacturer"/>
+		<result property="productNo" column="productNo"/>
+		<result property="location" column="location"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="altitude" column="altitude"/>
+		<result property="dateTime" column="numPixel"/>
+		<result property="supportedTransportProtocolList" column="supportedTransportProtocolList"/>
+		<result property="supportedTransportConnectionControlList" column="supportedTransportConnectionControlList"/>
+		<result property="supportedTransportDirectionList" column="supportedTransportDirectionList"/>
+		<result property="supportedOperationList" column="supportedOperationList"/>
+		<result property="supportedAttributeList" column="supportedAttributeList"/>
+		<result property="supportedSensorServiceCenterList" column="supportedSensorServiceCenterList"/>
+		<result property="panIDList" column="panIDList"/>
+		<result property="monitoringMode" column="monitoringMode"/>
+		<result property="monitoringPeriod" column="monitoringPeriod"/>
+		<result property="statusCode" column="statusCode"/>
+		<result property="deleteCode" column="deleteCode"/>
+	</resultMap>
+
+	<resultMap id="snPan" class="snPanVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="topology" column="topology"/>
+		<result property="protocolStack" column="protocolStack"/>
+		<result property="panChannel" column="panChannel"/>
+		<result property="supportedChannelList" column="supportedChannelList"/>
+		<result property="supportedTopologyList" column="supportedTopologyList"/>
+		<result property="supportedProtocolStackList" column="supportedProtocolStackList"/>
+		<result property="supportedOperationList" column="supportedOperationList"/>
+		<result property="supportedAttributeList" column="supportedAttributeList"/>
+		<result property="snIDList" column="snIDList"/>
+		<result property="statusCode" column="statusCode"/>
+		<result property="deleteCode" column="deleteCode"/>
+	</resultMap>
+	
+	<resultMap id="snNode" class="snNodeVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="globalID" column="globalID"/>
+		<result property="manufacturer" column="manufacturer"/>
+		<result property="productNo" column="productNo"/>
+		<result property="location" column="location"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="altitude" column="altitude"/>
+		<result property="role" column="role"/>
+		<result property="roleList" column="roleList"/>
+		<result property="parentNodeIDList" column="parentNodeIDList"/>
+		<result property="supportedOperationList" column="supportedOperationList"/>
+		<result property="supportedAttributeList" column="supportedAttributeList"/>
+		<result property="tdIDList" column="tdIDList"/>
+		<result property="monitoringMode" column="monitoringMode"/>
+		<result property="monitoringPeriod" column="monitoringPeriod"/>
+		<result property="statusCode" column="statusCode"/>
+		<result property="deleteCode" column="deleteCode"/>
+	</resultMap>
+	
+	<resultMap id="snTransducer" class="snTransducerVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="tdID" column="tdID"/>
+		<result property="manufacturer" column="manufacturer"/>
+		<result property="productNo" column="productNo"/>
+		<result property="transducerCategory" column="transducerCategory"/>
+		<result property="transducerType" column="transducerType"/>
+		<result property="unit" column="unit"/>
+		<result property="dataType" column="dataType"/>
+		<result property="rangeMin" column="rangeMin"/>
+		<result property="rangeMax" column="rangeMax"/>
+		<result property="rangeOffset" column="rangeOffset"/>
+		<result property="level" column="level"/>
+		<result property="supportedOperationList" column="supportedOperationList"/>
+		<result property="supportedAttributeList" column="supportedAttributeList"/>
+		<result property="statusCode" column="statusCode"/>
+		<result property="actuationResult" column="actuationResult"/>
+		<result property="deleteCode" column="deleteCode"/>
+	</resultMap>
+	
+	<resultMap id="snSensingValue" class="SNSensingValueVO">
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="tdID" column="tdID"/>
+		<result property="reportTime" column="reportTime"/>
+		<result property="sensingTime" column="sensingTime"/>
+		<result property="sensorType" column="sensorType"/>
+		<result property="sensingValue" column="sensingValue"/>
+	</resultMap>
+	
+	<select id="mwsInterfaceDAO.validateSessionKey" parameterClass="loginSessionVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS validYn
+			  FROM sdm_LoginSession
+			 WHERE sessionKey = #sessionKey#
+		]]>
+	</select>
+	
+	<select id="mwsInterfaceDAO.selectLoginSession" parameterClass="loginSessionVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT userID
+				 , userPW
+				 , sessionKey
+			  FROM sdm_LoginSession
+			 WHERE userID = #userID#
+		]]>
+	</select>
+	
+	<update id="mwsInterfaceDAO.updateSessionKeyLogin" parameterClass="loginSessionVO">
+		<![CDATA[
+			UPDATE sdm_LoginSession
+			   SET sessionKey = #sessionKey#
+			 WHERE userID = #userID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updateSessionKeyLogout" parameterClass="loginSessionVO">
+		<![CDATA[
+			UPDATE sdm_LoginSession
+			   SET sessionKey = ''
+			 WHERE userID = #userID#
+		]]>
+	</update>
+	
+	<select id="mwsInterfaceDAO.selectExistingGateway" parameterClass="snGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Gateway
+			 WHERE gwID = #gwID#
+		]]>
+	</select>
+	
+	<select id="mwsInterfaceDAO.selectExistingPan" parameterClass="snPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Pan
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</select>
+	
+	<select id="mwsInterfaceDAO.selectExistingNode" parameterClass="snNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Node
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</select>
+	
+	<select id="mwsInterfaceDAO.selectExistingTransducer" parameterClass="snTransducerVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</select>
+	
+	<insert id="mwsInterfaceDAO.insertGateway">
+		<![CDATA[
+			INSERT INTO sdm_Gateway (
+						gwID
+					  , url
+					  , manufacturer
+					  , productNo
+					  , location
+					  , longitude
+					  , latitude
+					  , altitude
+					  , dateTime
+					  , supportedTransportProtocolList
+					  , supportedTransportConnectionControlList
+					  , supportedTransportDirectionList
+					  , supportedOperationList
+					  , supportedAttributeList
+					  , supportedSensorServiceCenterList
+					  , panIDList
+					  , monitoringMode
+					  , monitoringPeriod
+					  , statusCode
+					  , position
+					  , deleteCode
+					  )
+				VALUES (
+						#gwID#
+					  , #url#
+					  , #manufacturer#
+					  , #productNo#
+					  , #location#
+					  , #longitude#
+					  , #latitude#
+					  , #altitude#
+					  , #dateTime#
+					  , #supportedTransportProtocolList#
+					  , #supportedTransportConnectionControlList#
+					  , #supportedTransportDirectionList#
+					  , #supportedOperationList#
+					  , #supportedAttributeList#
+					  , #supportedSensorServiceCenterList#
+					  , #panIDList#
+					  , #monitoringMode#
+					  , #monitoringPeriod#
+					  , #statusCode#
+					  , ST_POINTFROMTEXT('POINT($longitude$ $latitude$)',0)
+					  , #deleteCode#
+					  )  
+		]]>
+	</insert>
+	
+	<update id="mwsInterfaceDAO.updateGateway">
+		<![CDATA[
+			UPDATE sdm_Gateway
+			   SET url 										= #url#
+				 , manufacturer 							= #manufacturer#
+				 , productNo 								= #productNo#
+				 , location 								= #location#
+				 , longitude								= #longitude#
+				 , latitude									= #latitude#
+				 , altitude									= #altitude#
+				 , dateTime 								= #dateTime#
+				 , supportedTransportProtocolList 			= #supportedTransportProtocolList#
+				 , supportedTransportConnectionControlList 	= #supportedTransportConnectionControlList#
+				 , supportedTransportDirectionList 			= #supportedTransportDirectionList#
+				 , supportedOperationList 					= #supportedOperationList#
+				 , supportedAttributeList 					= #supportedAttributeList#
+				 , supportedSensorServiceCenterList 		= #supportedSensorServiceCenterList#
+				 , panIDList								= #panIDList#
+				 , monitoringMode 							= #monitoringMode#
+				 , monitoringPeriod 						= #monitoringPeriod#
+				 , statusCode 								= #statusCode#
+				 , position 								= ST_POINTFROMTEXT('POINT($longitude$ $latitude$)',0)
+				 , deleteCode 								= #deleteCode#
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	
+	<insert id="mwsInterfaceDAO.insertPan">
+		<![CDATA[
+			INSERT INTO sdm_Pan (
+						gwID
+					  , panID
+					  , topology
+					  , protocolStack
+					  , panChannel
+					  , supportedChannelList
+					  , supportedTopologyList
+					  , supportedProtocolStackList
+					  , supportedOperationList
+					  , supportedAttributeList
+					  , snIDList
+					  , statusCode
+					  , deleteCode
+					  )
+				VALUES (
+						#gwID#
+					  , #panID#
+					  , #topology#
+					  , #protocolStack#
+					  , #panChannel#
+					  , #supportedChannelList#
+					  , #supportedTopologyList#
+					  , #supportedProtocolStackList#
+					  , #supportedOperationList#
+					  , #supportedAttributeList#
+					  , #snIDList#
+					  , #statusCode#
+					  , #deleteCode#
+					  )  
+		]]>
+	</insert>
+	
+	<update id="mwsInterfaceDAO.updatePan">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET topology 					= #topology#
+				 , protocolStack 				= #protocolStack#
+			  	 , panChannel 					= #panChannel#
+				 , supportedChannelList 		= #supportedChannelList#
+				 , supportedTopologyList 		= #supportedTopologyList#
+				 , supportedProtocolStackList 	= #supportedProtocolStackList#
+				 , supportedOperationList 		= #supportedOperationList#
+				 , supportedAttributeList 		= #supportedAttributeList#
+				 , snIDList						= #snIDList#
+				 , statusCode 					= #statusCode#
+				 , deleteCode 					= #deleteCode#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	
+	<insert id="mwsInterfaceDAO.insertNode">
+		<![CDATA[
+			INSERT INTO sdm_Node (
+						gwID
+					  , panID
+					  , snID
+					  , globalID
+					  , manufacturer
+					  , productNo
+					  , location
+					  , longitude
+					  , latitude
+					  , altitude
+					  , role
+					  , roleList
+					  , parentNodeIDList
+					  , supportedOperationList
+					  , supportedAttributeList
+					  , tdIDList
+					  , monitoringMode
+					  , monitoringPeriod
+					  , statusCode
+					  , position
+					  , deleteCode
+					  )
+				VALUES (
+						#gwID#
+					  , #panID#
+					  , #snID#
+					  , #globalID#
+					  , #manufacturer#
+					  , #productNo#
+					  , #location#
+					  , #longitude#
+					  , #latitude#
+					  , #altitude#
+					  , #role#
+					  , #roleList#
+					  , #parentNodeIDList#
+					  , #supportedOperationList#
+					  , #supportedAttributeList#
+					  , #tdIDList#
+					  , #monitoringMode#
+					  , #monitoringPeriod#
+					  , #statusCode#
+					  , ST_POINTFROMTEXT('POINT($longitude$ $latitude$)',0)
+					  , #deleteCode#
+					  )  
+		]]>
+	</insert>
+	
+	<update id="mwsInterfaceDAO.updateNode">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET globalID					= #globalID#
+				 , manufacturer				= #manufacturer#
+				 , productNo				= #productNo#
+				 , location					= #location#
+				 , longitude				= #longitude#
+				 , latitude					= #latitude#
+				 , altitude					= #altitude#
+				 , role						= #role#
+				 , roleList					= #roleList#
+				 , parentNodeIDList			= #parentNodeIDList#
+				 , supportedOperationList	= #supportedOperationList#
+				 , supportedAttributeList	= #supportedAttributeList#
+				 , tdIDList					= #tdIDList#
+				 , monitoringMode			= #monitoringMode#
+				 , monitoringPeriod			= #monitoringPeriod#
+				 , statusCode 				= #statusCode#
+				 , position					= ST_POINTFROMTEXT('POINT($longitude$ $latitude$)',0)
+				 , deleteCode 				= #deleteCode#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</update>
+	
+	
+	
+	<insert id="mwsInterfaceDAO.insertTransducer">
+		<![CDATA[
+			INSERT INTO sdm_Transducer (
+						gwID
+					  , panID
+					  , snID
+					  , tdID
+					  , manufacturer
+					  , productNo
+					  , transducerCategory
+					  , transducerType
+					  , unit
+					  , dataType
+					  , rangeMin
+					  , rangeMax
+					  , rangeOffset
+					  , level
+					  , supportedOperationList
+					  , supportedAttributeList
+					  , statusCode
+					  , actuationResult
+					  , deleteCode
+					  )
+				VALUES (
+						#gwID#
+					  , #panID#
+					  , #snID#
+					  , #tdID#
+					  , #manufacturer#
+					  , #productNo#
+					  , #transducerCategory#
+					  , #transducerType#
+					  , #unit#
+					  , #dataType#
+					  , #rangeMin#
+					  , #rangeMax#
+					  , #rangeOffset#
+					  , #level#
+					  , #supportedOperationList#
+					  , #supportedAttributeList#
+					  , #statusCode#
+					  , #actuationResult#
+					  , #deleteCode#
+					  )  
+		]]>
+	</insert>
+	
+	<update id="mwsInterfaceDAO.updateTransducer">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET manufacturer				= #manufacturer#
+			  	 , productNo				= #productNo#
+				 , transducerCategory		= #transducerCategory#
+				 , transducerType			= #transducerType#
+				 , unit						= #unit#
+				 , dataType					= #dataType#
+				 , rangeMin					= #rangeMin#
+				 , rangeMax					= #rangeMax#
+				 , rangeOffset				= #rangeOffset#
+				 , level					= #level#
+				 , supportedOperationList	= #supportedOperationList#
+				 , supportedAttributeList	= #supportedAttributeList#
+				 , statusCode 				= #statusCode#
+				 , actuationResult			= #actuationResult#
+				 , deleteCode 				= #deleteCode#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updateGatewayGwID">
+		<![CDATA[
+			UPDATE sdm_Gateway
+			   SET gwID = #newGwID#
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updatePanGwID">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET gwID = #newGwID#
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateNodeGwID">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID = #newGwID#
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateTransducerGwID">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID = #newGwID#
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updatePanPanID">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateNodePanID">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateTransducerPanID">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updateNodeSnID">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			     , snID  = #newSnID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateTransducerSnID">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			     , snID  = #newSnID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updateTransducerTdID">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			     , snID  = #newSnID#
+			     , tdID  = #newTdID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</update>
+	
+	<select id="mwsInterfaceDAO.updateGatewayAddress" parameterClass="snGatewayVO">
+		{ CALL sdm_sp_updateGatewayAddress('$gwID$', '$newGwID$') }
+	</select>
+	
+	<select id="mwsInterfaceDAO.updatePanAddress" parameterClass="snPanVO">
+		{ CALL sdm_sp_updatePanAddress('$gwID$', '$panID$', '$newGwID$', '$newPanID$') }
+	</select>
+	
+	<select id="mwsInterfaceDAO.updateNodeAddress" parameterClass="snNodeVO">
+		{ CALL sdm_sp_updateNodeAddress('$gwID$', '$panID$', '$snID$', '$newGwID$', '$newPanID$', '$newSnID$') }
+	</select>
+	
+	<select id="mwsInterfaceDAO.updateTransducerAddress" parameterClass="snTransducerVO">
+		{ CALL sdm_sp_updateTransducerAddress('$gwID$', '$panID$', '$snID$', '$tdID$', '$newGwID$', '$newPanID$', '$newSnID$', '$newTdID$') }
+	</select>
+	
+	<update id="mwsInterfaceDAO.updateGatewayDeleteCode">
+		<![CDATA[
+			UPDATE sdm_Gateway
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updatePanDeleteCodeGw">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateNodeDeleteCodeGw">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateTransducerDeleteCodeGw">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updatePanDeleteCode">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateNodeDeleteCodePan">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateTransducerDeleteCodePan">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updateNodeDeleteCode">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateTransducerDeleteCodeSn">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updateTransducerDeleteCode">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET deleteCode = 1 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</update>
+	
+	<select id="mwsInterfaceDAO.selectSensingValueRange" parameterClass="SNSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT rangeMin
+				 , rangeMax
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</select>
+	
+	<insert id="mwsInterfaceDAO.insertSensingValue">
+		<![CDATA[
+			INSERT INTO sdm_SensingValue (
+						gwID
+					  , panID
+					  , snID
+					  , tdID
+					  , reportTime
+					  , sensingTime
+					  , sensorType
+					  , sensingValue
+					  )
+				VALUES (
+						#gwID#
+					  , #panID#
+					  , #snID#
+					  , #tdID#
+					  , #reportTime#
+					  , #sensingTime#
+					  , #sensorType#
+					  , #sensingValue#
+					  )  
+		]]>
+	</insert>
+	
+	<insert id="mwsInterfaceDAO.insertSensingValueInvalid">
+		<![CDATA[
+			INSERT INTO sdm_SensingValueInvalid (
+						gwID
+					  , panID
+					  , snID
+					  , tdID
+					  , reportTime
+					  , sensingTime
+					  , sensorType
+					  , sensingValue
+					  )
+				VALUES (
+						#gwID#
+					  , #panID#
+					  , #snID#
+					  , #tdID#
+					  , #reportTime#
+					  , #sensingTime#
+					  , #sensorType#
+					  , #sensingValue#
+					  )  
+		]]>
+	</insert>
+	
+	<update id="mwsInterfaceDAO.updateActuationResult">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET actuationResult = #actuationResult# 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</update>
+	
+	<update id="mwsInterfaceDAO.updateGatewayStatusCode">
+		<![CDATA[
+			UPDATE sdm_Gateway
+			   SET statusCode = #statusCode#
+			 WHERE gwID  = #gwID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updatePanStatusCode">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET statusCode = #statusCode#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateNodeStatusCode">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET statusCode = #statusCode# 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</update>
+	<update id="mwsInterfaceDAO.updateTransducerStatusCode">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET statusCode = #statusCode# 
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</update>
+	
+</sqlMap>

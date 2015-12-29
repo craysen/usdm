@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.psl.dataaccess.util.EgovMap;
@@ -55,7 +56,7 @@ public class APIInterfaceController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/query/latestValue", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonQueryLatestValue(@RequestBody String filterJSON) {
+	public String jsonQueryLatestValue(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -185,21 +186,35 @@ public class APIInterfaceController {
 				sensingValueList.add(sensingValue);
 			}
 			
-			responseMessage.put("responseCode", "200");
-			responseMessage.put("responseMsg",  "Query Success");
-			responseMessage.put("resultSet",  	sensingValueList);
+			if (sensingValueList.size() == 0) {
+				throw new NoDataException();
+			}
 			
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
+			responseMessage.put("resultSet",  	sensingValueList);
+		
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
+
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 			
-			responseMessage.put("responseCode", "202");
-			responseMessage.put("responseMsg",  "Query Error: Invalid SessionKey");
-		
+		} catch (NoDataException e) {
+			System.out.println(e.getMessage());
+			
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1200");
+			responseMessage.put("responseMsg",  "Error : Target Resource Not Found");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "201");
-			responseMessage.put("responseMsg",  "Query Error: Incorrect Request");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -212,7 +227,7 @@ public class APIInterfaceController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/query/spatioTemporal", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonQuerySpatioTemporal(@RequestBody String filterJSON) {
+	public String jsonQuerySpatioTemporal(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -415,21 +430,35 @@ public class APIInterfaceController {
 				sensingValueList.add(sensingValue);
 			}
 			
-			responseMessage.put("responseCode", "200");
-			responseMessage.put("responseMsg",  "Query Success");
+			if (sensingValueList.size() == 0) {
+				throw new NoDataException();
+			}
+			
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			responseMessage.put("resultSet",  	sensingValueList);
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "202");
-			responseMessage.put("responseMsg",  "Query Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
+		
+		} catch (NoDataException e) {
+			System.out.println(e.getMessage());
+			
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1200");
+			responseMessage.put("responseMsg",  "Error : Target Resource Not Found");
 		
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "201");
-			responseMessage.put("responseMsg",  "Query Error: Incorrect Request");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -441,7 +470,7 @@ public class APIInterfaceController {
 	// information/gatewayIDList
 	@RequestMapping(value="/information/gatewayIDList", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonInformationGatewayIDList(@RequestBody String filterJSON) {
+	public String jsonInformationGatewayIDList(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -480,21 +509,35 @@ public class APIInterfaceController {
 				gatewayIDList.add((String)queryMap.get("gwid"));
 			}
 			
-			responseMessage.put("responseCode", "400");
-			responseMessage.put("responseMsg",  "Information Success");
+			if (gatewayIDList.size() == 0) {
+				throw new NoDataException();
+			}
+			
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			responseMessage.put("gwIDList",  	gatewayIDList);
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "402");
-			responseMessage.put("responseMsg",  "Information Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 		
+		} catch (NoDataException e) {
+			System.out.println(e.getMessage());
+			
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1200");
+			responseMessage.put("responseMsg",  "Error : Target Resource Not Found");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "401");
-			responseMessage.put("responseMsg",  "Information Error: Incorrect Request");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -507,7 +550,7 @@ public class APIInterfaceController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/information/resourceDescription", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonInformationResourceDescription(@RequestBody String filterJSON) {
+	public String jsonInformationResourceDescription(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -668,21 +711,35 @@ public class APIInterfaceController {
 				}
 			}
 			
-			responseMessage.put("responseCode", "400");
-			responseMessage.put("responseMsg",  "Information Success");
+			if (resourceDescriptionList.size() == 0) {
+				throw new NoDataException();
+			}
+			
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			responseMessage.put("resourceDescriptionList", resourceDescriptionList);
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "402");
-			responseMessage.put("responseMsg",  "Information Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 		
+		} catch (NoDataException e) {
+			System.out.println(e.getMessage());
+			
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1200");
+			responseMessage.put("responseMsg",  "Error : Target Resource Not Found");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "401");
-			responseMessage.put("responseMsg",  "Information Error: Incorrect Request");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -695,7 +752,7 @@ public class APIInterfaceController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/information/resourceStatus", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonInformationResourceStatus(@RequestBody String filterJSON) {
+	public String jsonInformationResourceStatus(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -833,21 +890,35 @@ public class APIInterfaceController {
 				statusList.add(statusMap);
 			}
 			
-			responseMessage.put("responseCode", "400");
-			responseMessage.put("responseMsg",  "Information Success");
+			if (statusList.size() == 0) {
+				throw new NoDataException();
+			}
+			
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			responseMessage.put("statusList",  	statusList);
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "402");
-			responseMessage.put("responseMsg",  "Information Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 		
+		} catch (NoDataException e) {
+			System.out.println(e.getMessage());
+			
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1200");
+			responseMessage.put("responseMsg",  "Error : Target Resource Not Found");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "401");
-			responseMessage.put("responseMsg",  "Information Error: Incorrect Request");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -860,7 +931,7 @@ public class APIInterfaceController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/sri/insertAssessValues", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonSriInsertAssessValues(@RequestBody String filterJSON) {
+	public String jsonSriInsertAssessValues(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -939,20 +1010,23 @@ public class APIInterfaceController {
 				apiInterfaceService.insertAssessValues(assessValueVO);
 			}
 			
-			responseMessage.put("responseCode", "900");
-			responseMessage.put("responseMsg",  "SRI Success");
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "903");
-			responseMessage.put("responseMsg",  "SRI Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 		
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "901");
-			responseMessage.put("responseMsg",  "SRI Error: Incorrect Message");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -965,7 +1039,7 @@ public class APIInterfaceController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/sri/retrieveAssessValues", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonSriRetrieveAssessValues(@RequestBody String filterJSON) {
+	public String jsonSriRetrieveAssessValues(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -1033,21 +1107,35 @@ public class APIInterfaceController {
 				assessValueList.add(assessValue);
 			}
 			
-			responseMessage.put("responseCode", "900");
-			responseMessage.put("responseMsg",  "SRI Success");
+			if (assessValueList.size() == 0) {
+				throw new NoDataException();
+			}
+			
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			responseMessage.put("assessValues",	assessValueList);
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "903");
-			responseMessage.put("responseMsg",  "SRI Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 		
+		} catch (NoDataException e) {
+			System.out.println(e.getMessage());
+			
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1200");
+			responseMessage.put("responseMsg",  "Error : Target Resource Not Found");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "901");
-			responseMessage.put("responseMsg",  "SRI Error: Incorrect Message");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -1060,7 +1148,7 @@ public class APIInterfaceController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/sri/assessUtilities", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonSriAssessUtilities(@RequestBody String filterJSON) {
+	public String jsonSriAssessUtilities(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -1112,20 +1200,23 @@ public class APIInterfaceController {
 				apiInterfaceService.insertAssessValues(assessValueVO);
 			}
 			
-			responseMessage.put("responseCode", "900");
-			responseMessage.put("responseMsg",  "SRI Success");
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "903");
-			responseMessage.put("responseMsg",  "SRI Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 		
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "901");
-			responseMessage.put("responseMsg",  "SRI Error: Incorrect Message");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -1137,7 +1228,7 @@ public class APIInterfaceController {
 	// sri/assessSRI
 	@RequestMapping(value="/sri/assessSRI", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonSriAssessSRI(@RequestBody String filterJSON) {
+	public String jsonSriAssessSRI(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -1185,20 +1276,23 @@ public class APIInterfaceController {
 			
 			apiInterfaceService.insertAssessValues(assessValueVO);
 			
-			responseMessage.put("responseCode", "900");
-			responseMessage.put("responseMsg",  "SRI Success");
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "903");
-			responseMessage.put("responseMsg",  "SRI Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 		
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "901");
-			responseMessage.put("responseMsg",  "SRI Error: Incorrect Message");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
@@ -1211,7 +1305,7 @@ public class APIInterfaceController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/sri/retrieveRiskValues", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String jsonSriRetrieveRiskValues(@RequestBody String filterJSON) {
+	public String jsonSriRetrieveRiskValues(@RequestBody String filterJSON, HttpServletResponse response) {
 		Map<String, Object> responseMessage = new HashMap<String, Object>();
 		String responseJson = "";
 		
@@ -1288,21 +1382,35 @@ public class APIInterfaceController {
 				riskValueList.add(riskValue);
 			}
 			
-			responseMessage.put("responseCode", "900");
-			responseMessage.put("responseMsg",  "SRI Success");
+			if (riskValueList.size() == 0) {
+				throw new NoDataException();
+			}
+			
+			response.setStatus(HttpServletResponse.SC_OK);
+			responseMessage.put("responseCode", "1000");
+			responseMessage.put("responseMsg",  "Success");
 			responseMessage.put("riskValues",	riskValueList);
 			
 		} catch (LoginSessionException e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "903");
-			responseMessage.put("responseMsg",  "SRI Error: Invalid SessionKey");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1300");
+			responseMessage.put("responseMsg",  "Error : Invalid Session Key");
 		
+		} catch (NoDataException e) {
+			System.out.println(e.getMessage());
+			
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1200");
+			responseMessage.put("responseMsg",  "Error : Target Resource Not Found");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			responseMessage.put("responseCode", "901");
-			responseMessage.put("responseMsg",  "SRI Error: Incorrect Message");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			responseMessage.put("responseCode", "1100");
+			responseMessage.put("responseMsg",  "Error : Invalid Request Parameter");
 		}
 
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);

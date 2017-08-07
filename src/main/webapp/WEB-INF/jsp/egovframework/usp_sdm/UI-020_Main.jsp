@@ -8,7 +8,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId=J0pIKmd35JT8_HQBgyRN"></script>
+    
     <title>SDM</title>
+    <style>
+		.area {
+		    position: absolute;
+		    background: #fff;
+		    border: 1px solid #888;
+		    border-radius: 3px;
+		    font-size: 12px;
+		    top: -5px;
+		    left: 15px;
+		    padding:2px;
+		}
+		
+		.info {
+		    font-size: 12px;
+		    padding: 5px;
+		}
+		.info .title {
+		    font-weight: bold;
+		}
+	</style>
     <link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/sample.css'/>"/>
     
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -17,19 +43,10 @@
     /* 최초 화면호출 이벤트 */
     function form_onLoad()
     {
-    	document.getElementById("jsontest").style.display = "none";
-    	
     	return;
     }
     
-    function title_onclick()
-    {
-    	if (document.getElementById("jsontest").style.display == "block")
-    		document.getElementById("jsontest").style.display = "none";
-    	else
-    		document.getElementById("jsontest").style.display = "block";
-    }
-    
+    /*
  	// connection/login
     function login_onclick()
     {
@@ -514,6 +531,7 @@
 							}
 		});
     }
+	*/
         
     </script>
 </head>
@@ -529,7 +547,7 @@
       <tr>
         <td>
           <img src="<c:url value='/images/egovframework/usdm/title_dot.gif'/>"/>
-          <font size="4"><b>&nbsp;지하공간 센싱데이터 관리 시스템 Home</b></font>
+          <font size="4"><b>&nbsp;지하공간 센싱데이터 관리 시스템</b></font>
         </td>
       </tr>
       <tr><td bgcolor="#D3E2EC" height="3px"></td></tr>
@@ -538,158 +556,158 @@
   <br></br>
   <br></br>
   <!-- // 타이틀 -->
+  
+  <div id="map" style="width:100%;height:800px;position:relative;overflow:hidden;"></div>
+  
+  <!-- API key for localhost -->
+  <!-- 
+  <script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=94e1ab6949314b3111887925d09a68a9&libraries=services,clusterer,drawing"></script>
+ -->
+ 
+  <!-- API key for 129.254.221.32 -->
+  <script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=63577337fdb613a0b520b5b9af9074a2&libraries=services,clusterer,drawing"></script>
+   
+  <script>
+		
+		//---------------------
+		// 지도 그리기 START --
+		//---------------------
+		
+		// 지도를 담을 영역의 DOM 레퍼런스
+		var container = document.getElementById('map');
+		
+		// 지도를 생성할 때 필요한 기본 옵션
+		var options = {
+			// 지도의 중심좌표
+			center: new daum.maps.LatLng(36.358274, 127.364318),
+		
+			// 지도의 레벨(확대, 축소 정도)
+			level: 5
+		};
+	
+		// 지도 생성 및 객체 리턴
+		var map = new daum.maps.Map(container, options), customOverlay = new daum.maps.CustomOverlay({});
+		
+		// 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+		var mapTypeControl = new daum.maps.MapTypeControl();
+		// 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+		// daum.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+		map.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);
 
-  <a href="javascript:title_onclick()";>
-  <b><Font size="3">&nbsp;U</Font></b>nderground
-  <b><Font size="3">&nbsp;S</Font></b>ensing
-  <b><Font size="3">&nbsp;D</Font></b>ata
-  <b><Font size="3">&nbsp;M</Font></b>anagement
-  <b><Font size="3">&nbsp;S</Font></b>ystem
-  </a>
+		// 지도 확대 축소를 제어할 수 있는 줌 컨트롤을 생성합니다
+		var zoomControl = new daum.maps.ZoomControl();
+		map.addControl(zoomControl,    daum.maps.ControlPosition.RIGHT);
+		
+		//-------------------
+		// 지도 그리기 END --
+		//-------------------
+		
+		//--------------------------
+		// Global Variables START --
+		//--------------------------
+		
+		// 마커 투명도
+		var normalOpacity   = 0.5; // 평상시
+		var selectedOpacity = 1.0; // 선택시
+		
+		//------------------------
+		// Global Variables END --
+		//------------------------
+		
+		//-------------------------
+		// 센서노드 그리기 START --
+		//-------------------------
+		
+		// 지도에 표시된 마커 객체를 가지고 있을 배열입니다
+	    var markers = [];
 
-  <br></br>
-  <br></br>
-  
-  <div id="jsontest">
-  <B>[JSON test]</B>
-  <br></br>
-  <table>
-  	<colgroup>
-    	<col width="30"/>
-        <col width="200"/>
-    	<col width="30"/>
-        <col width="?"/>
-    </colgroup>
-    <tr>
-    	<td></td><td><b>MWS</b></td>
-    	<td></td><td><b>API</b></td>
-    </tr>
-    <tr>
-  		<td><input type="button" value="go" onclick="javascript:login_onclick();"/></td>
-  		<td colspan=3>
-  			<font color="blue">/connection/login</font>
-  		</td>
-  	</tr>
-    <tr>
-  		<td><input type="button" value="go" onclick="javascript:logout_onclick();"/></td>
-  		<td colspan=3>
-  			<font color="blue">/connection/logout</font>
-  		</td>
-  	</tr>
-  	<tr><td><br></br></td></tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:gateway_onclick();"/></td>
-  		<td>
-  			/resource/gateway
-  		</td>
-  		<td><input type="button" value="go" onclick="javascript:latest_onclick();"/></td>
-  		<td>
-  			/query/latestValue
-  		</td>
-  	</tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:pan_onclick();"/></td>
-  		<td>
-  			/resource/pan
-  		</td>
-  		<td><input type="button" value="go" onclick="javascript:spatio_onclick();"/></td>
-  		<td>
-  			/query/spatioTemporal
-  		</td>
-  	</tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:node_onclick();"/></td>
-  		<td colspan=3>
-  			/resource/node
-  		</td>
-  	</tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:transducer_onclick();"/></td>
-  		<td>
-  			/resource/transducer
-  		</td>
-  		<td><input type="button" value="go" onclick="javascript:gwlist_onclick();"/></td>
-  		<td>
-  			/information/gatewayIDList
-  		</td>
-  	</tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:update_onclick();"/></td>
-  		<td>
-  			<font color="blue">/resource/update</font>
-  		</td>
-  		<td><input type="button" value="go" onclick="javascript:description_onclick();"/></td>
-  		<td>
-  			/information/resourceDescription
-  		</td>
-  	</tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:delete_onclick();"/></td>
-  		<td>
-  			<font color="blue">/resource/delete</font>
-  		</td>
-  		<td><input type="button" value="go" onclick="javascript:status_onclick();"/></td>
-  		<td>
-  			/information/resourceStatus
-  		</td>
-  	</tr>
-  	<tr><td><br></br></td></tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:sensing_onclick();"/></td>
-  		<td>
-  			/report/sensingValue
-  		</td>
-  		<td><input type="button" value="go" onclick="javascript:insertsri_onclick();"/></td>
-  		<td>
-  			/sri/insertAssessValues
-  		</td>
-  	</tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:actuation_onclick();"/></td>
-  		<td>
-  			<font color="blue">/report/actuationResult</font>
-  		</td>
-		<td><input type="button" value="go" onclick="javascript:retrievesri_onclick();"/></td>
-  		<td>
-  			/sri/retrieveAssessValues
-  		</td>  		
-  	</tr>
-  	<tr>
-  		<td></td>
-  		<td></td>
-  		<td><input type="button" value="go" onclick="javascript:utility_onclick();"/></td>
-  		<td>
-  			<font color="red">/sri/assessUtilities</font>
-  		</td>
-  	</tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:statusResource_onclick();"/></td>
-  		<td>
-  			<font color="blue">/notice/statusResource</font>
-  		</td>
-  		<td><input type="button" value="go" onclick="javascript:assesssri_onclick();"/></td>
-  		<td>
-  			<font color="red">/sri/assessSRI</font>
-  		</td>
-  	</tr>
-  	<tr>
-  		<td><input type="button" value="go" onclick="javascript:reboot_onclick();"/></td>
-  		<td><font color="red">/notice/reboot</font></td>
-  		<td><input type="button" value="go" onclick="javascript:retrieveriskvalues_onclick();"/></td>
-  		<td>
-  			/sri/retrieveRiskValues
-  		</td>
-  	</tr>
-  </table>
-  
-  <br></br>
-  <textarea id="jsontext" readonly="readonly" style="word-break:break-all;" cols="80" rows="20">
-  </textarea>
-  
-  </div>
+		<c:forEach items="${sensorList}" var="sensor">
+			addMarker("${sensor.id}", "${sensor.geom}");
+		</c:forEach>
+		
+		function addMarker(id, coordList) {
+			var position = new daum.maps.LatLng(coordList.split(' ')[0], coordList.split(' ')[1]);
+			
+			// marker 객체생성
+			var marker = new daum.maps.Marker({
+			    map: map,
+			    position: position,
+			    opacity: normalOpacity,
+			    clickable: true
+			});
+			
+			// 생성된 마커를 배열에 추가합니다
+		    markers.push(marker);
+			
+			
+			// 인포윈도우의 내용 생성
+		    var iwContent = '<div style="padding:5px;">';
+		    var tableContent = '';
+		    var isnull = true;
+		    
+		    iwContent += '<b>Node [' + id + ']</b><br>';
+		    
+		    tableContent += '<table border=0 cellspacing=1 cellpadding=5 bgcolor=silver>';
+		    tableContent += '<tr align=center bgcolor=#D9E5FF>';
+		    tableContent += '<td><b>tdID</td>';
+		    tableContent += '<td><b>TYPE</td>';
+		    tableContent += '<td><b>TIME</td>';
+		    tableContent += '<td><b>VALUE</td>';
+		    tableContent += '</tr>';
+		    
+		    <c:forEach items="${valueList}" var="value">
+		    	if (id == '${value.id}') {
+		    		tableContent += '<tr align=center bgcolor=white>';
+		    		tableContent += '<td>&nbsp;${value.tdid}&nbsp;</td>';
+		    		tableContent += '<td>&nbsp;${value.sensortype}&nbsp;</td>';
+		    		tableContent += '<td>&nbsp;${value.timestr}&nbsp;</td>';
+		    		tableContent += '<td>&nbsp;${value.sensingvalue}&nbsp;</td>';
+		    		tableContent += '</tr>';
+		    		
+		    		if (isnull == true) isnull = false;
+		    	}
+			</c:forEach>
+		    
+			tableContent += '</table>';
+			
+			if (isnull == true) {
+				tableContent = '<b>No Data</b>';
+			}
+			
+		    iwContent += tableContent;
+		    iwContent += '</div>';
+
+			// 인포윈도우를 생성합니다
+			var infowindow = new daum.maps.InfoWindow({
+			    position : position, 
+			    content : iwContent 
+			});
+		
+			// 마우스오버 이벤트
+			daum.maps.event.addListener(marker, 'mouseover', function() {
+				this.setOpacity(selectedOpacity);
+
+				// 마커 위에 인포윈도우를 표시합니다. 두번째 파라미터인 marker를 넣어주지 않으면 지도 위에 표시됩니다
+				infowindow.open(map, marker);
+			});
+			
+			// 마우스떠남 이벤트
+			daum.maps.event.addListener(marker, 'mouseout', function() {
+				this.setOpacity(normalOpacity);
+				
+				infowindow.close();
+			});
+		}
+		
+		//-----------------------
+		// 센서노드 그리기 END --
+		//-----------------------
+		
+  </script>
   
 </div>
 	
 </form>
+
 </body>
 </html>

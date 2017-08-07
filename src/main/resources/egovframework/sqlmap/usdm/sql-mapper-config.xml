@@ -10,13 +10,29 @@
 		<typeAlias alias="drainPipeImageVO" type="egovframework.usdm.service.DrainPipeImageVO"/>
 		<typeAlias alias="underWaterVO" type="egovframework.usdm.service.UnderWaterVO"/>
 		<typeAlias alias="railroadVideoVO" type="egovframework.usdm.service.RailroadVideoVO"/>
+		<typeAlias alias="geoVideoRelVO" type="egovframework.usdm.service.GeoVideoRelVO"/>
+		
+		<typeAlias alias="manholePipeRelVO" type="egovframework.usdm.service.ManholePipeRelVO"/>
+		
+		<typeAlias alias="drainPipeAccidentVO" type="egovframework.usdm.service.DrainPipeAccidentVO"/>
+		<typeAlias alias="waterPipeAccidentVO" type="egovframework.usdm.service.WaterPipeAccidentVO"/>
 
-		<typeAlias alias="loginSessionVO" type="egovframework.usdm.service.LoginSessionVO"/>		
+		<typeAlias alias="loginSessionVO" type="egovframework.usdm.service.LoginSessionVO"/>
+				
 		<typeAlias alias="snGatewayVO" type="egovframework.usdm.service.SNGatewayVO"/>
 		<typeAlias alias="snPanVO" type="egovframework.usdm.service.SNPanVO"/>
 		<typeAlias alias="snNodeVO" type="egovframework.usdm.service.SNNodeVO"/>
 		<typeAlias alias="snTransducerVO" type="egovframework.usdm.service.SNTransducerVO"/>
 		<typeAlias alias="snSensingValueVO" type="egovframework.usdm.service.SNSensingValueVO"/>
 		<typeAlias alias="snAssessValueVO" type="egovframework.usdm.service.SNAssessValueVO"/>
+		<typeAlias alias="snSriGridVO" type="egovframework.usdm.service.SNSriGridVO"/>
+		<typeAlias alias="snAccidentVO" type="egovframework.usdm.service.SNAccidentVO"/>
+		<typeAlias alias="snGeoRelationVO" type="egovframework.usdm.service.SNGeoRelationVO"/>
+		<typeAlias alias="snSriVO" type="egovframework.usdm.service.SNSriVO"/>
+		<typeAlias alias="snFirmwareVO" type="egovframework.usdm.service.SNFirmwareVO"/>
+		<typeAlias alias="snFirmwareUpdateHistoryVO" type="egovframework.usdm.service.SNFirmwareUpdateHistoryVO"/>
+		
+		<typeAlias alias="rfidVO" type="egovframework.usdm.service.RfidVO"/>
+		<typeAlias alias="userDefinedMessageVO" type="egovframework.usdm.service.UserDefinedMessageVO"/>
     </typeAliases>
 </configuration>

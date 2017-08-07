@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Common">
+
+	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias alias="usdmSearchVO" type="egovframework.usdm.service.UsdmDefaultVO"/>
+	
+	<select id="commonDAO.selectSensorNodeGeometry" resultClass="EgovMap">
+		<![CDATA[
+			SELECT gwID||':'||panID||':'||snID  AS id
+			     , latitude || ' ' || longitude AS geom
+			  FROM sdm_Node
+		]]>
+	</select>
+	
+	<select id="commonDAO.selectSensorNodeSensingValue" resultClass="EgovMap">
+		<![CDATA[
+			SELECT a.gwID||':'||a.panID||':'||a.snID  AS id
+			     , b.tdID
+				 , b.sensorType
+				 , b.sensingTime
+				 , b.sensingValue
+			  FROM sdm_Node a
+			     , sdm_SensingValueLatest b
+			 WHERE a.gwID  = b.gwID
+			   AND a.panID = b.panID
+			   AND a.snID  = b.snID
+		  ORDER BY b.gwID, b.panID, b.snID, TO_NUMBER(b.tdID)
+		]]>
+	</select>
+	
+</sqlMap>

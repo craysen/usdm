@@ -8,7 +8,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>SDM</title>
+    <title>USP_SDM</title>
     
     <frameset rows="30,*" frameborder="0">
     	<frame name="TopFrame" src="<c:url value='/topmenu.do'/>" noresize />

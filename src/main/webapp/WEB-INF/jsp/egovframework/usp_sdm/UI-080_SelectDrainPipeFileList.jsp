@@ -71,7 +71,7 @@
     	
     	// 이미지인 경우
     	if (file_type == "I") {
-    		form.action = "<c:url value='/drainpipe/selectDrainPipeImgaeDetail.do?fileId=" + file_id + "'/>";
+    		form.action = "<c:url value='/drainpipe/selectDrainPipeImageDetail.do?fileId=" + file_id + "'/>";
     	}
     	// 동영상인 경우
     	else if (file_type == "V") {

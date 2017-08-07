@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.usdm.service.impl.CommonMapper">
+
+	<select id="selectSensorNodeGeometry" resultType="EgovMap">
+		<![CDATA[
+			SELECT gwID||':'||panID||':'||snID  AS id
+			     , latitude || ' ' || longitude AS geom
+			  FROM sdm_Node
+		]]>
+	</select>
+
+	<select id="selectSensorNodeSensingValue" resultType="EgovMap">
+		<![CDATA[
+			SELECT a.gwID||':'||a.panID||':'||a.snID  AS id
+			     , b.tdID
+				 , b.sensorType
+				 , b.sensingTime
+				 , b.sensingValue
+			  FROM sdm_Node a
+			     , sdm_SensingValueLatest b
+			 WHERE a.gwID  = b.gwID
+			   AND a.panID = b.panID
+			   AND a.snID  = b.snID
+		  ORDER BY b.gwID, b.panID, b.snID, TO_NUMBER(b.tdID)
+		]]>
+	</select>
+
+</mapper>

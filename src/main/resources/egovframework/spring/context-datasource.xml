@@ -13,7 +13,7 @@
     <!-- Kairos -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="kr.co.realtimetech.kairos.jdbc.kairosDriver"/>
-        <property name="url" value="jdbc:kairos://127.0.0.1:5000/usdm" />
+        <property name="url" value="jdbc:kairos://127.0.0.1:5000/usdm2" />
         <property name="username" value="root"/>
         <property name="password" value="root"/>
     </bean>

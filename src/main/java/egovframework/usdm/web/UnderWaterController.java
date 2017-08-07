@@ -181,9 +181,11 @@ public class UnderWaterController {
 	public List<UnderWaterVO> getUnderWaterVOFromText(MultipartFile file) throws Exception {
 		List<UnderWaterVO> underWaterVOList = new ArrayList<UnderWaterVO>();
 		
+		BufferedReader bufferedReader = null;
+		
 		try {
 			InputStream inputStream = file.getInputStream();
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 						
 			String line;
 			String delimiter = "\t";		// 필드 구분자
@@ -209,10 +211,17 @@ public class UnderWaterController {
 	            underWaterVOList.add(underWaterVO);
 			}
 			
-			bufferedReader.close();
-			
 		} catch (Exception e) {
 			e.printStackTrace();
+		
+		} finally {
+			if (bufferedReader != null) {
+				try {
+					bufferedReader.close();
+				} catch (Exception e) {
+                    e.printStackTrace();
+                }
+			}
 		}
 		
 		return underWaterVOList;

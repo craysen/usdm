@@ -17,6 +17,7 @@ package egovframework.usdm.service;
 
 public class SNGatewayVO extends UsdmDefaultVO {
 
+	private String 	GID;
 	private String 	gwID;
 	private String 	url;
 	private String 	manufacturer;
@@ -37,8 +38,17 @@ public class SNGatewayVO extends UsdmDefaultVO {
 	private int		monitoringPeriod;
 	private String 	statusCode;
 	private int		deleteCode;
+	private String	nickName;
 	private String 	newGwID;
-	
+	private String 	X;
+	private String 	Y;
+
+	public String getGID() {
+		return GID;
+	}
+	public void setGID(String gID) {
+		GID = gID;
+	}
 	public String getGwID() {
 		return gwID;
 	}
@@ -163,11 +173,29 @@ public class SNGatewayVO extends UsdmDefaultVO {
 	public void setDeleteCode(int deleteCode) {
 		this.deleteCode = deleteCode;
 	}
+	public String getNickName() {
+		return nickName;
+	}
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
 	public String getNewGwID() {
 		return newGwID;
 	}
 	public void setNewGwID(String newGwID) {
 		this.newGwID = newGwID;
+	}
+	public String getX() {
+		return X;
+	}
+	public void setX(String x) {
+		X = x;
+	}
+	public String getY() {
+		return Y;
+	}
+	public void setY(String y) {
+		Y = y;
 	}
 	
 }

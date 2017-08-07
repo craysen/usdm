@@ -141,4 +141,45 @@ public class DrainPipeServiceImpl extends EgovAbstractServiceImpl implements Dra
 		return drainPipeDAO.selectDrainPipeImageList(usdmSearchVO);
 	}
 
+	@Override
+	public List<?> selectDrainManholeGeometry(UsdmDefaultVO usdmSearchVO) throws Exception {
+		return drainPipeDAO.selectDrainManholeGeometry(usdmSearchVO);
+	}
+	@Override
+	public List<?> selectDrainPipeGeometry(UsdmDefaultVO usdmSearchVO) throws Exception {
+		return drainPipeDAO.selectDrainPipeGeometry(usdmSearchVO);
+	}
+	
+	@Override
+	public void insertDrainAccident(DrainPipeAccidentVO vo) throws Exception {
+		try {
+			LOGGER.debug(vo.toString());
+			drainPipeDAO.insertDrainAccident(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public List<?> selectDrainAccidentList(UsdmDefaultVO usdmSearchVO) throws Exception {
+		return drainPipeDAO.selectDrainAccidentList(usdmSearchVO);
+	}
+
+	@Override
+	public DrainPipeAccidentVO selectDrainAccidentDetail(DrainPipeAccidentVO accidentVO) throws Exception {
+		DrainPipeAccidentVO resultVO = new DrainPipeAccidentVO();
+		
+		try {
+			resultVO = drainPipeDAO.selectDrainAccidentDetail(accidentVO);
+			
+			if (resultVO == null)
+				throw processException("info.nodata.msg");
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return resultVO;
+	}
+
 }

@@ -26,10 +26,13 @@
     function form_onLoad()
     {
 		var form = document.detailForm;
+		
+		/*
 		form.gwID.value = "1";
 		form.panID.value = "1";
 		form.snID.value = "1";
 		form.tdID.value = "1";
+		*/
 		
 		return;
     }

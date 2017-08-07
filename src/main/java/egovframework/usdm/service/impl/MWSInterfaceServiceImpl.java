@@ -91,6 +91,16 @@ public class MWSInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 	}
 	
 	@Override
+	public void insertGatewayByID(SNGatewayVO vo) throws Exception {
+		try {
+			LOGGER.debug(vo.toString());
+			mwsInterfaceDAO.insertGatewayByID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
 	public void insertPan(SNPanVO vo) throws Exception {
 		try {
 			LOGGER.debug(vo.toString());
@@ -101,10 +111,30 @@ public class MWSInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 	}
 	
 	@Override
+	public void insertPanByID(SNPanVO vo) throws Exception {
+		try {
+			LOGGER.debug(vo.toString());
+			mwsInterfaceDAO.insertPanByID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
 	public void insertNode(SNNodeVO vo) throws Exception {
 		try {
 			LOGGER.debug(vo.toString());
 			mwsInterfaceDAO.insertNode(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void insertNodeByID(SNNodeVO vo) throws Exception {
+		try {
+			LOGGER.debug(vo.toString());
+			mwsInterfaceDAO.insertNodeByID(vo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -165,6 +195,45 @@ public class MWSInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 		
 		try {
 			result = mwsInterfaceDAO.updateTransducerAddress(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int updateGatewayAddressByGID(SNGatewayVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.updateGatewayAddressByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int updatePanAddressByGID(SNPanVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.updatePanAddressByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int updateNodeAddressByGID(SNNodeVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.updateNodeAddressByGID(vo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -264,6 +333,45 @@ public class MWSInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 	}
 	
 	@Override
+	public int deleteGatewayByGID(SNGatewayVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.deleteGatewayByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int deletePanByGID(SNPanVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.deletePanByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
+	@Override
+	public int deleteNodeByGID(SNNodeVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.deleteNodeByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Override
 	public int insertSensingValue(SNSensingValueVO vo) throws Exception {
 		int result = 0;
 		
@@ -278,11 +386,78 @@ public class MWSInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 	}
 	
 	@Override
+	public int insertSensingValueByGID(SNSensingValueVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			LOGGER.debug(vo.toString());
+			result = mwsInterfaceDAO.insertSensingValueByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public void checkSensingValueThreshold(SNSensingValueVO vo) throws Exception {
+		try {
+			LOGGER.debug(vo.toString());
+			mwsInterfaceDAO.checkSensingValueThreshold(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void checkLeakageThreshold(SNSensingValueVO vo) throws Exception {
+		try {
+			LOGGER.debug(vo.toString());
+			mwsInterfaceDAO.checkLeakageThreshold(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void insertBinaryValue(SNSensingValueVO vo) throws Exception {
+		try {
+			LOGGER.debug(vo.toString());
+			mwsInterfaceDAO.insertBinaryValue(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void insertBinaryValueByGID(SNSensingValueVO vo) throws Exception {
+		try {
+			LOGGER.debug(vo.toString());
+			mwsInterfaceDAO.insertBinaryValueByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
 	public int updateActuationResult(SNTransducerVO vo) throws Exception {
 		int result = 0;
 		
 		try {
 			result = mwsInterfaceDAO.updateActuationResult(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int updateActuationResultByGID(SNTransducerVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.updateActuationResultByGID(vo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -342,6 +517,43 @@ public class MWSInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 	@Override
 	public int validateSessionKey(LoginSessionVO vo) throws Exception {
 		return mwsInterfaceDAO.validateSessionKey(vo);
+	}
+	
+	@Override
+	public int updateGatewayStatusByGID(SNGatewayVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.updateGatewayStatusByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	@Override
+	public int updatePanStatusByGID(SNPanVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.updatePanStatusByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	@Override
+	public int updateNodeStatusByGID(SNNodeVO vo) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mwsInterfaceDAO.updateNodeStatusByGID(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 
 }

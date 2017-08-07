@@ -5,13 +5,23 @@
 
 	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
 	
-	<typeAlias alias="loginSessionVO" 	type="egovframework.usdm.service.LoginSessionVO"/>
-	<typeAlias alias="snGatewayVO"    	type="egovframework.usdm.service.SNGatewayVO"/>
-	<typeAlias alias="snPanVO"        	type="egovframework.usdm.service.SNPanVO"/>
-	<typeAlias alias="snNodeVO"       	type="egovframework.usdm.service.SNNodeVO"/>
-	<typeAlias alias="snTransducerVO" 	type="egovframework.usdm.service.SNTransducerVO"/>
-	<typeAlias alias="snSensingValueVO" type="egovframework.usdm.service.SNSensingValueVO"/>
-	<typeAlias alias="snAssessValueVO" 	type="egovframework.usdm.service.SNAssessValueVO"/>
+	<typeAlias alias="loginSessionVO" 				type="egovframework.usdm.service.LoginSessionVO"/>
+	<typeAlias alias="snGatewayVO"    				type="egovframework.usdm.service.SNGatewayVO"/>
+	<typeAlias alias="snPanVO"        				type="egovframework.usdm.service.SNPanVO"/>
+	<typeAlias alias="snNodeVO"       				type="egovframework.usdm.service.SNNodeVO"/>
+	<typeAlias alias="snTransducerVO" 				type="egovframework.usdm.service.SNTransducerVO"/>
+	<typeAlias alias="snSensingValueVO" 			type="egovframework.usdm.service.SNSensingValueVO"/>
+	<typeAlias alias="snAssessValueVO" 				type="egovframework.usdm.service.SNAssessValueVO"/>
+	<typeAlias alias="snSriGridVO" 					type="egovframework.usdm.service.SNSriGridVO"/>
+	<typeAlias alias="snAccidentVO" 				type="egovframework.usdm.service.SNAccidentVO"/>
+	<typeAlias alias="snGeoRelationVO" 				type="egovframework.usdm.service.SNGeoRelationVO"/>
+	<typeAlias alias="snSriVO" 						type="egovframework.usdm.service.SNSriVO"/>
+	<typeAlias alias="snFirmwareVO" 				type="egovframework.usdm.service.SNFirmwareVO"/>
+	<typeAlias alias="snFirmwareUpdateHistoryVO"	type="egovframework.usdm.service.SNFirmwareUpdateHistoryVO"/>
+	<typeAlias alias="geoVideoRelVO" 				type="egovframework.usdm.service.GeoVideoRelVO"/>
+	<typeAlias alias="manholePipeRelVO" 			type="egovframework.usdm.service.ManholePipeRelVO"/>
+	<typeAlias alias="rfidVO" 						type="egovframework.usdm.service.RfidVO"/>
+	<typeAlias alias="userDefinedMessageVO" 		type="egovframework.usdm.service.UserDefinedMessageVO"/>
 
 	<resultMap id="loginSession" class="loginSessionVO">
 		<result property="userID" column="userID"/>
@@ -21,6 +31,7 @@
 	
 	<resultMap id="snGateway" class="snGatewayVO">
 		<result property="gwID" column="gwID"/>
+		<result property="GID" column="GID"/>
 		<result property="url" column="url"/>
 		<result property="manufacturer" column="manufacturer"/>
 		<result property="productNo" column="productNo"/>
@@ -42,6 +53,8 @@
 	</resultMap>
 
 	<resultMap id="snPan" class="snPanVO">
+		<result property="gwGID" column="gwGID"/>
+		<result property="GID" column="GID"/>
 		<result property="gwID" column="gwID"/>
 		<result property="panID" column="panID"/>
 		<result property="topology" column="topology"/>
@@ -57,6 +70,9 @@
 	</resultMap>
 	
 	<resultMap id="snNode" class="snNodeVO">
+		<result property="gwGID" column="gwGID"/>
+		<result property="panGID" column="panGID"/>
+		<result property="GID" column="GID"/>
 		<result property="gwID" column="gwID"/>
 		<result property="panID" column="panID"/>
 		<result property="snID" column="snID"/>
@@ -79,6 +95,10 @@
 	</resultMap>
 	
 	<resultMap id="snTransducer" class="snTransducerVO">
+		<result property="gwGID" column="gwGID"/>
+		<result property="panGID" column="panGID"/>
+		<result property="snGID" column="snGID"/>
+		<result property="GID" column="GID"/>
 		<result property="gwID" column="gwID"/>
 		<result property="panID" column="panID"/>
 		<result property="snID" column="snID"/>
@@ -101,6 +121,7 @@
 	</resultMap>
 	
 	<resultMap id="snSensingValue" class="SNSensingValueVO">
+		<result property="snGID" column="snGID"/>
 		<result property="gwID" column="gwID"/>
 		<result property="panID" column="panID"/>
 		<result property="snID" column="snID"/>
@@ -110,6 +131,7 @@
 		<result property="sensorType" column="sensorType"/>
 		<result property="sensingValue" column="sensingValue"/>
 		<result property="additionalCondition" column="additionalCondition"/>
+		<result property="GID" column="GID"/>
 	</resultMap>
 	
 	<resultMap id="snAssessValue" class="SNAssessValueVO">
@@ -120,6 +142,87 @@
 		<result property="longitude" column="longitude"/>
 		<result property="latitude" column="latitude"/>
 		<result property="altitude" column="altitude"/>
+	</resultMap>
+	
+	<resultMap id="snSriGrid" class="SNSriGridVO">
+		<result property="cellID" column="cellID"/>
+		<result property="minX" column="minX"/>
+		<result property="minY" column="minY"/>
+		<result property="maxX" column="maxX"/>
+		<result property="maxY" column="maxY"/>
+		<result property="waterSri" column="waterSri"/>
+		<result property="drainSri" column="drainSri"/>
+		<result property="subwaySri" column="subwaySri"/>
+		<result property="geologySri" column="geologySri"/>
+		<result property="lastUpdate" column="lastUpdate"/>
+		<result property="minValue" column="minValue"/>
+	</resultMap>
+	
+	<resultMap id="snAccident" class="SNAccidentVO">
+		<result property="ftrCde" column="ftrCde"/>
+		<result property="ftrIdn" column="ftrIdn"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="altitude" column="altitude"/>
+		<result property="address1" column="address1"/>
+		<result property="address2" column="address2"/>
+		<result property="address3" column="address3"/>
+		<result property="address4" column="address4"/>
+		<result property="accidentTime" column="accidentTime"/>
+		<result property="accidentDepth" column="accidentDepth"/>
+		<result property="accidentDegree" column="accidentDegree"/>
+		<result property="accidentType" column="accidentType"/>
+		<result property="accidentShape" column="accidentShape"/>
+		<result property="accidentDesc" column="accidentDesc"/>
+		<result property="geoTable" column="geoTable"/>
+		<result property="accidentTable" column="accidentTable"/>
+	</resultMap>
+	
+	<resultMap id="snGeoRelation" class="SNGeoRelationVO">
+		<result property="GID" column="GID"/>
+		<result property="startTime" column="startTime"/>
+		<result property="endTime" column="endTime"/>
+		<result property="ftrCde" column="ftrCde"/>
+		<result property="ftrIdn" column="ftrIdn"/>
+		<result property="gwID" column="gwID"/>
+		<result property="panID" column="panID"/>
+		<result property="snID" column="snID"/>
+		<result property="reason" column="reason"/>
+		<result property="sensingTime" column="sensingTime"/>
+		<result property="sensorType" column="sensorType"/>
+		<result property="sensingValue" column="sensingValue"/>
+	</resultMap>
+	
+	<resultMap id="snSri" class="SNSriVO">
+		<result property="geoID" column="geoID"/>
+		<result property="roadType" column="roadType"/>
+		<result property="complaintCount" column="complaintCount"/>
+		<result property="recordPeriod" column="recordPeriod"/>
+		<result property="leakSignal" column="leakSignal"/>
+		<result property="pipeMove" column="pipeMove"/>
+		<result property="internalState" column="internalState"/>
+		<result property="emptySpace" column="emptySpace"/>
+	</resultMap>
+	
+	<resultMap id="snFirmware" class="SNFirmwareVO">
+		<result property="firmwareID" column="firmwareID"/>
+		<result property="targetDeviceType" column="targetDeviceType"/>
+		<result property="manufacturerID" column="manufacturerID"/>
+		<result property="majorVersion" column="majorVersion"/>
+		<result property="minorVersion" column="minorVersion"/>
+		<result property="description" column="description"/>
+		<result property="dataSize" column="dataSize"/>
+		<result property="binaryData" column="binaryData"/>
+	</resultMap>
+	
+	<resultMap id="snFirmwareUpdateHistory" class="SNFirmwareUpdateHistoryVO">
+		<result property="firmwareID" column="firmwareID"/>
+		<result property="targetID" column="targetID"/>
+		<result property="transmissionTime" column="transmissionTime"/>
+		<result property="transmissionResult" column="transmissionResult"/>
+		<result property="updateType" column="updateType"/>
+		<result property="updateTime" column="updateTime"/>
+		<result property="recommended1BlockSize" column="recommended1BlockSize"/>
 	</resultMap>
 	
 	<select id="apiInterfaceDAO.validateSessionKey" parameterClass="loginSessionVO" resultClass="egovMap">
@@ -156,6 +259,53 @@
 		]]>
 	</select>
 	
+	<select id="apiInterfaceDAO.selectSensingValueLatest" parameterClass="snSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID || ':' || panID || ':' || snID || ':' || tdID AS tdAddress
+				 , sensingTime 
+				 , sensorType
+				 , sensingValue
+			  FROM sdm_SensingValueLatest
+			 WHERE ('FF' = #gwID#  OR gwID  = #gwID#)
+			   AND ('FF' = #panID# OR panID = #panID#)
+			   AND ('FF' = #snID#  OR snID  = #snID#)
+			   AND ('FF' = #tdID#  OR tdID  = #tdID#)
+			   AND sensorType  = #sensorType#
+			   $additionalCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectSensingValueQueryByID" parameterClass="snSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.snGID			AS snGID
+				 , a.sensingTime	AS sensingTime
+				 , a.sensorType		AS sensorType
+				 , a.sensingValue	AS sensingValue
+			  FROM sdm_SensingValue a
+			     , sdm_Node b
+			 WHERE a.snGID    	 = #GID#
+			   AND a.sensorType  = #sensorType#
+			   AND a.snGID		 = b.GID
+			   AND a.sensingTime = (SELECT MAX(sensingTime)
+									  FROM sdm_SensingValue
+									 WHERE snGID = a.snGID )
+			   $additionalCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectSensingValueLatestByID" parameterClass="snSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT snGID
+				 , sensingTime
+				 , sensorType
+				 , sensingValue
+			  FROM sdm_SensingValueLatest
+			 WHERE snGID      = #GID#
+			   AND sensorType = #sensorType#
+			   $additionalCondition$
+		]]>
+	</select>
+	
 	<select id="apiInterfaceDAO.selectSensingValueSpatioTemporal" parameterClass="snSensingValueVO" resultClass="egovMap">
 		<![CDATA[
 			SELECT a.gwID || ':' || a.panID || ':' || a.snID || ':' || a.tdID AS tdAddress
@@ -170,11 +320,174 @@
 			   AND ('FF' = #tdID#  OR a.tdID  = #tdID#)
 			   AND a.sensorType  = #sensorType#
 			   AND a.gwID		 = b.gwID
-			   and a.panID		 = b.panID
-			   and a.snID		 = b.snID
+			   AND a.panID		 = b.panID
+			   AND a.snID		 = b.snID
 			   $additionalCondition$
 			   $temporalCondition$
 			   $spatialCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectSensingValueSpatioTemporalByID" parameterClass="snSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.snGID			AS snGID
+				 , a.sensingTime 	AS sensingTime 
+				 , a.sensorType 	AS sensorType
+				 , a.sensingValue 	AS sensingValue
+			  FROM sdm_SensingValue a
+			     , sdm_Node b
+			 WHERE a.snGID 		 = #GID#
+			   AND a.sensorType  = #sensorType#
+			   AND a.snGID		 = b.GID
+			   $additionalCondition$
+			   $temporalCondition$
+			   $spatialCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectAccident" parameterClass="SNAccidentVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT pipe_ftr_idn AS geoID
+			     , longitude
+			     , latitude
+			     , ST_X(coordinate) AS x
+			     , ST_Y(coordinate) AS y
+			     , accidentTime
+			     , accidentType
+			     , accidentShape
+			     , accidentDesc
+			  FROM $accidentTable$
+			 WHERE pipe_ftr_idn = #ftrIdn#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectAccidentByRegion" parameterClass="SNAccidentVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT pipe_ftr_idn AS geoID
+			     , longitude
+			     , latitude
+			     , ST_X(coordinate) AS x
+			     , ST_Y(coordinate) AS y
+			     , accidentTime
+			     , accidentType
+			     , accidentShape
+			     , accidentDesc
+			  FROM $accidentTable$
+			 $spatialCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectValueByGeoObject" parameterClass="SNGeoRelationVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.ftr_idn     AS geoID
+			     , a.nodeGID     AS snID
+			     , b.sensorType
+			     , b.sensingTime
+			     , b.sensingValue
+			  FROM sdm_NodeGeoRel a
+			     , sdm_SensingValue b
+			 WHERE a.ftr_idn      = #ftrIdn#
+			   AND a.ftr_cde = (SELECT ftr_cde FROM $geoTable$ WHERE ftr_idn = #ftrIdn#)
+			   AND a.nodeGID      = b.snGID
+			   AND b.sensorType   = #sensorType#
+			   AND b.sensingTime >= #startTime#
+			   AND b.sensingTime <= #endTime#
+			   $additionalCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectSewerMovingObject" parameterClass="geoVideoRelVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.videoID
+			     , a.manhole_ftr_idn AS mhID
+			     , a.directionAngle  AS direction
+			     , TO_CHAR(a.recStartTime) AS startTime
+			     , TO_CHAR(a.recEndTime)   AS endTime
+			     , a.filePath
+			     , a.fileName
+			     , a.fileRealName
+			     , a.distance
+			  FROM sdm_DrainPipeVideo a
+			     , sdm_DrainPipeVideoRel b
+			 WHERE a.videoID       = b.videoID
+			   AND b.ftr_idn       = #ftrIdn#
+			   AND a.recStartTime >= #startTime#
+			   AND a.recEndTime   <= #endTime#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectSewerVideoGeoID" parameterClass="geoVideoRelVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			  FROM sdm_DrainPipeVideoRel
+			 WHERE videoID = #videoID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectSubwayMovingObject" parameterClass="geoVideoRelVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.videoID
+			     , ''                AS mhID
+			     , ''                AS direction
+			     , TO_CHAR(a.recStartTime) AS startTime
+			     , TO_CHAR(a.recEndTime)   AS endTime
+			     , a.filePath
+			     , a.fileName
+			     , a.fileRealName
+			     , a.distance
+			  FROM sdm_RailroadVideo a
+			     , sdm_RailroadVideoRel b
+			 WHERE a.videoID       = b.videoID
+			   AND b.ftr_idn       = #ftrIdn#
+			   AND a.recStartTime >= #startTime#
+			   AND a.recEndTime   <= #endTime#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectSubwayVideoGeoID" parameterClass="geoVideoRelVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			  FROM sdm_RailroadVideoRel
+			 WHERE videoID = #videoID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectSriGrid" parameterClass="SNSriGridVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT cellID
+			     , NVL(waterSri,0)       AS waterSri
+			     , NVL(drainSri,0)       AS drainSri
+			     , NVL(subwaySri,0)      AS subwaySri
+			     , NVL(stationSri,0)     AS stationSri
+			     , NVL(geologySri,0)     AS geologySri
+			     , NVL(watergrade,' ')   AS watergrade
+				 , NVL(draingrade,' ')   AS draingrade
+				 , NVL(subwaygrade,' ')  AS subwaygrade
+				 , NVL(stationgrade,' ') AS stationgrade
+				 , NVL(geologygrade,' ') AS geologygrade
+			  FROM sdm_SRIGrid
+			 WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON(($minX$ $minY$, $maxX$ $minY$, $maxX$ $maxY$, $minX$ $maxY$, $minX$ $minY$))',0), geom) = 1
+			   AND LEAST(NVL(waterSri,999),NVL(drainSri,999),NVL(subwaySri,999),NVL(stationSri,999),NVL(geologySri,999)) >= $minValue$
+			   AND (waterSri IS NOT NULL
+			     OR drainSri IS NOT NULL
+			     OR subwaySri IS NOT NULL
+			     OR stationSri IS NOT NULL
+			     OR geologySri IS NOT NULL )
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectXSriGrid" parameterClass="SNSriGridVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT cellID
+			     , NVL(waterSri,0)       AS waterSri
+			     , NVL(drainSri,0)       AS drainSri
+			     , NVL(subwaySri,0)      AS subwaySri
+			     , NVL(stationSri,0)     AS stationSri
+			     , NVL(geologySri,0)     AS geologySri
+			     , NVL(watergrade,' ')   AS watergrade
+				 , NVL(draingrade,' ')   AS draingrade
+				 , NVL(subwaygrade,' ')  AS subwaygrade
+				 , NVL(stationgrade,' ') AS stationgrade
+				 , NVL(geologygrade,' ') AS geologygrade
+			  FROM sdm_SRIGrid
+			 WHERE cellID IN ($cellIDList$)
 		]]>
 	</select>
 	
@@ -182,41 +495,54 @@
 		<![CDATA[
 			SELECT gwID
 			  FROM sdm_Gateway
+			 WHERE deleteCode = 0
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectGatewayIDList2" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+			  FROM sdm_Gateway
+			 WHERE GID IS NOT NULL
+			   AND deleteCode = 0
 		]]>
 	</select>
 	
 	<select id="apiInterfaceDAO.selectGatewayDescription" parameterClass="SNGatewayVO" resultClass="egovMap">
 		<![CDATA[
-			SELECT gwID
+			SELECT GID, gwID
 				 , url, manufacturer, productNo, location
 				 , longitude, latitude, altitude, dateTime
 				 , supportedTransportProtocolList, supportedTransportConnectionControlList
 				 , supportedTransportDirectionList, supportedOperationList
 				 , supportedAttributeList, supportedSensorServiceCenterList
-				 , panIDList, monitoringMode, monitoringPeriod
+				 , panIDList, monitoringMode, monitoringPeriod, nickName
 			  FROM sdm_Gateway
 			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+			   AND deleteCode = 0
 		]]>
 	</select>
 	<select id="apiInterfaceDAO.selectPanDescriptionByGwID" parameterClass="SNGatewayVO" resultClass="egovMap">
 		<![CDATA[
-			SELECT gwID, panID
+			SELECT GID, gwID, panID
 				 , topology, protocolStack, panChannel, supportedChannelList
 				 , supportedTopologyList, supportedProtocolStackList, supportedOperationList
-				 , supportedAttributeList, snIDList
+				 , supportedAttributeList, snIDList, nickName
 			  FROM sdm_Pan
 			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+			   AND deleteCode = 0
 		]]>
 	</select>
 	<select id="apiInterfaceDAO.selectNodeDescriptionByGwID" parameterClass="SNGatewayVO" resultClass="egovMap">
 		<![CDATA[
-			SELECT gwID, panID, snID
+			SELECT GID, gwID, panID, snID
 				 , globalID, manufacturer, productNo, location
 				 , longitude, latitude, altitude, role, roleList
 				 , parentNodeIDList, supportedOperationList, supportedAttributeList
-				 , tdIDList, monitoringMode, monitoringPeriod
+				 , tdIDList, monitoringMode, monitoringPeriod, nickName
 			  FROM sdm_Node
 			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+			   AND deleteCode = 0
 		]]>
 	</select>
 	<select id="apiInterfaceDAO.selectTransducerDescriptionByGwID" parameterClass="SNGatewayVO" resultClass="egovMap">
@@ -224,33 +550,36 @@
 			SELECT gwID, panID, snID, tdID
 				 , manufacturer, productNo, transducerCategory, transducerType
 				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
-				 , supportedOperationList, supportedAttributeList
+				 , supportedOperationList, supportedAttributeList, nickName
 			  FROM sdm_Transducer
 			 WHERE ('FF' = #gwID# OR gwID = #gwID#)
+			   AND deleteCode = 0
 		]]>
 	</select>
 	
 	<select id="apiInterfaceDAO.selectPanDescription" parameterClass="SNPanVO" resultClass="egovMap">
 		<![CDATA[
-			SELECT gwID, panID
+			SELECT GID, gwID, panID
 				 , topology, protocolStack, panChannel, supportedChannelList
 				 , supportedTopologyList, supportedProtocolStackList, supportedOperationList
-				 , supportedAttributeList, snIDList
+				 , supportedAttributeList, snIDList, nickName
 			  FROM sdm_Pan
 			 WHERE gwID  = #gwID#
 			   AND panID = #panID#
+			   AND deleteCode = 0
 		]]>
 	</select>
 	<select id="apiInterfaceDAO.selectNodeDescriptionByPanID" parameterClass="SNPanVO" resultClass="egovMap">
 		<![CDATA[
-			SELECT gwID, panID, snID
+			SELECT GID, gwID, panID, snID
 				 , globalID, manufacturer, productNo, location
 				 , longitude, latitude, altitude, role, roleList
 				 , parentNodeIDList, supportedOperationList, supportedAttributeList
-				 , tdIDList, monitoringMode, monitoringPeriod
+				 , tdIDList, monitoringMode, monitoringPeriod, nickName
 			  FROM sdm_Node
 			 WHERE gwID  = #gwID#
 			   AND panID = #panID#
+			   AND deleteCode = 0
 		]]>
 	</select>
 	<select id="apiInterfaceDAO.selectTransducerDescriptionByPanID" parameterClass="SNPanVO" resultClass="egovMap">
@@ -258,24 +587,26 @@
 			SELECT gwID, panID, snID, tdID
 				 , manufacturer, productNo, transducerCategory, transducerType
 				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
-				 , supportedOperationList, supportedAttributeList
+				 , supportedOperationList, supportedAttributeList, nickName
 			  FROM sdm_Transducer
 			 WHERE gwID  = #gwID#
 			   AND panID = #panID#
+			   AND deleteCode = 0
 		]]>
 	</select>
 	
 	<select id="apiInterfaceDAO.selectNodeDescription" parameterClass="SNNodeVO" resultClass="egovMap">
 		<![CDATA[
-			SELECT gwID, panID, snID
+			SELECT GID, gwID, panID, snID
 				 , globalID, manufacturer, productNo, location
 				 , longitude, latitude, altitude, role, roleList
 				 , parentNodeIDList, supportedOperationList, supportedAttributeList
-				 , tdIDList, monitoringMode, monitoringPeriod
+				 , tdIDList, monitoringMode, monitoringPeriod, nickName
 			  FROM sdm_Node
 			 WHERE gwID  = #gwID#
 			   AND panID = #panID#
 			   AND snID  = #snID#
+			   AND deleteCode = 0
 		]]>
 	</select>
 	<select id="apiInterfaceDAO.selectTransducerDescriptionBySnID" parameterClass="SNNodeVO" resultClass="egovMap">
@@ -283,11 +614,12 @@
 			SELECT gwID, panID, snID, tdID
 				 , manufacturer, productNo, transducerCategory, transducerType
 				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
-				 , supportedOperationList, supportedAttributeList
+				 , supportedOperationList, supportedAttributeList, nickName
 			  FROM sdm_Transducer
 			 WHERE gwID  = #gwID#
 			   AND panID = #panID#
 			   AND snID  = #snID#
+			   AND deleteCode = 0
 		]]>
 	</select>
 	
@@ -296,12 +628,133 @@
 			SELECT gwID, panID, snID, tdID
 				 , manufacturer, productNo, transducerCategory, transducerType
 				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
-				 , supportedOperationList, supportedAttributeList
+				 , supportedOperationList, supportedAttributeList, nickName
 			  FROM sdm_Transducer
 			 WHERE gwID  = #gwID#
 			   AND panID = #panID#
 			   AND snID  = #snID#
 			   AND tdID  = #tdID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectGatewayDescriptionByGID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID, gwID
+				 , url, manufacturer, productNo, location
+				 , longitude, latitude, altitude, dateTime
+				 , supportedTransportProtocolList, supportedTransportConnectionControlList
+				 , supportedTransportDirectionList, supportedOperationList
+				 , supportedAttributeList, supportedSensorServiceCenterList
+				 , panIDList, monitoringMode, monitoringPeriod, nickName
+			  FROM sdm_Gateway
+			 WHERE GID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectPanDescriptionByGwGID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID, gwID, panID
+				 , topology, protocolStack, panChannel, supportedChannelList
+				 , supportedTopologyList, supportedProtocolStackList, supportedOperationList
+				 , supportedAttributeList, snIDList, nickName
+			  FROM sdm_Pan
+			 WHERE gwGID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectNodeDescriptionByGwGID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID, gwID, panID, snID
+				 , globalID, manufacturer, productNo, location
+				 , longitude, latitude, altitude, role, roleList
+				 , parentNodeIDList, supportedOperationList, supportedAttributeList
+				 , tdIDList, monitoringMode, monitoringPeriod, nickName
+			  FROM sdm_Node
+			 WHERE gwGID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerDescriptionByGwGID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID, tdID
+				 , manufacturer, productNo, transducerCategory, transducerType
+				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
+				 , supportedOperationList, supportedAttributeList, nickName
+			  FROM sdm_Transducer
+			 WHERE gwGID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectPanDescriptionByGID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID, gwID, panID
+				 , topology, protocolStack, panChannel, supportedChannelList
+				 , supportedTopologyList, supportedProtocolStackList, supportedOperationList
+				 , supportedAttributeList, snIDList, nickName
+			  FROM sdm_Pan
+			 WHERE GID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectNodeDescriptionByPanGID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID, gwID, panID, snID
+				 , globalID, manufacturer, productNo, location
+				 , longitude, latitude, altitude, role, roleList
+				 , parentNodeIDList, supportedOperationList, supportedAttributeList
+				 , tdIDList, monitoringMode, monitoringPeriod, nickName
+			  FROM sdm_Node
+			 WHERE panGID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerDescriptionByPanGID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID, tdID
+				 , manufacturer, productNo, transducerCategory, transducerType
+				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
+				 , supportedOperationList, supportedAttributeList, nickName
+			  FROM sdm_Transducer
+			 WHERE panGID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectNodeDescriptionByGID" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID, gwID, panID, snID
+				 , globalID, manufacturer, productNo, location
+				 , longitude, latitude, altitude, role, roleList
+				 , parentNodeIDList, supportedOperationList, supportedAttributeList
+				 , tdIDList, monitoringMode, monitoringPeriod, nickName
+			  FROM sdm_Node
+			 WHERE GID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerDescriptionBySnGID" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID, tdID
+				 , manufacturer, productNo, transducerCategory, transducerType
+				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
+				 , supportedOperationList, supportedAttributeList, nickName
+			  FROM sdm_Transducer
+			 WHERE snGID = #GID#
+			   AND deleteCode = 0
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectTransducerDescriptionByGID" parameterClass="SNTransducerVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT gwID, panID, snID, tdID
+				 , manufacturer, productNo, transducerCategory, transducerType
+				 , unit, dataType, rangeMin, rangeMax, rangeOffset, level
+				 , supportedOperationList, supportedAttributeList, nickName
+			  FROM sdm_Transducer
+			 WHERE GID = #GID#
+			   AND deleteCode = 0
 		]]>
 	</select>
 	
@@ -422,6 +875,1379 @@
 		]]>
 	</select>
 	
+	<select id="apiInterfaceDAO.selectGatewayStatusByGID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+			     , statusCode
+			  FROM sdm_Gateway
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectPanStatusByGwGID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Pan
+			 WHERE gwGID = #GID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectNodeStatusByGwGID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Node
+			 WHERE gwGID = #GID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerStatusByGwGID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Transducer
+			 WHERE gwGID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectPanStatusByGID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Pan
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectNodeStatusByPanGID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Node
+			 WHERE panGID = #GID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerStatusByPanGID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Transducer
+			 WHERE panGID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectNodeStatusByGID" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Node
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectTransducerStatusBySnGID" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Transducer
+			 WHERE snGID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectTransducerStatusByGID" parameterClass="SNTransducerVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT GID
+				 , statusCode
+			  FROM sdm_Transducer
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectConnectivity" parameterClass="SNGeoRelationVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.nodeGID AS snID
+				 , a.ftr_idn AS geoID
+				 , a.startTime
+				 , a.endTime
+				 , a.gwID || ':' || a.panID || ':' || a.snID AS snAddress
+			  FROM sdm_NodeGeoRel a
+			     , sdm_Node b
+			 WHERE ('' = #GID#    OR a.nodeGID = #GID#)
+			   AND ('' = #ftrIdn# OR a.ftr_idn = #ftrIdn#)
+			   AND a.nodeGID = b.GID
+			   $temporalCondition$
+		]]>
+	</select>
+
+	<select id="apiInterfaceDAO.selectExistingNodeByRel" parameterClass="SNGeoRelationVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_Node
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingGeoByRel" parameterClass="SNGeoRelationVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM $geoTable$
+			 WHERE ftr_idn = #ftrIdn#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingNodeGeoRelByGeoID" parameterClass="SNGeoRelationVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_NodeGeoRel
+			 WHERE ftr_idn = #ftrIdn#
+			   AND endTime = #endTime#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingNodeGeoRelBySnGID" parameterClass="SNGeoRelationVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_NodeGeoRel
+			 WHERE nodeGID = #GID#
+			   AND endTime = #endTime#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectSnPosition" parameterClass="SNGeoRelationVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ST_X(position) AS x
+				 , ST_Y(position) AS y
+			  FROM sdm_Node
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectGeoPosition" parameterClass="SNGeoRelationVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ST_X(geom) AS x
+				 , ST_Y(geom) AS y
+			  FROM $geoTable$
+			 WHERE ftr_idn = #ftrIdn#
+		]]>
+	</select>
+		
+	<update id="apiInterfaceDAO.updateNodeGeoRelByGeoID" parameterClass="SNGeoRelationVO">
+		<![CDATA[
+			UPDATE sdm_NodeGeoRel
+			   SET nodeGID  = #GID#
+			     , gwID     = (SELECT gwID  FROM sdm_Node WHERE GID = #GID#)
+			     , panID    = (SELECT panID FROM sdm_Node WHERE GID = #GID#)
+			     , snID     = (SELECT snID  FROM sdm_Node WHERE GID = #GID#)
+			     , position = (SELECT ST_POINTFROMTEXT('POINT($X$ $Y$)',0) FROM dual)
+			 WHERE ftr_idn = #ftrIdn#
+			   AND endTime = #endTime#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateNodeGeoRelBySnGID" parameterClass="SNGeoRelationVO">
+		<![CDATA[
+			UPDATE sdm_NodeGeoRel
+			   SET ftr_cde = (SELECT ftr_cde FROM $geoTable$ WHERE ftr_idn = #ftrIdn#)
+			     , ftr_idn = #ftrIdn#
+			 WHERE nodeGID = #GID#
+			   AND endTime = #endTime#
+		]]>
+	</update>
+	
+	<insert id="apiInterfaceDAO.insertNodeGeoRelByGeoID" parameterClass="SNGeoRelationVO">
+		<![CDATA[
+			INSERT INTO sdm_NodeGeoRel (
+					nodeGID
+				  , startTime
+				  , endTime
+				  , ftr_cde
+				  , ftr_idn
+				  , gwID
+				  , panID
+				  , snID
+				  , position)
+			VALUES (#GID#
+				  , #currentTime#
+				  , #endTime#
+				  , (SELECT ftr_cde FROM $geoTable$ WHERE ftr_idn = #ftrIdn#)
+				  , #ftrIdn#
+				  , (SELECT gwID  FROM sdm_Node WHERE GID = #GID#)
+				  , (SELECT panID FROM sdm_Node WHERE GID = #GID#)
+				  , (SELECT snID  FROM sdm_Node WHERE GID = #GID#)
+				  , ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+				  )
+		]]>
+	</insert>
+	
+	<insert id="apiInterfaceDAO.insertNodeGeoRelBySnGID" parameterClass="SNGeoRelationVO">
+		<![CDATA[
+			INSERT INTO sdm_NodeGeoRel (
+					nodeGID
+				  , startTime
+				  , endTime
+				  , ftr_cde
+				  , ftr_idn
+				  , gwID
+				  , panID
+				  , snID
+				  , position)
+			VALUES (#GID#
+				  , #currentTime#
+				  , #endTime#
+				  , 'NOCDE'
+				  , #ftrIdn#
+				  , (SELECT gwID  FROM sdm_Node WHERE GID = #GID#)
+				  , (SELECT panID FROM sdm_Node WHERE GID = #GID#)
+				  , (SELECT snID  FROM sdm_Node WHERE GID = #GID#)
+				  , ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+				  )
+		]]>
+	</insert>
+	
+	<update id="apiInterfaceDAO.updateOldNodeGeoRelByGeoID" parameterClass="SNGeoRelationVO">
+		<![CDATA[
+			UPDATE sdm_NodeGeoRel
+			   SET endTime = #currentTime#
+			 WHERE ftr_idn = #ftrIdn#
+			   AND endTime = #endTime#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateOldNodeGeoRelBySnGID" parameterClass="SNGeoRelationVO">
+		<![CDATA[
+			UPDATE sdm_NodeGeoRel
+			   SET endTime = #currentTime#
+			 WHERE nodeGID = #GID#
+			   AND endTime = #endTime#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateSnAddressByRel" parameterClass="SNGeoRelationVO">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID      = #gwID#
+			     , panID     = #panID#
+			     , snID      = #snID#
+			     , longitude = #longitude#
+			     , latitude  = #latitude#
+			     , position  = ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+			 WHERE GID = #GID#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateTdAddressByRel" parameterClass="SNGeoRelationVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID  = #gwID#
+			     , panID = #panID#
+			     , snID  = #snID#
+			 WHERE snGID = #GID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectExistingGateway" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Gateway
+			 WHERE gwID = #gwID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingGatewayByID" parameterClass="SNGatewayVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Gateway
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingPan" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Pan
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingPanByID" parameterClass="SNPanVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Pan
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingNode" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Node
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingNodeByID" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Node
+			 WHERE GID = #GID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingTransducer" parameterClass="SNTransducerVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_Transducer
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</select>
+	
+	<update id="apiInterfaceDAO.updateGwDescription" parameterClass="SNGatewayVO">
+		<![CDATA[
+			UPDATE sdm_Gateway
+			   SET gwID 		= #newGwID#
+				 , nickName 	= #nickName#
+				 , longitude	= #longitude#
+				 , latitude		= #latitude#
+		  		 , altitude		= #altitude#
+				 , position		= ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updatePanGwID" parameterClass="SNGatewayVO">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET gwID = #newGwID#
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateNodeGwID" parameterClass="SNGatewayVO">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID = #newGwID#
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateTransducerGwID" parameterClass="SNGatewayVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID = #newGwID#
+			 WHERE gwID = #gwID#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateGwDescriptionByID" parameterClass="SNGatewayVO">
+		<![CDATA[
+			UPDATE sdm_Gateway
+			   SET gwID 		= #newGwID#
+				 , nickName 	= #nickName#
+				 , longitude	= #longitude#
+				 , latitude		= #latitude#
+		  		 , altitude		= #altitude#
+				 , position		= ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+			 WHERE GID = #GID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updatePanGwIDByID" parameterClass="SNGatewayVO">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET gwID = #newGwID#
+			 WHERE gwGID = #GID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateNodeGwIDByID" parameterClass="SNGatewayVO">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID = #newGwID#
+			 WHERE gwGID = #GID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateTransducerGwIDByID" parameterClass="SNGatewayVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID = #newGwID#
+			 WHERE gwGID = #GID#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updatePanDescription" parameterClass="SNPanVO">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET gwID 	= #newGwID#
+				 , panID	= #newPanID#
+				 , nickName	= #nickName#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateNodePanID" parameterClass="SNPanVO">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateTransducerPanID" parameterClass="SNPanVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updatePanDescriptionByID" parameterClass="SNPanVO">
+		<![CDATA[
+			UPDATE sdm_Pan
+			   SET gwID 	= #newGwID#
+				 , panID	= #newPanID#
+				 , nickName	= #nickName#
+			 WHERE GID = #GID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateNodePanIDByID" parameterClass="SNPanVO">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			 WHERE panGID = #GID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateTransducerPanIDByID" parameterClass="SNPanVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			 WHERE panGID = #GID#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateSnDescription" parameterClass="SNNodeVO">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID 		= #newGwID#
+				 , panID 		= #newPanID#
+				 , snID 		= #newSnID#
+				 , nickName 	= #nickName#
+				 , longitude	= #longitude#
+				 , latitude		= #latitude#
+		  		 , altitude		= #altitude#
+				 , position		= ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateTransducerSnID" parameterClass="SNNodeVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			     , snID  = #newSnID#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateSnDescriptionByID" parameterClass="SNNodeVO">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET gwID 		= #newGwID#
+				 , panID 		= #newPanID#
+				 , snID 		= #newSnID#
+				 , nickName 	= #nickName#
+				 , longitude	= #longitude#
+				 , latitude		= #latitude#
+		  		 , altitude		= #altitude#
+				 , position		= ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+			 WHERE GID = #GID#
+		]]>
+	</update>
+	<update id="apiInterfaceDAO.updateTransducerSnIDByID" parameterClass="SNNodeVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID  = #newGwID#
+			     , panID = #newPanID#
+			     , snID  = #newSnID#
+			 WHERE snGID = #GID#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateTdDescription" parameterClass="SNTransducerVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID 	= #newGwID#
+				 , panID 	= #newPanID#
+				 , snID 	= #newSnID#
+				 , tdID 	= #newTdID#
+				 , nickName	= #nickName#
+			 WHERE gwID  = #gwID#
+			   AND panID = #panID#
+			   AND snID  = #snID#
+			   AND tdID  = #tdID#
+		]]>
+	</update>
+	
+	<update id="apiInterfaceDAO.updateTdDescriptionByID" parameterClass="SNTransducerVO">
+		<![CDATA[
+			UPDATE sdm_Transducer
+			   SET gwID 	= #newGwID#
+				 , panID 	= #newPanID#
+				 , snID 	= #newSnID#
+				 , tdID 	= #newTdID#
+				 , nickName	= #nickName#
+			 WHERE GID = #GID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectExistingAccidentGeo" parameterClass="SNAccidentVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM $geoTable$
+			 WHERE ftr_idn = #ftrIdn#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingAccident" parameterClass="SNAccidentVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM $accidentTable$
+			 WHERE pipe_ftr_cde = (SELECT ftr_cde FROM $geoTable$ WHERE ftr_idn = #ftrIdn#)
+			   AND pipe_ftr_idn = #ftrIdn#
+			   AND longitude    = #longitude#
+			   AND latitude     = #latitude#
+			   AND accidentTime = #accidentTime#
+		]]>
+	</select>
+	
+	<insert id="apiInterfaceDAO.insertAccident" parameterClass="SNAccidentVO">
+		<![CDATA[
+			INSERT INTO $accidentTable$ (
+						pipe_ftr_cde
+					  , pipe_ftr_idn
+					  , longitude
+					  , latitude
+					  , coordinate
+					  , accidentTime
+					  , accidentDepth
+					  , accidentDegree
+					  , accidentType
+					  , accidentShape
+					  , accidentDesc
+					  )
+				VALUES (
+					    (SELECT ftr_cde FROM $geoTable$ WHERE ftr_idn = #ftrIdn#)
+					  , #ftrIdn#
+					  , #longitude#
+					  , #latitude#
+					  , ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+					  , #accidentTime#
+					  , #accidentDepth#
+					  , #accidentDegree#
+					  , #accidentType#
+					  , #accidentShape#
+					  , #accidentDesc#
+					  )  
+		]]>
+	</insert>
+	
+	<select id="apiInterfaceDAO.selectExistingThreshold" parameterClass="SNSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_SensingValueThreshold
+			 WHERE sensorType = #sensorType#
+		]]>
+	</select>
+	<insert id="apiInterfaceDAO.insertThreshold" parameterClass="SNSensingValueVO">
+		<![CDATA[
+			INSERT INTO sdm_SensingValueThreshold (
+						sensorType
+					  , operator1
+					  , operand1
+					  , logicalOp
+					  , operator2
+					  , operand2
+					  )
+				VALUES (
+					    #sensorType#
+					  , #operator1#
+					  , #operand1#
+					  , #logicalOp#
+					  , #operator2#
+					  , #operand2#
+					  )  
+		]]>
+	</insert>
+	<update id="apiInterfaceDAO.updateThreshold" parameterClass="SNSensingValueVO">
+		<![CDATA[
+			UPDATE sdm_SensingValueThreshold
+			   SET operator1 = #operator1#
+			     , operand1  = #operand1#
+			     , logicalOp = #logicalOp#
+			     , operator2 = #operator2#
+			     , operand2  = #operand2#
+			 WHERE sensorType = #sensorType#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectExistingLeakThreshold" parameterClass="SNSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_LeakageThreshold
+			 WHERE snGID             = #GID#
+               AND UPPER(sensorType) = UPPER(#sensorType#)
+		]]>
+	</select>
+	<insert id="apiInterfaceDAO.insertLeakThreshold" parameterClass="SNSensingValueVO">
+		<![CDATA[
+			INSERT INTO sdm_LeakageThreshold (
+						snGID
+					  , sensorType
+					  , operator
+					  , operand
+					  , counter
+					  , counterLimit
+					  )
+				VALUES (
+					    #GID#
+					  , #sensorType#
+					  , #operator1#
+					  , #operand1#
+					  , 0
+					  , #counter#
+					  )  
+		]]>
+	</insert>
+	<update id="apiInterfaceDAO.updateLeakThreshold" parameterClass="SNSensingValueVO">
+		<![CDATA[
+			UPDATE sdm_LeakageThreshold
+			   SET operator     = #operator1#
+			     , operand      = #operand1#
+			     , counterLimit = #counter#
+			 WHERE snGID             = #GID#
+               AND UPPER(sensorType) = UPPER(#sensorType#)
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectExistingWaterManholePipeRel" parameterClass="manholePipeRelVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM sdm_WaterPipeManholeRel
+			 WHERE manhole_ftr_idn = #manholeFtrIdn#
+			   AND pipe_ftr_idn    = #pipeFtrIdn#
+		]]>
+	</select>
+	<insert id="apiInterfaceDAO.insertWaterManholePipeRel" parameterClass="manholePipeRelVO">
+		<![CDATA[
+			INSERT INTO sdm_WaterPipeManholeRel (
+						manhole_ftr_cde
+				 	  , manhole_ftr_idn
+					  , pipe_ftr_cde
+					  , pipe_ftr_idn
+					  )
+				VALUES (
+					    (SELECT ftr_cde FROM sdm_WaterManhole WHERE ftr_idn = #manholeFtrIdn#)
+					  , #manholeFtrIdn#
+					  , (SELECT ftr_cde FROM sdm_WaterPipe WHERE ftr_idn = #pipeFtrIdn#)
+					  , #pipeFtrIdn#
+					  )  
+		]]>
+	</insert>
+	
+	<select id="apiInterfaceDAO.selectWaterManholePipeRel" parameterClass="manholePipeRelVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT pipe_ftr_idn
+			  FROM sdm_WaterPipeManholeRel
+			 WHERE manhole_ftr_idn = #manholeFtrIdn#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectWaterManholeList" parameterClass="SNSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_idn        AS geoID
+				 , ST_Y(geom)     AS Y
+				 , ST_X(geom)     AS X
+				 , RTRIM(dpg_std) AS dpgstd
+				 , RTRIM(som_cde) AS somcde
+				 , RTRIM(mhs_cde) AS mhscde
+			  FROM $geoTable$
+		     $spatialCondition$
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectGeoobjectList" parameterClass="SNSensingValueVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_idn    AS geoID
+				 , ST_Y(geom) AS Y
+				 , ST_X(geom) AS X
+			  FROM $geoTable$
+		     $spatialCondition$
+		]]>
+	</select>
+	
+	<insert id="apiInterfaceDAO.insertFirmwareData" parameterClass="SNFirmwareVO">
+		<![CDATA[
+			INSERT INTO sdm_FirmwareData (
+						targetDeviceType
+					  , manufacturerID
+					  , majorVersion
+					  , minorVersion
+					  , description
+					  , dataSize
+					  , binaryData
+					  )
+				VALUES (
+					    #targetDeviceType#
+					  , #manufacturerID#
+					  , #majorVersion#
+					  , #minorVersion#
+					  , #description#
+					  , #dataSize#
+					  , #binaryData#
+					  )  
+		]]>
+	</insert>
+	
+	<select id="apiInterfaceDAO.selectLatestFirmwareID" parameterClass="SNFirmwareVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT MAX(firmwareID) AS firmwareID
+			  FROM sdm_FirmwareData
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectFirmwareList" parameterClass="SNFirmwareVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT firmwareID
+				 , targetDeviceType
+				 , manufacturerID
+				 , majorVersion
+				 , minorVersion
+				 , description
+			  FROM sdm_FirmwareData
+		     WHERE (-1 = #targetDeviceType# OR targetDeviceType = #targetDeviceType#)
+		       AND (-1 = #manufacturerID#   OR manufacturerID   = #manufacturerID#)
+		       AND (-1 = #majorVersion#     OR majorVersion     = #majorVersion#)
+		       AND (-1 = #minorVersion#     OR minorVersion     = #minorVersion#)
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectFirmwareData" parameterClass="SNFirmwareVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT targetDeviceType
+				 , manufacturerID
+				 , majorVersion
+				 , minorVersion
+				 , description
+				 , dataSize
+				 , TO_CHAR(binaryData) AS binarydata
+			  FROM sdm_FirmwareData
+		     WHERE firmwareID = #firmwareID#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingFirmwareData" parameterClass="SNFirmwareVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_FirmwareData
+		     WHERE firmwareID = #firmwareID#
+		]]>
+	</select>
+	
+	<delete id="apiInterfaceDAO.deleteFirmwareData" parameterClass="SNFirmwareVO">
+		<![CDATA[
+			DELETE sdm_FirmwareData
+		     WHERE firmwareID = #firmwareID#
+		]]>
+	</delete>
+	
+	<select id="apiInterfaceDAO.selectExistingFirmwareUpdateHistory" parameterClass="SNFirmwareUpdateHistoryVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_FirmwareUpdateHistory
+		     WHERE gwID             = #gwID#
+		       AND targetID         = #targetID#
+		       AND transmissionTime = #transmissionTime#
+		]]>
+	</select>
+	<insert id="apiInterfaceDAO.insertFirmwareUpdateHistory" parameterClass="SNFirmwareUpdateHistoryVO">
+		<![CDATA[
+			INSERT INTO sdm_FirmwareUpdateHistory (
+			            gwID
+			          , targetID
+			          , transmissionTime
+			          , transmissionResult
+			          , firmwareID
+					  , updateType
+					  , updateTime
+					  , recommended1BlockSize
+					  )
+				VALUES (
+					    #gwID#
+					  , #targetID#
+					  , #transmissionTime#
+					  , #transmissionResult#
+					  , #firmwareID#
+					  , #updateType#
+					  , #updateTime#
+					  , #recommended1BlockSize#
+					  )
+		]]>
+	</insert>
+		
+	<select id="apiInterfaceDAO.selectFirmwareUpdateHistory" parameterClass="SNFirmwareUpdateHistoryVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.gwID
+			     , a.transmissionTime
+			     , MAX(a.transmissionResult)    AS transmissionResult
+			     , MAX(a.firmwareID)            AS firmwareID
+			     , MAX(b.targetDeviceType)      AS targetDeviceType
+			     , MAX(b.manufacturerID)        AS manufacturerID
+			     , MAX(b.majorVersion)          AS majorVersion
+			     , MAX(b.minorVersion)          AS minorVersion
+			     , MAX(a.updateType)            AS updateType
+			     , MAX(a.updateTime)            AS updateTime
+			     , MAX(a.recommended1BlockSize) AS recommended1BlockSize
+			  FROM sdm_FirmwareUpdateHistory a
+			     , sdm_FirmwareData b
+		     WHERE a.firmwareID = b.firmwareID
+		     $gwIDCondition$
+		     $targetCondition$
+		     $temporalCondition$
+		  GROUP BY a.gwID, a.transmissionTime
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectFirmwareUpdateHistoryTargetList" parameterClass="SNFirmwareUpdateHistoryVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT targetID
+			  FROM sdm_FirmwareUpdateHistory
+		     WHERE gwID             = #gwID#
+		       AND transmissionTime = #transmissionTime#
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingUserDefinedMessage" parameterClass="UserDefinedMessageVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_UserDefinedMessage
+		     WHERE targetID         = #targetID#
+		       AND transmissionTime = #transmissionTime#
+		]]>
+	</select>
+	<insert id="apiInterfaceDAO.insertUserDefinedMessage" parameterClass="UserDefinedMessageVO">
+		<![CDATA[
+			INSERT INTO sdm_UserDefinedMessage (
+			            targetID
+			          , transmissionTime
+			          , commandID
+			          , transmissionDirection
+			          , transmissionResult
+			          , dataSize
+					  , binaryData
+					  )
+				VALUES (
+					    #targetID#
+					  , #transmissionTime#
+					  , #commandID#
+					  , #transmissionDirection#
+					  , #transmissionResult#
+					  , #messageDataSize#
+					  , #messageBinaryData#
+					  )
+		]]>
+	</insert>
+	
+	<select id="apiInterfaceDAO.selectUserDefinedMessage" parameterClass="UserDefinedMessageVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT targetID
+			     , commandID
+			     , transmissionDirection
+			     , transmissionResult
+			     , transmissionTime
+			     , dataSize
+			     , TO_CHAR(binaryData) AS binaryData
+			  FROM sdm_UserDefinedMessage
+		     WHERE targetID = #targetID#
+		       $temporalCondition$
+		  ORDER BY transmissionTime DESC
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingTdDefault" parameterClass="SNTransducerVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_TransducerDefault
+		     WHERE tdID = #tdID#
+		]]>
+	</select>
+	
+	<insert id="apiInterfaceDAO.insertTdDefault" parameterClass="SNTransducerVO">
+		<![CDATA[
+			INSERT INTO sdm_TransducerDefault (
+						tdID
+					  , manufacturer
+					  , productNo
+					  , transducerCategory
+					  , transducerType
+					  , unit
+					  , dataType
+					  , rangeMin
+					  , rangeMax
+					  , rangeOffset
+					  , level
+					  )
+				VALUES (
+					    #tdID#
+					  , #manufacturer#
+					  , #productNo#
+					  , #transducerCategory#
+					  , #transducerType#
+					  , #unit#
+					  , #dataType#
+					  , #rangeMin#
+					  , #rangeMax#
+					  , #rangeOffset#
+					  , #level#
+					  )  
+		]]>
+	</insert>
+	
+	<select id="apiInterfaceDAO.selectTdDefault" parameterClass="SNTransducerVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT tdID
+			     , manufacturer
+			     , productNo
+			     , transducerCategory
+			  	 , transducerType
+				 , unit
+				 , dataType
+				 , rangeMin
+				 , rangeMax
+				 , rangeOffset
+				 , level
+			  FROM sdm_TransducerDefault
+		     $tdIDCondition$
+		]]>
+	</select>
+	
+	<update id="apiInterfaceDAO.updateTdDefault" parameterClass="SNTransducerVO">
+		<![CDATA[
+			UPDATE sdm_TransducerDefault
+			   SET manufacturer	      = NVL(#manufacturer#,       manufacturer)
+				 , productNo	      = NVL(#productNo#,          productNo)
+				 , transducerCategory = NVL(#transducerCategory#, transducerCategory)
+				 , transducerType     = NVL(#transducerType#,     transducerType)
+				 , unit	              = NVL(#unit#,               unit)
+				 , dataType	          = NVL(#dataType#,           dataType)
+				 , rangeMin	          = NVL($rangeMin$,           rangeMin)
+				 , rangeMax	          = NVL($rangeMax$,           rangeMax)
+				 , rangeOffset        = NVL($rangeOffset$,        rangeOffset)
+				 , level	          = NVL(#level#,              level)
+			 WHERE tdID = #tdID#
+		]]>
+	</update>
+	
+	<delete id="apiInterfaceDAO.deleteTdDefault" parameterClass="SNTransducerVO">
+		<![CDATA[
+			DELETE sdm_TransducerDefault
+		     WHERE tdID = #tdID#
+		]]>
+	</delete>
+	
+	<select id="apiInterfaceDAO.getWaterBSRIByID" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , wtl_sri AS BSRI
+			     , wtl_lev AS level
+			     , wtl_sta AS indirectAssess
+			     , lek_sig AS leakNoise
+			     , pip_mov AS pipeMove 
+			  FROM sdm_WaterPipeSri
+			 WHERE ftr_idn IN ($geoID$)
+			   AND wtl_sri IS NOT NULL
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.getWaterBSRIByRegion" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT b.ftr_idn AS geoID
+			     , b.wtl_sri AS BSRI
+			     , b.wtl_lev AS level
+			     , b.wtl_sta AS indirectAssess
+			     , b.lek_sig AS leakNoise
+			     , b.pip_mov AS pipeMove
+			  FROM sdm_WaterPipe a
+			     , sdm_WaterPipeSri b
+			 WHERE a.ftr_idn = b.ftr_idn
+			   AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON(($minX$ $minY$, $maxX$ $minY$, $maxX$ $maxY$, $minX$ $maxY$, $minX$ $minY$))',0), a.geom) = 1
+			   AND b.wtl_sri IS NOT NULL   
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.getSewerBSRIByID" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , sew_sri AS BSRI
+			     , sew_lev AS level
+			     , sew_sta AS indirectAssess
+			     , NVL(sew_ctv,0) AS internalState
+			     , NVL(sew_gpr,0) AS emptySpace
+			  FROM sdm_DrainPipeSri
+			 WHERE ftr_idn IN ($geoID$)
+			   AND sew_sri IS NOT NULL
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.getSewerBSRIByRegion" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT b.ftr_idn AS geoID
+			     , b.sew_sri AS BSRI
+			     , b.sew_lev AS level
+			     , b.sew_sta AS indirectAssess
+			     , NVL(b.sew_ctv,0) AS internalState
+			     , NVL(b.sew_gpr,0) AS emptySpace
+			  FROM sdm_DrainPipe a
+			     , sdm_DrainPipeSri b
+			 WHERE a.ftr_idn = b.ftr_idn
+			   AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON(($minX$ $minY$, $maxX$ $minY$, $maxX$ $maxY$, $minX$ $maxY$, $minX$ $minY$))',0), a.geom) = 1
+			   AND b.sew_sri IS NOT NULL   
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.getSubwayBSRIByID" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , met_sri AS BSRI
+			     , met_lev AS level
+			     , grd_cde AS structureGrade
+			     , des_typ AS designType
+			     , max_dep AS maxDepth
+			     , SUBSTR(SYSDATE,0,4) - cmp_ymd + 1 AS duration
+			     , grd_50  AS groundCount
+			     , rod_50  AS roadCount
+			     , nea_dis AS evaDistance
+			     , nea_dep AS evaDepth
+			     , col_wel AS collectingWell
+			  FROM sdm_SubwayLineSri
+			 WHERE ftr_idn IN ($geoID$)
+			   AND met_sri IS NOT NULL
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.getSubwayBSRIByRegion" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT b.ftr_idn AS geoID
+			     , b.met_sri AS BSRI
+			     , b.met_lev AS level
+			     , b.grd_cde AS structureGrade
+			     , b.des_typ AS designType
+			     , b.max_dep AS maxDepth
+			     , SUBSTR(SYSDATE,0,4) - b.cmp_ymd + 1 AS duration
+			     , b.grd_50  AS groundCount
+			     , b.rod_50  AS roadCount
+			     , b.nea_dis AS evaDistance
+			     , b.nea_dep AS evaDepth
+			     , b.col_wel AS collectingWell
+			  FROM sdm_SubwayLine a
+			     , sdm_SubwayLineSri b
+			 WHERE a.ftr_idn = b.ftr_idn
+			   AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON(($minX$ $minY$, $maxX$ $minY$, $maxX$ $maxY$, $minX$ $maxY$, $minX$ $minY$))',0), a.geom) = 1
+			   AND b.met_sri IS NOT NULL   
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.getStationBSRIByID" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , sta_sri AS BSRI
+			     , sta_lev AS level
+			     , max_dep AS maxDepth
+			     , SUBSTR(SYSDATE,0,4) - cmp_ymd + 1 AS duration
+			     , grd_50  AS groundCount
+			     , rod_50  AS roadCount
+			     , nea_dis AS evaDistance
+			     , nea_dep AS evaDepth
+			     , col_wel AS collectingWell
+			  FROM sdm_SubwayStationSri
+			 WHERE ftr_idn IN ($geoID$)
+			   AND sta_sri IS NOT NULL
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.getStationBSRIByRegion" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT b.ftr_idn AS geoID
+			     , b.sta_sri AS BSRI
+			     , b.sta_lev AS level
+			     , b.max_dep AS maxDepth
+			     , SUBSTR(SYSDATE,0,4) - b.cmp_ymd + 1 AS duration
+			     , b.grd_50  AS groundCount
+			     , b.rod_50  AS roadCount
+			     , b.nea_dis AS evaDistance
+			     , b.nea_dep AS evaDepth
+			     , b.col_wel AS collectingWell
+			  FROM sdm_SubwayStation a
+			     , sdm_SubwayStationSri b
+			 WHERE a.ftr_idn = b.ftr_idn
+			   AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON(($minX$ $minY$, $maxX$ $minY$, $maxX$ $maxY$, $minX$ $maxY$, $minX$ $minY$))',0), a.geom) = 1
+			   AND b.sta_sri IS NOT NULL   
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectExistingWaterSri" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_WaterPipeSri
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateWaterBSRIByID" parameterClass="SNSriVO">
+		<![CDATA[
+			UPDATE sdm_WaterPipeSri
+			   SET rod_typ = #roadType#
+			     , rct_cnt = #complaintCount#
+			     , pip_mat = #recordPeriod#
+			     , lek_sig = #leakSignal#
+			     , pip_mov = #pipeMove#
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectWaterPipeSRI" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT * 
+			  FROM sdm_WaterPipeSri
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateWaterPipeSRI" parameterClass="SNSriVO">
+		<![CDATA[
+			UPDATE sdm_WaterPipeSri
+			   SET wtl_sta = #assessValue#
+			     , wtl_sri = #sriValue#
+			     , wtl_lev = #sriGrade#
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectExistingSewerSri" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_DrainPipeSri
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateSewerBSRIByID" parameterClass="SNSriVO">
+		<![CDATA[
+			UPDATE sdm_DrainPipeSri
+			   SET rod_typ = #roadType#
+			     , pip_mat = #recordPeriod#
+			     , sew_ctv = #internalState#
+			     , sew_gpr = #emptySpace#
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectDrainPipeSRI" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT * 
+			  FROM sdm_DrainPipeSri
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateDrainPipeSRI" parameterClass="SNSriVO">
+		<![CDATA[
+			UPDATE sdm_DrainPipeSri
+			   SET sew_sta = #assessValue#
+			     , sew_sri = #sriValue#
+			     , sew_lev = #sriGrade#
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectExistingSubwaySri" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_SubwayLineSri
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateSubwayBSRIByID" parameterClass="SNSriVO">
+		<![CDATA[
+			UPDATE sdm_SubwayLineSri
+			   SET grd_cde = #structureGrade#
+			     , grd_50  = #groundCount50#
+			     , grd_100 = #groundCount100#
+			     , grd_200 = #groundCount200#
+			     , rod_50  = #roadCount50#
+			     , rod_100 = #roadCount100#
+			     , rod_200 = #roadCount200#
+			     , nea_dis = #evaDistance#
+			     , nea_dep = #evaDepth#
+			     , col_wel = #collectingWell#
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectSubwayLineSRI" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT *
+			  FROM sdm_SubwayLineSri
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateSubwayLineSRI" parameterClass="SNSriVO">
+		<![CDATA[
+			UPDATE sdm_SubwayLineSri
+			   SET met_sri = #sriValue#
+			     , met_lev = #sriGrade#
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectExistingStationSri" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_SubwayStationSri
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateStationBSRIByID" parameterClass="SNSriVO">
+		<![CDATA[
+			UPDATE sdm_SubwayStationSri
+			   SET grd_50  = #groundCount50#
+			     , grd_100 = #groundCount100#
+			     , grd_200 = #groundCount200#
+			     , rod_50  = #roadCount50#
+			     , rod_100 = #roadCount100#
+			     , rod_200 = #roadCount200#
+			     , nea_dis = #evaDistance#
+			     , nea_dep = #evaDepth#
+			     , col_wel = #collectingWell#
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectSubwayStationSRI" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT *
+			  FROM sdm_SubwayStationSri
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateSubwayStationSRI" parameterClass="SNSriVO">
+		<![CDATA[
+			UPDATE sdm_SubwayStationSri
+			   SET sta_sri = #sriValue#
+			     , sta_lev = #sriGrade#
+			 WHERE ftr_idn = #geoID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectGridWaterSRI" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.cellid
+			     , MAX(c.wtl_sri) as sri
+			  FROM sdm_SriGrid a
+                 , sdm_WaterPipe b
+                 , sdm_WaterPipeSri c
+             WHERE a.cellid IN (SELECT b.cellid
+                                  FROM sdm_WaterPipe a
+                                     , sdm_SriGrid b
+                                 WHERE a.ftr_idn = #geoID#
+                                   AND ST_INTERSECTS(a.geom, b.geom) = 1 )
+               AND ST_INTERSECTS(a.geom, b.geom) = 1
+               AND b.ftr_idn = c.ftr_idn
+          GROUP BY a.cellid
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateGridWaterSRI" parameterClass="SNSriGridVO">
+		<![CDATA[
+			UPDATE sdm_SriGrid
+               SET waterSri   = #sri#
+                 , waterGrade = #grade#
+                 , lastUpdate = #lastUpdate#
+             WHERE cellID = #cellID#
+		]]>
+	</update>
+	<select id="apiInterfaceDAO.selectGridDrainSRI" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.cellid
+			     , MAX(c.sew_sri) as sri
+			  FROM sdm_SriGrid a
+                 , sdm_DrainPipe b
+                 , sdm_DrainPipeSri c
+             WHERE a.cellid IN (SELECT b.cellid
+                                  FROM sdm_DrainPipe a
+                                     , sdm_SriGrid b
+                                 WHERE a.ftr_idn = #geoID#
+                                   AND ST_INTERSECTS(a.geom, b.geom) = 1 )
+               AND ST_INTERSECTS(a.geom, b.geom) = 1
+               AND b.ftr_idn = c.ftr_idn
+          GROUP BY a.cellid
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateGridDrainSRI" parameterClass="SNSriGridVO">
+		<![CDATA[
+			UPDATE sdm_SriGrid
+               SET drainSri   = #sri#
+                 , drainGrade = #grade#
+                 , lastUpdate = #lastUpdate#
+             WHERE cellID = #cellID#
+		]]>
+	</update>
+	<select id="apiInterfaceDAO.selectGridSubwaySRI" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.cellid
+			     , MAX(c.met_sri) as sri
+			  FROM sdm_SriGrid a
+                 , sdm_SubwayLine b
+                 , sdm_SubwayLineSri c
+             WHERE a.cellid IN (SELECT b.cellid
+                                  FROM sdm_SubwayLine a
+                                     , sdm_SriGrid b
+                                 WHERE a.ftr_idn = #geoID#
+                                   AND ST_INTERSECTS(a.geom, b.geom) = 1 )
+               AND ST_INTERSECTS(a.geom, b.geom) = 1
+               AND b.ftr_idn = c.ftr_idn
+          GROUP BY a.cellid
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateGridSubwaySRI" parameterClass="SNSriGridVO">
+		<![CDATA[
+			UPDATE sdm_SriGrid
+               SET subwaySri   = #sri#
+                 , subwayGrade = #grade#
+                 , lastUpdate  = #lastUpdate#
+             WHERE cellID = #cellID#
+		]]>
+	</update>
+	<select id="apiInterfaceDAO.selectGridStationSRI" parameterClass="SNSriVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT a.cellid
+			     , MAX(c.sta_sri) as sri
+			  FROM sdm_SriGrid a
+                 , sdm_SubwayStation b
+                 , sdm_SubwayStationSri c
+             WHERE a.cellid IN (SELECT b.cellid
+                                  FROM sdm_SubwayStation a
+                                     , sdm_SriGrid b
+                                 WHERE a.ftr_idn = #geoID#
+                                   AND ST_INTERSECTS(a.geom, b.geom) = 1 )
+               AND ST_INTERSECTS(a.geom, b.geom) = 1
+               AND b.ftr_idn = c.ftr_idn
+          GROUP BY a.cellid
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateGridStationSRI" parameterClass="SNSriGridVO">
+		<![CDATA[
+			UPDATE sdm_SriGrid
+               SET stationSri   = #sri#
+                 , stationGrade = #grade#
+                 , lastUpdate   = #lastUpdate#
+             WHERE cellID = #cellID#
+		]]>
+	</update>
+	
 	<insert id="apiInterfaceDAO.insertAssessValues" parameterClass="SNAssessValueVO">
 		<![CDATA[
 			INSERT INTO sdm_AssessValue (
@@ -474,6 +2300,153 @@
 			 WHERE category IN ($category$)
 			   AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON(($minX$ $minY$, $maxX$ $minY$, $maxX$ $maxY$, $minX$ $maxY$, $minX$ $minY$))',0), position) = 1
 			   AND type = 'risk'
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectNearestGeoObject" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT ftr_cde    AS ftrcde
+			     , ftr_idn    AS ftridn
+			     , ST_X(geom) AS X
+			     , ST_Y(geom) AS Y
+			  FROM $geoTable$
+			 WHERE ST_NEAREST(geom, ST_POINTFROMTEXT('POINT($X$ $Y$)',0),1) = 1 
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectExistingNodeGeoRel" parameterClass="SNNodeVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_NodeGeoRel
+			 WHERE nodeGID = #GID#
+			   AND ftr_cde = #ftr_cde#
+			   AND ftr_idn = #ftr_idn#
+			   AND endTime = #endTime# 
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateOldNodeGeoRel" parameterClass="SNNodeVO">
+		<![CDATA[
+			UPDATE sdm_NodeGeoRel
+			   SET endTime = #currentTime#
+			 WHERE nodeGID = #GID#
+			   AND endTime = #endTime#
+		]]>
+	</update>
+	<insert id="apiInterfaceDAO.insertNodeGeoRel" parameterClass="SNNodeVO">
+		<![CDATA[
+			INSERT INTO sdm_NodeGeoRel
+			           (nodeGID
+			          , startTime
+			          , endTime
+			          , ftr_cde
+			          , ftr_idn
+			          , gwID
+			          , panID
+			          , snID
+			          , position )
+			    VALUES (#GID#
+			          , #currentTime#
+			          , #endTime#
+			          , #ftr_cde#
+			          , #ftr_idn#
+			          , (SELECT gwID  FROM sdm_Node WHERE GID = #GID#) 
+			          , (SELECT panID FROM sdm_Node WHERE GID = #GID#) 
+			          , (SELECT snID  FROM sdm_Node WHERE GID = #GID#)
+			          , ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+			          )
+		]]>
+	</insert>
+	<update id="apiInterfaceDAO.updateNodeGeoID" parameterClass="SNNodeVO">
+		<![CDATA[
+			UPDATE sdm_Node
+			   SET ftr_cde   = #ftr_cde#
+			     , ftr_idn   = #ftr_idn#
+			     , longitude = #longitude#
+			     , latitude  = #latitude#
+			     , position  = ST_POINTFROMTEXT('POINT($X$ $Y$)',0)
+			 WHERE GID = #GID#
+		]]>
+	</update>
+	
+	<select id="apiInterfaceDAO.selectExistingRfid" parameterClass="RfidVO" resultClass="EgovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'),'N') AS existYn
+			  FROM sdm_Rfid
+			 WHERE rfid = #rfid#
+		]]>
+	</select>
+	<insert id="apiInterfaceDAO.insertRfid" parameterClass="RfidVO">
+		<![CDATA[
+			INSERT INTO sdm_Rfid
+			           (rfid
+			          , latitude
+			          , longitude
+			          , state
+			          , strength )
+			    VALUES (#rfid#
+			          , #latitude#
+			          , #longitude#
+			          , #state#
+			          , #strength#
+			          )
+		]]>
+	</insert>
+	<update id="apiInterfaceDAO.updateRfid" parameterClass="RfidVO">
+		<![CDATA[
+			UPDATE sdm_Rfid
+			   SET latitude  = #latitude#
+			     , longitude = #longitude#
+			     , state     = #state#
+			     , strength  = #strength#
+			 WHERE rfid = #rfid#
+		]]>
+	</update>
+	<select id="apiInterfaceDAO.selectRfidState" parameterClass="RfidVO" resultClass="EgovMap">
+		<![CDATA[
+			SELECT state
+			  FROM sdm_Rfid
+			 WHERE rfid = #rfid#
+		]]>
+	</select>
+	<update id="apiInterfaceDAO.updateRfidState" parameterClass="RfidVO">
+		<![CDATA[
+			UPDATE sdm_Rfid
+			   SET state    = #state#
+			     , strength = #strength# 
+			 WHERE rfid = #rfid#
+		]]>
+	</update>
+	<select id="apiInterfaceDAO.selectRfid" parameterClass="RfidVO" resultClass="EgovMap">
+		<![CDATA[
+			SELECT rfid
+			     , latitude
+			     , longitude
+			     , state
+			     , strength
+			  FROM sdm_Rfid
+			 $rfidCondition$
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectWaterPipeGeometry" resultClass="EgovMap">
+		<![CDATA[
+			SELECT ftr_idn AS id
+				 , SUBSTR(ST_ASTEXT(geom),12,LENGTH(ST_ASTEXT(geom))-12) AS geom
+			  FROM sdm_WaterPipe
+		]]>
+	</select>
+	
+	<select id="apiInterfaceDAO.selectDrainPipeGeometry" resultClass="EgovMap">
+		<![CDATA[
+			SELECT ftr_idn AS id
+				 , SUBSTR(ST_ASTEXT(geom),12,LENGTH(ST_ASTEXT(geom))-12) AS geom
+			  FROM sdm_DrainPipe
+		]]>
+	</select>
+	<select id="apiInterfaceDAO.selectDrainManholeGeometry" resultClass="EgovMap">
+		<![CDATA[
+			SELECT ftr_idn AS id
+				 , SUBSTR(ST_ASTEXT(geom),7,LENGTH(ST_ASTEXT(geom))-7) AS geom
+			  FROM sdm_DrainManhole
 		]]>
 	</select>
 	

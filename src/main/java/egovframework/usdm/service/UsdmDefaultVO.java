@@ -30,6 +30,8 @@ public class UsdmDefaultVO implements Serializable {
 	private double 	centerY;
 	private int 	radius;
 	private String 	poi			= "";
+	private String 	ftrIdn;
+	private String 	spatialCondition;
 	
 	public String getSearchId() {
 		return searchId;
@@ -96,6 +98,18 @@ public class UsdmDefaultVO implements Serializable {
 	}
 	public void setPoi(String poi) {
 		this.poi = poi;
+	}
+	public String getFtrIdn() {
+		return ftrIdn;
+	}
+	public void setFtrIdn(String ftrIdn) {
+		this.ftrIdn = ftrIdn;
+	}
+	public String getSpatialCondition() {
+		return spatialCondition;
+	}
+	public void setSpatialCondition(String spatialCondition) {
+		this.spatialCondition = spatialCondition;
 	}
 	
 }

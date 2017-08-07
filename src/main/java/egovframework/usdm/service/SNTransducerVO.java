@@ -17,6 +17,10 @@ package egovframework.usdm.service;
 
 public class SNTransducerVO extends UsdmDefaultVO {
 
+	private String 	gwGID;
+	private String 	panGID;
+	private String 	snGID;
+	private String 	GID;
 	private String 	gwID;
 	private String 	panID;
 	private String 	snID;
@@ -36,11 +40,37 @@ public class SNTransducerVO extends UsdmDefaultVO {
 	private String	statusCode;
 	private String	actuationResult;
 	private int 	deleteCode;
+	private String	nickName;
 	private String 	newGwID;
 	private String 	newPanID;
 	private String 	newSnID;
 	private String 	newTdID;
+	private String 	tdIDCondition;
 	
+	public String getGwGID() {
+		return gwGID;
+	}
+	public void setGwGID(String gwGID) {
+		this.gwGID = gwGID;
+	}
+	public String getPanGID() {
+		return panGID;
+	}
+	public void setPanGID(String panGID) {
+		this.panGID = panGID;
+	}
+	public String getSnGID() {
+		return snGID;
+	}
+	public void setSnGID(String snGID) {
+		this.snGID = snGID;
+	}
+	public String getGID() {
+		return GID;
+	}
+	public void setGID(String gID) {
+		GID = gID;
+	}
 	public String getGwID() {
 		return gwID;
 	}
@@ -155,6 +185,12 @@ public class SNTransducerVO extends UsdmDefaultVO {
 	public void setDeleteCode(int deleteCode) {
 		this.deleteCode = deleteCode;
 	}
+	public String getNickName() {
+		return nickName;
+	}
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
 	public String getNewGwID() {
 		return newGwID;
 	}
@@ -178,6 +214,12 @@ public class SNTransducerVO extends UsdmDefaultVO {
 	}
 	public void setNewTdID(String newTdID) {
 		this.newTdID = newTdID;
+	}
+	public String getTdIDCondition() {
+		return tdIDCondition;
+	}
+	public void setTdIDCondition(String tdIDCondition) {
+		this.tdIDCondition = tdIDCondition;
 	}
 	
 }

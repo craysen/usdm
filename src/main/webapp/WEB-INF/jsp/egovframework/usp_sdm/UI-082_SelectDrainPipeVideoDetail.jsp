@@ -49,12 +49,22 @@
     	else
     		return false;
     }
+    
+    /* 하수관선택 버튼 클릭 이벤트 */
+    function btnFindPipe_onclick()
+    {
+    	var url = "<c:url value='/drainpipe/selectPipePopup.do'/>";
+    	var openParam = "width=850, height=600, scrollbars=no, toolbar=no, resizable=no, status=no, location=no, menubar=no";
+    	
+    	var popupObj = window.open(url, "mapPopup", openParam);
+    }
         
     </script>
 </head>
 <body style="text-align:center; margin:0 auto; display:inline; padding-top:100px;" onload="javascript:form_onLoad();">
 
 <form:form commandName="drainPipeVideoVO" id="detailForm" name="detailForm" enctype="multipart/form-data">
+	<input type="hidden" id="argReadonly" value="Y"/>
     <div id="content_pop">
     	<!-- 타이틀 -->
     	<div id="title">
@@ -145,19 +155,25 @@
     			</td>
     		</tr>
     		<tr>
-    			<td class="tbtd_caption">하수도ID</td>
+    			<td class="tbtd_caption">맨홀 및 하수관</td>
     			<td class="tbtd_content" colspan="3">
-    				<form:input path="pipeIdList" maxlength="50" cssClass="longtxt"/>
+    				<span class="btn_blue_l">
+                        <a href="javascript:btnFindPipe_onclick();">보기</a>
+                        <img src="<c:url value='/images/egovframework/usdm/btn_bg_r.gif'/>" style="margin-left:6px;"/>
+                    </span>
+                    &nbsp;
+                    맨홀ID&nbsp;<form:input path="manholeFtrIdn" maxlength="30" cssClass="txt" readonly="readonly"/>&nbsp;
+    				하수관ID&nbsp;<form:input path="pipeFtrIdn" maxlength="30" cssClass="longtxt" readonly="readonly"/>
     			</td>
     		</tr>
     		<tr>
-    			<td class="tbtd_caption">맨홀ID</td>
-    			<td class="tbtd_content">
-    				<form:input path="manholeId" maxlength="30" cssClass="txt"/>
-    			</td>
     			<td class="tbtd_caption">방향각</td>
     			<td class="tbtd_content">
     				<form:input path="directionAngle" maxlength="30" cssClass="txt"/>
+    			</td>
+    			<td class="tbtd_caption">이동거리</td>
+    			<td class="tbtd_content">
+    				<form:input path="distance" maxlength="30" cssClass="txt"/>
     			</td>
     		</tr>
     		<tr>

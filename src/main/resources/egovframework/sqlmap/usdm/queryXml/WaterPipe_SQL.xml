@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WaterPipe">
+
+	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias alias="waterPipeAccidentVO" type="egovframework.usdm.service.WaterPipeAccidentVO"/>
+
+	<resultMap id="waterPipeAccident" class="waterPipeAccidentVO">
+		<result property="pipeFtrCde" column="pipeFtrCde"/>
+		<result property="pipeFtrIdn" column="pipeFtrIdn"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="accidentTime" column="accidentTime"/>
+		<result property="accidentType" column="accidentType"/>
+		<result property="accidentShape" column="accidentShape"/>
+		<result property="accidentDesc" column="accidentDesc"/>
+	</resultMap>
+	
+	<select id="waterPipeDAO.selectWaterPipeGeometry" resultClass="EgovMap">
+		<![CDATA[
+			SELECT ftr_idn   AS id
+				 , wgscoords AS geom
+				 , SUBSTR(ST_ASTEXT(geom),12,LENGTH(ST_ASTEXT(geom))-12) AS tmgeom
+			  FROM sdm_WaterPipe
+		]]>
+	</select>
+	
+	<insert id="waterPipeDAO.insertWaterAccident" parameterClass="waterPipeAccidentVO">
+		<![CDATA[
+			INSERT INTO sdm_WaterAccident (
+						pipe_ftr_cde
+					  , pipe_ftr_idn
+					  , longitude
+					  , latitude
+					  , coordinate
+					  , accidentTime
+					  , accidentType
+					  , accidentShape
+					  , accidentDesc
+					  )
+				VALUES (
+					    (SELECT ftr_cde FROM sdm_WaterPipe WHERE ftr_idn = #pipeFtrIdn#)
+					  , #pipeFtrIdn#
+					  , #longitude#
+					  , #latitude#
+					  , ST_POINTFROMTEXT('POINT($x$ $y$)',0)
+					  , #accidentTime#
+					  , #accidentType#
+					  , #accidentShape#
+					  , #accidentDesc#
+					  )
+		]]>
+	</insert>
+	
+	<select id="waterPipeDAO.selectWaterAccidentList" parameterClass="usdmSearchVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT pipe_ftr_cde
+			     , pipe_ftr_idn
+			     , longitude
+			     , latitude
+			     , TO_CHAR(accidentTime) AS accidentTime
+			     , accidentTime AS accidentTimeLong
+			     , accidentType
+			     , accidentShape
+			  FROM sdm_WaterAccident
+			 WHERE ('' = #ftrIdn# OR pipe_ftr_idn = #ftrIdn#)
+			   $spatialCondition$
+		  ORDER BY accidentTimeLong DESC
+		]]>
+	</select>
+	
+	<select id="waterPipeDAO.selectWaterAccidentDetail" parameterClass="waterPipeAccidentVO" resultClass="waterPipeAccidentVO">
+		<![CDATA[
+			SELECT pipe_ftr_cde AS pipeFtrCde
+			     , pipe_ftr_idn AS pipeFtrIdn
+			     , longitude
+			     , latitude
+			     , accidentTime
+			     , accidentType
+			     , accidentShape
+			     , accidentDesc
+			  FROM sdm_WaterAccident
+			 WHERE pipe_ftr_cde = #pipeFtrCde#
+			   AND pipe_ftr_idn = #pipeFtrIdn#
+			   AND longitude    = #longitude#
+			   AND latitude     = #latitude#
+			   AND accidentTime = #accidentTime#
+		]]>
+	</select>
+	
+</sqlMap>

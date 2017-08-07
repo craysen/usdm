@@ -15,14 +15,28 @@
  */
 package egovframework.usdm.web.util;
 
-public final class LoginSessionException extends Exception {
+import javax.servlet.http.HttpServletResponse;
+
+public final class NoResourceException extends Exception {
 	
-	public LoginSessionException() {
+	static final int 	responseStatus 	= HttpServletResponse.SC_BAD_REQUEST;
+	static final int 	responseCode 	= 4001;
+	static final String responseMsg 	= "Error : Target Resource Not Found.";
+	
+	public NoResourceException() {
 		return;
+	}
+	
+	public int getStatus() {
+		return responseStatus;
+	}
+	
+	public String getCode() {
+		return String.valueOf(responseCode);
 	}
 	
 	@Override
 	public String getMessage() {
-		return String.valueOf("Invalid Session Information : sessionKey is not valid.");
+		return String.valueOf(responseMsg);
 	}
 }

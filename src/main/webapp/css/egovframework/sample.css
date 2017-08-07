@@ -109,3 +109,4 @@ input.longtxt   {height:18px; width:300px; background-color:#FFF; border:1px sol
 input.shorttxt	{height:18px; width:30px; background-color:#FFF; border:1px solid #BCC8D8; padding-top:2px; color:#5e5e5e; cursor:text;}
 input.essentiality  {height:18px; background-color:#ebebeb; border:1px solid #BCC8D8; padding-top:2px; color:#000; cursor:text;}
 input.essentialreadonly  {height:18px; background-color:#ebebeb; border:1px solid #BCC8D8; padding-top:2px; color:#000; cursor:text; readonly:true;}
+input.txt.readonly {height:18px; width:100px; background-color:#EAEAEA; border:1px solid #BCC8D8; padding-top:2px; color:#5e5e5e; cursor:text; readonly:readonly;}

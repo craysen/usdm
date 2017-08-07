@@ -34,8 +34,9 @@ public class DrainPipeVideoVO extends UsdmDefaultVO {
 	private double 			positionX;
 	private double 			positionY;
 	private double 			positionZ;
-	private String			pipeIdList;
-	private int				manholeId;
+	private String			manholeFtrCde;
+	private int				manholeFtrIdn;
+	private String			pipeFtrIdn;
 	private double 			directionAngle;
 	private String			addr1;
 	private String			addr2;
@@ -44,8 +45,9 @@ public class DrainPipeVideoVO extends UsdmDefaultVO {
 	private String			recEndTime;
 	private String			damage;
 	private String			POI;
+	private double			distance;
 	
-	public int getVideoId() {
+	public int getvideoId() {
 		return videoId;
 	}
 	public void setVideoId(int videoId) {
@@ -135,17 +137,17 @@ public class DrainPipeVideoVO extends UsdmDefaultVO {
 	public void setPositionZ(double positionZ) {
 		this.positionZ = positionZ;
 	}
-	public String getPipeIdList() {
-		return pipeIdList;
+	public String getManholeFtrCde() {
+		return manholeFtrCde;
 	}
-	public void setPipeIdList(String pipeIdList) {
-		this.pipeIdList = pipeIdList;
+	public void setManholeFtrCde(String manholeFtrCde) {
+		this.manholeFtrCde = manholeFtrCde;
 	}
-	public int getManholeId() {
-		return manholeId;
+	public int getManholeFtrIdn() {
+		return manholeFtrIdn;
 	}
-	public void setManholeId(int manholeId) {
-		this.manholeId = manholeId;
+	public void setManholeFtrIdn(int manholeFtrIdn) {
+		this.manholeFtrIdn = manholeFtrIdn;
 	}
 	public double getDirectionAngle() {
 		return directionAngle;
@@ -194,6 +196,21 @@ public class DrainPipeVideoVO extends UsdmDefaultVO {
 	}
 	public void setPOI(String pOI) {
 		POI = pOI;
+	}
+	public double getDistance() {
+		return distance;
+	}
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
+	public String getPipeFtrIdn() {
+		return pipeFtrIdn;
+	}
+	public void setPipeFtrIdn(String pipeFtrIdn) {
+		this.pipeFtrIdn = pipeFtrIdn;
+	}
+	public int getVideoId() {
+		return videoId;
 	}
 	
 }

@@ -36,56 +36,77 @@ public interface MWSInterfaceMapper {
 		
 	// resource/gateway
 	void insertGateway(SNGatewayVO vo) throws Exception;
-	
 	// resource/pan
 	void insertPan(SNPanVO vo) throws Exception;
-	
 	// resource/node
 	void insertNode(SNNodeVO vo) throws Exception;
-	
 	// resource/transducer
 	void insertTransducer(SNTransducerVO vo) throws Exception;
+		
+	// resource/gatewayByID(2)
+	void insertGatewayByID(SNGatewayVO vo) throws Exception;
+	// resource/panByID(2)
+	void insertPanByID(SNPanVO vo) throws Exception;
+	// resource/nodeByID(2)
+	void insertNodeByID(SNNodeVO vo) throws Exception;
 	
 	// resource/update
 	int updateGatewayAddress(SNGatewayVO vo) throws Exception;
-	
 	int updatePanAddress(SNPanVO vo) throws Exception;
-	
 	int updateNodeAddress(SNNodeVO vo) throws Exception;
-	
 	int updateTransducerAddress(SNGatewayVO vo) throws Exception;
+	
+	// resource/updateByGID(2)
+	int updateGatewayAddressByGID(SNGatewayVO vo) throws Exception;
+	int updatePanAddressByGID(SNPanVO vo) throws Exception;
+	int updateNodeAddressByGID(SNNodeVO vo) throws Exception;
 	
 	// resource/delete
 	int deleteGateway(SNGatewayVO vo) throws Exception;
-	
 	int deletePan(SNPanVO vo) throws Exception;
-
 	int deleteNode(SNNodeVO vo) throws Exception;
-	
 	int deleteTransducer(SNTransducerVO vo) throws Exception;
-	
 	int deleteGatewayDescent(SNGatewayVO vo) throws Exception;
-
 	int deletePanDescent(SNPanVO vo) throws Exception;
-	
 	int deleteNodeDescent(SNNodeVO vo) throws Exception;
+	
+	// resource/deleteByGID(2)
+	int deleteGatewayByGID(SNGatewayVO vo) throws Exception;
+	int deletePanByGID(SNPanVO vo) throws Exception;
+	int deleteNodeByGID(SNNodeVO vo) throws Exception;
 	
 	// report/sensingValue
 	int insertSensingValue(SNSensingValueVO vo) throws Exception;
+	
+	// report/sensingValueByGID(2)
+	int insertSensingValueByGID(SNSensingValueVO vo) throws Exception;
+	void checkSensingValueThreshold(SNSensingValueVO vo) throws Exception;
+	void checkLeakageThreshold(SNSensingValueVO vo) throws Exception;
+	
+	// report/binaryValue(2)
+	void insertBinaryValue(SNSensingValueVO vo) throws Exception;
+	
+	// report/binaryValueByGID(2)
+	void insertBinaryValueByGID(SNSensingValueVO vo) throws Exception;
 		
 	// report/actuationResult
 	int updateActuationResult(SNTransducerVO vo) throws Exception;
+	
+	// report/actuationResultByGID(2)
+	int updateActuationResultByGID(SNTransducerVO vo) throws Exception;
 		
 	// notice/statusResource
 	int updateGatewayStatus(SNGatewayVO vo) throws Exception;
-	
 	int updatePanStatus(SNPanVO vo) throws Exception;
-	
 	int updateNodeStatus(SNNodeVO vo) throws Exception;
-	
 	int updateTransducerStatus(SNTransducerVO vo) throws Exception;
 	
 	// notice/reboot
 	int validateSessionKey(LoginSessionVO vo) throws Exception;
+	
+	// notice/statusResourceByGID(2)
+	int updateGatewayStatusByGID(SNGatewayVO vo) throws Exception;
+	int updatePanStatusByGID(SNPanVO vo) throws Exception;
+	int updateNodeStatusByGID(SNNodeVO vo) throws Exception;
 
 }

@@ -18,7 +18,7 @@
     {
 		form = document.detailForm;
 		
-		test_input();
+		//test_input();
     }
     
     /* 테스트용 */
@@ -30,27 +30,37 @@
 		form.panID.value = "1";
 		form.snID.value = "1";
 		form.tdID.value = "1";
-		form.resolutionW.value = "1024";
-		form.resolutionH.value = "768";
-		form.numPixel.value = "1000000";
+		form.resolutionW.value = "640";
+		form.resolutionH.value = "480";
+		form.numPixel.value = "500000";
 		form.addr1.value = "대전시";
-		form.addr2.value = "유성구";
-		form.addr3.value = "탑립동";
-		form.positionX.value = "10";
-		form.positionY.value = "10";
-		form.positionZ.value = "10";
-		form.pipeIdList.value = "14,15";
-		form.manholeId.value = "370";
+		form.addr2.value = "서구";
+		form.addr3.value = "월평동";
+		form.positionX.value = "127.364258";
+		form.positionY.value = "36.35828";
+		form.positionZ.value = "55";
+		form.manholeFtrIdn.value = "3331";
+		form.pipeFtrIdn.value = "8956,8957";
 		form.directionAngle.value = "43";
-		form.recStartTime.value = "2015-05-01 23:46:13";
-		form.recEndTime.value = "2015-05-01 23:47:12";
-		form.POI.value = "대전시청";
+		form.distance.value = "14.75";
+		form.recStartTime.value = "2015-10-21 13:35:53";
+		form.recEndTime.value = "2015-10-21 13:44:13";
+		form.POI.value = "월평역";
     }
     
     /* 센서선택 버튼 클릭 이벤트 */
     function btnFindSensor_onclick()
     {
     	alert("센서선택 팝업 호출");
+    }
+    
+    /* 하수관선택 버튼 클릭 이벤트 */
+    function btnFindPipe_onclick()
+    {
+    	var url = "<c:url value='/drainpipe/selectPipePopup.do'/>";
+    	var openParam = "width=850, height=570, scrollbars=no, toolbar=no, resizable=no, status=no, location=no, menubar=no";
+    	
+    	var popupObj = window.open(url, "mapPopup", openParam);
     }
     
     /* 저장 버튼 클릭 이벤트 */
@@ -80,6 +90,7 @@
 <body style="text-align:center; margin:0 auto; display:inline; padding-top:100px;" onload="javascript:form_onLoad();">
 
 <form:form commandName="drainPipeVideoVO" id="detailForm" name="detailForm" enctype="multipart/form-data">
+	<input type="hidden" id="argReadonly" value="N"/>
     <div id="content_pop">
     	<!-- 타이틀 -->
     	<div id="title">
@@ -165,25 +176,31 @@
     		<tr>
     			<td class="tbtd_caption">GPS좌표</td>
     			<td class="tbtd_content" colspan="3">
-    				경도&nbsp;<form:input path="positionX" maxlength="10" cssClass="shorttxt"/>&nbsp;
-    				위도&nbsp;<form:input path="positionY" maxlength="10" cssClass="shorttxt"/>&nbsp;
-    				고도&nbsp;<form:input path="positionZ" maxlength="10" cssClass="shorttxt"/>
+    				위도&nbsp;<form:input path="positionY" maxlength="10" cssClass="txt"/>&nbsp;
+    				경도&nbsp;<form:input path="positionX" maxlength="10" cssClass="txt"/>&nbsp;
+    				고도&nbsp;<form:input path="positionZ" maxlength="10" cssClass="txt"/>
     			</td>
     		</tr>
     		<tr>
-    			<td class="tbtd_caption">하수도ID</td>
+    			<td class="tbtd_caption">맨홀 및 하수관</td>
     			<td class="tbtd_content" colspan="3">
-    				<form:input path="pipeIdList" maxlength="50" cssClass="longtxt"/>
+    				<span class="btn_blue_l">
+                        <a href="javascript:btnFindPipe_onclick();">선택</a>
+                        <img src="<c:url value='/images/egovframework/usdm/btn_bg_r.gif'/>" style="margin-left:6px;"/>
+                    </span>
+                    &nbsp;
+                    맨홀ID&nbsp;<form:input path="manholeFtrIdn" maxlength="30" cssClass="txt" readonly="readonly"/>&nbsp;
+    				하수관ID&nbsp;<form:input path="pipeFtrIdn" maxlength="30" cssClass="longtxt" readonly="readonly"/>
     			</td>
     		</tr>
     		<tr>
-    			<td class="tbtd_caption">맨홀ID</td>
-    			<td class="tbtd_content">
-    				<form:input path="manholeId" maxlength="30" cssClass="txt"/>
-    			</td>
     			<td class="tbtd_caption">방향각</td>
     			<td class="tbtd_content">
     				<form:input path="directionAngle" maxlength="30" cssClass="txt"/>
+    			</td>
+    			<td class="tbtd_caption">이동거리</td>
+    			<td class="tbtd_content">
+    				<form:input path="distance" maxlength="30" cssClass="txt"/>
     			</td>
     		</tr>
     		<tr>

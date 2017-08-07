@@ -17,9 +17,15 @@ package egovframework.usdm.service;
 
 public class SNNodeVO extends UsdmDefaultVO {
 
+	private String 	gwGID;
+	private String 	panGID;
+	private String 	GID;
 	private String 	gwID;
 	private String 	panID;
 	private String 	snID;
+	private String	ftr_cde;
+	private String	ftr_idn;
+	private double	deployTime;
 	private String 	globalID;
 	private String 	manufacturer;
 	private String 	productNo;
@@ -37,10 +43,34 @@ public class SNNodeVO extends UsdmDefaultVO {
 	private int		monitoringPeriod;
 	private String	statusCode;
 	private int 	deleteCode;
+	private String	nickName;
 	private String 	newGwID;
 	private String 	newPanID;
 	private String 	newSnID;
+	private String 	X;
+	private String 	Y;
+	private String 	geoTable;
+	private long	currentTime;
+	private long	endTime;
 	
+	public String getGwGID() {
+		return gwGID;
+	}
+	public void setGwGID(String gwGID) {
+		this.gwGID = gwGID;
+	}
+	public String getPanGID() {
+		return panGID;
+	}
+	public void setPanGID(String panGID) {
+		this.panGID = panGID;
+	}
+	public String getGID() {
+		return GID;
+	}
+	public void setGID(String gID) {
+		GID = gID;
+	}
 	public String getGwID() {
 		return gwID;
 	}
@@ -58,6 +88,24 @@ public class SNNodeVO extends UsdmDefaultVO {
 	}
 	public void setSnID(String snID) {
 		this.snID = snID;
+	}
+	public String getFtr_cde() {
+		return ftr_cde;
+	}
+	public void setFtr_cde(String ftr_cde) {
+		this.ftr_cde = ftr_cde;
+	}
+	public String getFtr_idn() {
+		return ftr_idn;
+	}
+	public void setFtr_idn(String ftr_idn) {
+		this.ftr_idn = ftr_idn;
+	}
+	public double getDeployTime() {
+		return deployTime;
+	}
+	public void setDeployTime(double deployTime) {
+		this.deployTime = deployTime;
 	}
 	public String getGlobalID() {
 		return globalID;
@@ -161,6 +209,12 @@ public class SNNodeVO extends UsdmDefaultVO {
 	public void setDeleteCode(int deleteCode) {
 		this.deleteCode = deleteCode;
 	}
+	public String getNickName() {
+		return nickName;
+	}
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
 	public String getNewGwID() {
 		return newGwID;
 	}
@@ -179,5 +233,35 @@ public class SNNodeVO extends UsdmDefaultVO {
 	public void setNewSnID(String newSnID) {
 		this.newSnID = newSnID;
 	}
-
+	public String getX() {
+		return X;
+	}
+	public void setX(String x) {
+		X = x;
+	}
+	public String getY() {
+		return Y;
+	}
+	public void setY(String y) {
+		Y = y;
+	}
+	public String getGeoTable() {
+		return geoTable;
+	}
+	public void setGeoTable(String geoTable) {
+		this.geoTable = geoTable;
+	}
+	public long getCurrentTime() {
+		return currentTime;
+	}
+	public void setCurrentTime(long currentTime) {
+		this.currentTime = currentTime;
+	}
+	public long getEndTime() {
+		return endTime;
+	}
+	public void setEndTime(long endTime) {
+		this.endTime = endTime;
+	}
+	
 }

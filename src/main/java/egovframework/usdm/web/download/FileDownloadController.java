@@ -73,28 +73,45 @@ public class FileDownloadController {
 		
 		int fSize = (int) uFile.length();
  
+		BufferedInputStream in = null;
+		
 		if (fSize > 0) {
- 
-			BufferedInputStream in = new BufferedInputStream(new FileInputStream(uFile));
-			String mimetype = servletContext.getMimeType(fileRealName);
- 
-			newFileName = new String(fileName.getBytes("utf-8"),"iso-8859-1");
+			try {
+				in = new BufferedInputStream(new FileInputStream(uFile));
+				String mimetype = servletContext.getMimeType(fileRealName);
+	 
+				newFileName = new String(fileName.getBytes("utf-8"),"iso-8859-1");
+				
+				response.setBufferSize(fSize);
+				response.setContentType(mimetype);
+				response.setHeader("Content-Disposition", "attachment; filename=\"" + newFileName + "\"");
+				response.setContentLength(fSize);
+	 
+				FileCopyUtils.copy(in, response.getOutputStream());
+				
+				response.getOutputStream().flush();
+				response.getOutputStream().close();
 			
-			response.setBufferSize(fSize);
-			response.setContentType(mimetype);
-			response.setHeader("Content-Disposition", "attachment; filename=\"" + newFileName + "\"");
-			response.setContentLength(fSize);
- 
-			FileCopyUtils.copy(in, response.getOutputStream());
-			in.close();
-			response.getOutputStream().flush();
-			response.getOutputStream().close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 		else {
 			
 			//setContentType을 프로젝트 환경에 맞추어 변경
 			response.setContentType("application/x-msdownload");
+			
 			PrintWriter printwriter = response.getWriter();
+			
 			printwriter.println("<html>");
 			printwriter.println("<br><br><br><h2>Could not get file name:<br>" + fileName + "</h2>");
 			printwriter.println("<br><br><br><center><h3><a href='javascript: history.go(-1)'>Back</a></h3></center>");

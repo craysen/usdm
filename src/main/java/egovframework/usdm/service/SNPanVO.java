@@ -17,6 +17,8 @@ package egovframework.usdm.service;
 
 public class SNPanVO extends UsdmDefaultVO {
 
+	private String 	gwGID;
+	private String 	GID;
 	private String 	gwID;
 	private String 	panID;
 	private String 	topology;
@@ -30,9 +32,22 @@ public class SNPanVO extends UsdmDefaultVO {
 	private String 	snIDList;
 	private String	statusCode;
 	private int		deleteCode;
+	private String	nickName;
 	private String 	newGwID;
 	private String 	newPanID;
 	
+	public String getGwGID() {
+		return gwGID;
+	}
+	public void setGwGID(String gwGID) {
+		this.gwGID = gwGID;
+	}
+	public String getGID() {
+		return GID;
+	}
+	public void setGID(String gID) {
+		GID = gID;
+	}
 	public String getGwID() {
 		return gwID;
 	}
@@ -110,6 +125,12 @@ public class SNPanVO extends UsdmDefaultVO {
 	}
 	public void setDeleteCode(int deleteCode) {
 		this.deleteCode = deleteCode;
+	}
+	public String getNickName() {
+		return nickName;
+	}
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 	public String getNewGwID() {
 		return newGwID;

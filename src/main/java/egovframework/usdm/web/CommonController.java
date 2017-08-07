@@ -15,7 +15,13 @@
  */
 package egovframework.usdm.web;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import egovframework.rte.fdl.property.EgovPropertyService;
+import egovframework.rte.psl.dataaccess.util.EgovMap;
+import egovframework.usdm.service.*;
+import egovframework.usdm.web.util.UsdmUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletContext;
@@ -23,6 +29,8 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springmodules.validation.commons.DefaultBeanValidator;
@@ -30,6 +38,10 @@ import org.springmodules.validation.commons.DefaultBeanValidator;
 @Controller
 public class CommonController {
 
+	/** CommonService */
+	@Resource(name = "commonService")
+	private CommonService commonService;
+	
 	/** EgovPropertyService */
 	@Resource(name = "propertiesService")
 	protected EgovPropertyService propertiesService;
@@ -55,7 +67,7 @@ public class CommonController {
 	@RequestMapping(value = "/main.do", method = RequestMethod.POST)
 	public String loginAction(UserLoginInfo user, HttpSession session) throws Exception {
 		
-		String returnStr = "";
+		String returnStr = "usp_sdm/mainframe";
 		
 		/*
 		UserLoginInfo loginUser = loginBO.findByUserIdAndPassword(user.getUserId(), user.getPassword());
@@ -84,40 +96,30 @@ public class CommonController {
         	loginUser.setUserId(user.getUserId());
 	        loginUser.setUserName("관리자");
 	        loginUser.setAuthGroupCd("ADMIN");
-	        
-	        returnStr = "usp_sdm/mainframe";
         }
         else if (user.getUserId().equals("etri")) {
         	
         	loginUser.setUserId(user.getUserId());
         	loginUser.setUserName("ETRI");
         	loginUser.setAuthGroupCd("ETRI");
-        	
-        	returnStr = "usp_sdm/mainframe";
         }
         else if (user.getUserId().equals("sewer")) {
         	
         	loginUser.setUserId(user.getUserId());
         	loginUser.setUserName("건기연");
         	loginUser.setAuthGroupCd("KICT");
-        	
-        	returnStr = "usp_sdm/mainframe";
         }
         else if (user.getUserId().equals("metro")) {
         	
         	loginUser.setUserId(user.getUserId());
         	loginUser.setUserName("철도연");
         	loginUser.setAuthGroupCd("KRRI");
-        	
-        	returnStr = "usp_sdm/mainframe";
         }
         else if (user.getUserId().equals("water")) {
         	
         	loginUser.setUserId(user.getUserId());
         	loginUser.setUserName("지자원");
         	loginUser.setAuthGroupCd("KIGAM");
-        	
-        	returnStr = "usp_sdm/mainframe";
         }
         else {
         	returnStr = "redirect:/loginError.do";
@@ -126,6 +128,22 @@ public class CommonController {
         session.setAttribute("userLoginInfo", loginUser);
         	
         return returnStr;
+	}
+	
+	// 로그인
+	// login.jsp를 통하지 않고 바로 관리자로 로그인하여 메인화면으로 진입
+	@RequestMapping(value = "/loginMain.do", method = RequestMethod.GET)
+	public String loginMainAction(UserLoginInfo user, HttpSession session) throws Exception {
+		
+		UserLoginInfo loginUser = new UserLoginInfo();
+		
+		loginUser.setUserId("admin");
+		loginUser.setUserName("관리자");
+		loginUser.setAuthGroupCd("ADMIN");
+		
+		session.setAttribute("userLoginInfo", loginUser);
+		
+		return "usp_sdm/mainframe";
 	}
 	
 	// 로그인 실패
@@ -147,7 +165,13 @@ public class CommonController {
 	
 	// 메인화면 호출
 	@RequestMapping(value = "/mainframe.do")
-	public String callMain() throws Exception {
+	public String callMain (@ModelAttribute("usdmSearchVO") UsdmDefaultVO usdmSearchVO, Model model) throws Exception {
+		List<?> sensorList = commonService.selectSensorNodeGeometry(usdmSearchVO);
+		List<?> valueList  = commonService.selectSensorNodeSensingValue(usdmSearchVO);
+		
+		model.addAttribute("sensorList", sensorList);
+		model.addAttribute("valueList",  valueList);
+		
 		return "usp_sdm/UI-020_Main";
 	}
 	

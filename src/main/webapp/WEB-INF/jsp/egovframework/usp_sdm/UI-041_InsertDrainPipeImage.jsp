@@ -18,7 +18,7 @@
     {
 		form = document.detailForm;
 		
-		test_input();
+		//test_input();
     }
     
     /* 테스트용 */

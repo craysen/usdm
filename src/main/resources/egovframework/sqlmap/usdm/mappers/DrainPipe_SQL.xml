@@ -17,8 +17,8 @@
 		<result property="positionX" column="positionX"/>
 		<result property="positionY" column="positionY"/>
 		<result property="positionZ" column="positionZ"/>
-		<result property="pipeIdList" column="pipeIdList"/>
-		<result property="manholeId" column="manholeId"/>
+		<result property="manholeFtrCde" column="manholeFtrCde"/>
+		<result property="manholeFtrIdn" column="manholeFtrIdn"/>
 		<result property="directionAngle" column="directionAngle"/>
 		<result property="addr1" column="addr1"/>
 		<result property="addr2" column="addr2"/>
@@ -27,6 +27,7 @@
 		<result property="recEndTime" column="recEndTime"/>
 		<result property="damage" column="damage"/>
 		<result property="POI" column="POI"/>
+		<result property="distance" column="distance"/>
 	</resultMap>
 
 	<resultMap id="drainPipeImage" type="egovframework.usdm.service.DrainPipeImageVO">
@@ -52,6 +53,17 @@
 		<result property="damage" column="damage"/>
 		<result property="POI" column="POI"/>
 	</resultMap>
+	
+	<resultMap id="drainPipeAccident" type="egovframework.usdm.service.DrainPipeAccidentVO">
+		<result property="pipeFtrCde" column="pipeFtrCde"/>
+		<result property="pipeFtrIdn" column="pipeFtrIdn"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="accidentTime" column="accidentTime"/>
+		<result property="accidentType" column="accidentType"/>
+		<result property="accidentShape" column="accidentShape"/>
+		<result property="accidentDesc" column="accidentDesc"/>
+	</resultMap>
 
 	<insert id="insertDrainPipeVideo" parameterType="DrainPipeVideoVO">
 		<![CDATA[
@@ -70,8 +82,8 @@
 					  , positionY
 					  , positionZ
 					  , position
-					  , pipeIdList
-					  , manholeId
+					  , manhole_ftr_cde
+					  , manhole_ftr_idn
 					  , directionAngle
 					  , addr1
 					  , addr2
@@ -80,6 +92,7 @@
 					  , recEndTime
 					  , damage
 					  , POI
+					  , distance
 					  )
 				VALUES (
 						#{gwID}
@@ -96,8 +109,8 @@
 					  , #{positionY}
 					  , #{positionZ}
 					  , ST_GEOMFROMTEXT('POINT(${positionX} ${positionY})',0)
-					  , #{pipeIdList}
-					  , #{manholeId}
+					  , (SELECT ftr_cde FROM sdm_DrainManhole WHERE ftr_idn = #{manholeFtrIdn})
+					  , #{manholeFtrIdn}
 					  , #{directionAngle}
 					  , #{addr1}
 					  , #{addr2}
@@ -106,6 +119,29 @@
 					  , #{recEndTime}
 					  , #{damage}
 					  , #{POI}
+					  , #{distance}
+					  )  
+		]]>
+	</insert>
+	
+	<select id="selectMaxDrainPipeVideoID" parameterType="DrainPipeVideoVO" resultType="egovMap">
+		<![CDATA[
+			SELECT MAX(videoId) AS videoId
+			  FROM sdm_DrainPipeVideo
+		]]>
+	</select>
+	
+	<insert id="insertDrainPipeVideoRel">
+		<![CDATA[
+			INSERT INTO sdm_DrainPipeVideoRel (
+						videoId
+					  , ftr_cde
+					  , ftr_idn
+					  )
+				VALUES (
+						#{videoId}
+					  , (SELECT ftr_cde FROM sdm_DrainPipe WHERE ftr_idn = #{pipeFtrIdn})
+					  , #{pipeFtrIdn}
 					  )  
 		]]>
 	</insert>
@@ -178,8 +214,8 @@
 				 , positionY		= NVL(#{positionY}, positionY)
 				 , positionZ		= NVL(#{positionZ}, positionZ)
 				 , position			= ST_GEOMFROMTEXT('POINT(${positionX} ${positionY})',0)
-				 , pipeIdList		= NVL(#{pipeIdList}, pipeIdList)
-				 , manholeId		= NVL(#{manholeId}, manholeId)
+				 , manhole_ftr_cde	= (SELECT ftr_cde FROM sdm_DrainManhole WHERE ftr_idn = #{manholeFtrIdn})
+				 , manhole_ftr_idn	= NVL(#{manholeFtrIdn}, manhole_ftr_idn)
 				 , directionAngle	= NVL(#{directionAngle}, directionAngle)
 				 , addr1			= NVL(#{addr1}, addr1)
 				 , addr2			= NVL(#{addr2}, addr2)
@@ -188,7 +224,24 @@
 				 , recEndTime		= NVL(#{recEndTime}, recEndTime)
 				 , damage			= NVL(#{damage}, damage)
 				 , POI				= NVL(#{POI}, POI)
-			 WHERE videoId = #searchId#
+				 , distance			= NVL(#{distance}, distance)
+			 WHERE videoId = #{searchId}
+		]]>
+	</update>
+	
+	<delete id="deleteDrainPipeVideoRel">
+		<![CDATA[
+			DELETE sdm_DrainPipeVideoRel
+			 WHERE videoId = #{searchId}
+		]]>
+	</delete>
+	
+	<update id="updateDrainPipeVideoRel">
+		<![CDATA[
+			UPDATE sdm_DrainPipeVideoRel
+			   SET ftr_cde = (SELECT ftr_cde FROM sdm_DrainPipe WHERE ftr_idn = #{pipeFtrIdn})
+				 , ftr_idn = #{pipeFtrIdn}
+			 WHERE videoId = #{searchId}
 		]]>
 	</update>
 	
@@ -308,8 +361,7 @@
 				 , positionX
 				 , positionY
 				 , positionZ
-				 , pipeIdList
-				 , manholeId
+				 , manhole_ftr_idn AS manholeFtrIdn
 				 , directionAngle
 				 , addr1
 				 , addr2
@@ -369,8 +421,8 @@
 				 , positionX
 				 , positionY
 				 , positionZ
-				 , pipeIdList
-				 , manholeId
+				 , manhole_ftr_cde AS manholeFtrCde
+				 , manhole_ftr_idn AS manholeFtrIdn
 				 , directionAngle
 				 , addr1
 				 , addr2
@@ -379,7 +431,16 @@
 				 , recEndTime
 				 , damage
 				 , POI
+				 , distance
 			  FROM sdm_DrainPipeVideo
+			 WHERE videoId = #{videoId}
+		]]>
+	</select>
+	
+	<select id="selectDrainPipeVideoRel" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS pipeFtrIdn
+			  FROM sdm_DrainPipeVideoRel
 			 WHERE videoId = #{videoId}
 		]]>
 	</select>
@@ -409,6 +470,86 @@
 				 , POI
 			  FROM sdm_DrainPipeImage
 			 WHERE imageId = #{imageId}
+		]]>
+	</select>
+	
+	<select id="selectDrainManholeGeometry" resultType="EgovMap">
+		<![CDATA[
+			SELECT ftr_idn   AS id
+				 , wgscoords AS geom
+			  FROM sdm_DrainManhole
+		]]>
+	</select>
+	
+	<select id="selectDrainPipeGeometry" resultType="EgovMap">
+		<![CDATA[
+			SELECT ftr_idn   AS id
+				 , wgscoords AS geom
+				 , SUBSTR(ST_ASTEXT(geom),12,LENGTH(ST_ASTEXT(geom))-12) AS tmgeom
+			  FROM sdm_DrainPipe
+		]]>
+	</select>
+	
+	<insert id="insertDrainAccident" parameterType="drainPipeAccidentVO">
+		<![CDATA[
+			INSERT INTO sdm_DrainAccident (
+						pipe_ftr_cde
+					  , pipe_ftr_idn
+					  , longitude
+					  , latitude
+					  , coordinate
+					  , accidentTime
+					  , accidentType
+					  , accidentShape
+					  , accidentDesc
+					  )
+				VALUES (
+					    (SELECT ftr_cde FROM sdm_DrainPipe WHERE ftr_idn = #{pipeFtrIdn})
+					  , #{pipeFtrIdn}
+					  , #{longitude}
+					  , #{latitude}
+					  , ST_POINTFROMTEXT('POINT(${x} ${y})',0)
+					  , #{accidentTime}
+					  , #{accidentType}
+					  , #{accidentShape}
+					  , #{accidentDesc}
+					  )
+		]]>
+	</insert>
+	
+	<select id="selectDrainAccidentList" parameterType="usdmSearchVO" resultType="egovMap">
+		<![CDATA[
+			SELECT pipe_ftr_cde
+			     , pipe_ftr_idn
+			     , longitude
+			     , latitude
+			     , TO_CHAR(accidentTime) AS accidentTime
+			     , accidentTime AS accidentTimeLong
+			     , accidentType
+			     , accidentShape
+			  FROM sdm_DrainAccident
+			 WHERE ('' = #{ftrIdn} OR pipe_ftr_idn = #{ftrIdn})
+			   ${spatialCondition}
+		  ORDER BY accidentTimeLong DESC
+		]]>
+	</select>
+	
+	<select id="selectDrainAccidentDetail" parameterType="drainPipeAccidentVO" resultType="drainPipeAccidentVO">
+		<![CDATA[
+			SELECT pipe_ftr_cde AS pipeFtrCde
+			     , pipe_ftr_idn AS pipeFtrIdn
+			     , longitude
+			     , latitude
+			     , accidentTime
+			     , accidentType
+			     , accidentShape
+			     , accidentDesc
+			  FROM sdm_DrainAccident
+			 WHERE pipe_ftr_cde = #{pipeFtrCde}
+			   AND pipe_ftr_idn = #{pipeFtrIdn}
+			   AND longitude    = #{longitude}
+			   AND latitude     = #{latitude}
+			   AND accidentTime = #{accidentTime}
 		]]>
 	</select>
 

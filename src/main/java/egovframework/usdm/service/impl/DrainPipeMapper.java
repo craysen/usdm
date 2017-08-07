@@ -18,6 +18,8 @@ package egovframework.usdm.service.impl;
 import java.util.List;
 
 import egovframework.rte.psl.dataaccess.mapper.Mapper;
+import egovframework.rte.psl.dataaccess.util.EgovMap;
+import egovframework.usdm.service.DrainPipeAccidentVO;
 import egovframework.usdm.service.DrainPipeImageVO;
 import egovframework.usdm.service.DrainPipeVideoVO;
 import egovframework.usdm.service.UsdmDefaultVO;
@@ -47,4 +49,13 @@ public interface DrainPipeMapper {
 	
 	List<?> selectDrainPipeImageList(UsdmDefaultVO usdmSearchVO) throws Exception;
 
+	List<?> selectDrainManholeGeometry(UsdmDefaultVO usdmSearchVO) throws Exception;
+	
+	List<?> selectDrainPipeGeometry(UsdmDefaultVO usdmSearchVO) throws Exception;
+
+	void insertDrainAccident(DrainPipeAccidentVO vo) throws Exception;
+	
+	List<?> selectDrainAccidentList(UsdmDefaultVO usdmSearchVO) throws Exception;
+
+	DrainPipeAccidentVO selectDrainAccidentDetail(DrainPipeAccidentVO drainPipeVideoVO) throws Exception;
 }

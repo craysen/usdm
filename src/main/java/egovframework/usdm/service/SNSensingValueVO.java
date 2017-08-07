@@ -17,6 +17,7 @@ package egovframework.usdm.service;
 
 public class SNSensingValueVO extends UsdmDefaultVO {
 
+	private String 	snGID;
 	private String 	gwID;
 	private String 	panID;
 	private String 	snID;
@@ -25,10 +26,29 @@ public class SNSensingValueVO extends UsdmDefaultVO {
 	private long  	sensingTime;
 	private String  sensorType;
 	private double	sensingValue;
+	private String	binaryValue;
 	private String  additionalCondition;
 	private String  temporalCondition;
 	private String  spatialCondition;
+	private String 	GID;
+	private String 	geoObjectType;
+	private String 	geoTable;
+
+	private String 	operator1;
+	private double	operand1;
+	private String 	logicalOp;
+	private String 	operator2;
+	private double	operand2;
+	private int		counter;
 	
+	private String	geoIDList;
+	
+	public String getSnGID() {
+		return snGID;
+	}
+	public void setSnGID(String snGID) {
+		this.snGID = snGID;
+	}
 	public String getGwID() {
 		return gwID;
 	}
@@ -77,6 +97,12 @@ public class SNSensingValueVO extends UsdmDefaultVO {
 	public void setSensingValue(double sensingValue) {
 		this.sensingValue = sensingValue;
 	}
+	public String getBinaryValue() {
+		return binaryValue;
+	}
+	public void setBinaryValue(String binaryValue) {
+		this.binaryValue = binaryValue;
+	}
 	public String getAdditionalCondition() {
 		return additionalCondition;
 	}
@@ -95,5 +121,65 @@ public class SNSensingValueVO extends UsdmDefaultVO {
 	public void setSpatialCondition(String spatialCondition) {
 		this.spatialCondition = spatialCondition;
 	}
-		
+	public String getGID() {
+		return GID;
+	}
+	public void setGID(String gID) {
+		GID = gID;
+	}
+	public String getGeoObjectType() {
+		return geoObjectType;
+	}
+	public void setGeoObjectType(String geoObjectType) {
+		this.geoObjectType = geoObjectType;
+	}
+	public String getGeoTable() {
+		return geoTable;
+	}
+	public void setGeoTable(String geoTable) {
+		this.geoTable = geoTable;
+	}
+	public String getOperator1() {
+		return operator1;
+	}
+	public void setOperator1(String operator1) {
+		this.operator1 = operator1;
+	}
+	public double getOperand1() {
+		return operand1;
+	}
+	public void setOperand1(double operand1) {
+		this.operand1 = operand1;
+	}
+	public String getLogicalOp() {
+		return logicalOp;
+	}
+	public void setLogicalOp(String logicalOp) {
+		this.logicalOp = logicalOp;
+	}
+	public String getOperator2() {
+		return operator2;
+	}
+	public void setOperator2(String operator2) {
+		this.operator2 = operator2;
+	}
+	public double getOperand2() {
+		return operand2;
+	}
+	public void setOperand2(double operand2) {
+		this.operand2 = operand2;
+	}
+	public String getGeoIDList() {
+		return geoIDList;
+	}
+	public void setGeoIDList(String geoIDList) {
+		this.geoIDList = geoIDList;
+	}
+	public int getCounter() {
+		return counter;
+	}
+	public void setCounter(int counter) {
+		this.counter = counter;
+	}
+	
 }

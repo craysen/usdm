@@ -90,6 +90,26 @@
     	case "UI100":
     		break;
     		
+    	// 하수도 사고정보 입력
+    	case "UI110":
+    		form.action = "<c:url value='/drainpipe/insertDrainAccident.do'/>";
+    		break;
+    		
+    	// 상수도 사고정보 입력
+    	case "UI120":
+    		form.action = "<c:url value='/waterpipe/insertWaterAccident.do'/>";
+    		break;
+    		
+    	// 하수도 사고목록 조회
+    	case "UI112":
+    		form.action = "<c:url value='/drainpipe/selectDrainAccidentList.do'/>";
+    		break;
+    		
+    	// 상수도 사고목록 조회
+    	case "UI122":
+    		form.action = "<c:url value='/waterpipe/selectWaterAccidentList.do'/>";
+    		break;
+    		
     	default:
     		return;
     	}
@@ -230,6 +250,28 @@
 				</c:when>
 				<c:when test="${auth=='KIGAM'}">
 					<!-- <li><a href='#' onclick="javascript:menu_onclick('UI100')"><span>파일정보 조회</span></a></li> -->
+				</c:when>
+			</c:choose>
+			
+			<c:choose>
+				<c:when test="${auth=='ADMIN' || auth=='KICT'}">
+					<li class='active has-sub'><a href='#'><span>사고정보 입력</span></a>
+						<ul>
+							<li><a href='#' onclick="javascript:menu_onclick('UI120')"><span>상수도 사고정보 입력</span></a></li>
+							<li><a href='#' onclick="javascript:menu_onclick('UI110')"><span>하수도 사고정보 입력</span></a></li>
+						</ul>
+					</li>
+				</c:when>
+			</c:choose>
+			
+			<c:choose>
+				<c:when test="${auth=='ADMIN' || auth=='ETRI' || auth=='KICT'}">
+					<li class='active has-sub'><a href='#'><span>사고정보 조회</span></a>
+						<ul>
+							<li><a href='#' onclick="javascript:menu_onclick('UI122')"><span>상수도 사고정보 조회</span></a></li>
+							<li><a href='#' onclick="javascript:menu_onclick('UI112')"><span>하수도 사고정보 조회</span></a></li>
+						</ul>
+					</li>
 				</c:when>
 			</c:choose>
 			

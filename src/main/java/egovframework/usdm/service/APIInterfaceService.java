@@ -60,7 +60,38 @@ public interface APIInterfaceService {
 	
 	// query/xSriGrid(2)
 	List<?> selectXSriGrid(SNSriGridVO vo) throws Exception;
+
+	// query/getGridByColor(3)
+	List<?> selectGridByColor(SNSriGridVO vo) throws Exception;
 	
+	// query/getGridBySRI(3)
+	List<?> selectGridBySRI(SNSriGridVO vo) throws Exception;
+	
+	// query/getInfraByColor(3)
+	List<?> selectInfraByColor(SNSriVO vo) throws Exception;
+	
+	// query/getInfraBySRI(3)
+	List<?> selectInfraBySRI(SNSriVO vo) throws Exception;
+	
+	// query/getInfraByAttribute(3)
+	List<?> selectInfraByAttribute(SNSriVO vo) throws Exception;
+	
+	// query/getInfraInGrid(3)
+	// query/getInfraInGridBySRI(3)
+	List<?> selectInfraInGrid(SNSriGridVO vo) throws Exception;
+	
+	// query/getSensingValueByID(3)
+	List<?> selectSensingValueByID(SNSensingValueVO vo) throws Exception;
+	
+	// query/repairHistory(3)
+	List<?> selectInfraRepair(InfraRepairVO vo) throws Exception;
+	
+	// query/repairHistorySubsidence(3)
+	List<?> selectSubsidenceRepair(SubsidenceRepairVO vo) throws Exception;
+	
+	// query/getEvent(3)
+	List<?> selectEvent(EventVO vo) throws Exception;
+		
 	// query/getWaterManhole(2)
 	List<?> selectWaterManholePipeRel(ManholePipeRelVO vo) throws Exception;
 	
@@ -157,6 +188,17 @@ public interface APIInterfaceService {
 	
 	// information/setLeakThreshold(2)
 	void insertLeakThreshold(SNSensingValueVO vo) throws Exception;
+	
+	// information/repairInfra(3)
+	String insertInfraRepair(InfraRepairVO vo) throws Exception;
+	EgovMap selectInfraRepairGeoChange(InfraRepairVO vo) throws Exception;
+	List<?> selectInfraRepairGridChanged(InfraRepairVO vo) throws Exception;
+	
+	// information/repairSubsidence(3)
+	String insertSubsidenceRepair(SubsidenceRepairVO vo) throws Exception;
+	List<?> selectSubsidenceRepairSewerChange(SubsidenceRepairVO vo) throws Exception;
+	List<?> selectSubsidenceRepairSubwayChange(SubsidenceRepairVO vo) throws Exception;
+	List<?> selectSubsidenceRepairStationChange(SubsidenceRepairVO vo) throws Exception;
 	
 	// information/geoobjectListRequest(2)
 	List<?> selectGeoobjectList(SNSensingValueVO vo) throws Exception;
@@ -265,5 +307,7 @@ public interface APIInterfaceService {
 	
 	// query/drainManhole2WGS
 	List<?> selectDrainManholeGeometry() throws Exception;
-	
+
+	// query/updateSriGridAll
+	void updateSriGridAll() throws Exception;
 }

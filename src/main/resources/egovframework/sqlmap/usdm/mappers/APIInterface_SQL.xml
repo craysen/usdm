@@ -148,13 +148,10 @@
 		<result property="address3" column="address3"/>
 		<result property="address4" column="address4"/>
 		<result property="accidentTime" column="accidentTime"/>
-		<result property="accidentDepth" column="accidentDepth"/>
-		<result property="accidentDegree" column="accidentDegree"/>
 		<result property="accidentType" column="accidentType"/>
 		<result property="accidentShape" column="accidentShape"/>
 		<result property="accidentDesc" column="accidentDesc"/>
 		<result property="geoTable" column="geoTable"/>
-		<result property="accidentTable" column="accidentTable"/>
 	</resultMap>
 	
 	<resultMap id="snGeoRelation" type="egovframework.usdm.service.SNGeoRelationVO">
@@ -203,6 +200,32 @@
 		<result property="updateTime" column="updateTime"/>
 		<result property="recommended1BlockSize" column="recommended1BlockSize"/>
 	</resultMap>
+	
+	<resultMap id="infraRepair" type="egovframework.usdm.service.InfraRepairVO">
+		<result property="geoType" column="geoType"/>
+		<result property="ftrCde" column="ftrCde"/>
+		<result property="ftrIdn" column="ftrIdn"/>
+		<result property="repairDate" column="repairDate"/>
+		<result property="category" column="category"/>
+		<result property="contents" column="contents"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+	</resultMap>
+	
+	<resultMap id="messageQueue" type="egovframework.usdm.service.MessageQueueVO">
+		<result property="eventName" column="eventName"/>
+		<result property="resourceID" column="resourceID"/>
+		<result property="value" column="value"/>
+		<result property="timestamp" column="timestamp"/>
+	</resultMap>
+	
+	<resultMap id="event" type="egovframework.usdm.service.EventVO">
+		<result property="eventName" column="eventName"/>
+		<result property="resourceID" column="resourceID"/>
+		<result property="eventValue" column="eventValue"/>
+		<result property="eventTime" column="eventTime"/>
+		<result property="temporalCondition" column="temporalCondition"/>
+	</resultMap>
 
 	<select id="validateSessionKey" parameterType="LoginSessionVO" resultType="egovMap">
 		<![CDATA[
@@ -249,7 +272,7 @@
 			   AND ('FF' = #{panID} OR panID = #{panID})
 			   AND ('FF' = #{snID}  OR snID  = #{snID})
 			   AND ('FF' = #{tdID}  OR tdID  = #{tdID})
-			   AND sensorType  = #{sensorType}
+			   AND ('ALL' = #{sensorType} OR sensorType = #{sensorType})
 			   ${additionalCondition}
 		]]>
 	</select>
@@ -279,8 +302,8 @@
 				 , sensorType
 				 , sensingValue
 			  FROM sdm_SensingValueLatest
-			 WHERE snGID      = #{GID}
-			   AND sensorType  = #{sensorType}
+			 WHERE snGID = #{GID}
+			   AND ('ALL' = #{sensorType} OR sensorType = #{sensorType})
 			   ${additionalCondition}
 		]]>
 	</select>
@@ -288,45 +311,56 @@
 	<select id="selectSensingValueSpatioTemporal" parameterType="SNSensingValueVO" resultType="egovMap">
 		<![CDATA[
 			SELECT a.gwID || ':' || a.panID || ':' || a.snID || ':' || a.tdID AS tdAddress
-				 , a.sensingTime	AS sensingTime
-				 , a.sensorType		AS sensorType
-				 , a.sensingValue	AS sensingValue
-			  FROM sdm_SensingValue a
-			     , sdm_Node b
-			 WHERE ('FF' = #{gwID}  OR a.gwID  = #{gwID})
-			   AND ('FF' = #{panID} OR a.panID = #{panID})
-			   AND ('FF' = #{snID}  OR a.snID  = #{snID})
-			   AND ('FF' = #{tdID}  OR a.tdID  = #{tdID})
-			   AND a.sensorType  = #{sensorType}
-			   AND a.gwID		 = b.gwID
-			   and a.panID		 = b.panID
-			   and a.snID		 = b.snID
-			   ${additionalCondition}
-			   ${temporalCondition}
-			   ${spatialCondition}
+				 , a.sensingTime 	AS sensingTime 
+				 , a.sensorType 	AS sensorType
+				 , a.sensingValue 	AS sensingValue
+			  FROM (SELECT gwID, panID, snID, tdID
+			             , sensingTime
+						 , sensorType
+						 , sensingValue
+					  FROM sdm_SensingValue
+					 WHERE ('FF' = #{gwID}  OR gwID  = #{gwID})
+					   AND ('FF' = #{panID} OR panID = #{panID})
+					   AND ('FF' = #{snID}  OR snID  = #{snID})
+					   AND ('FF' = #{tdID}  OR tdID  = #{tdID})
+					   AND ('ALL' = #{sensorType} OR sensorType = #{sensorType})   
+					   ${additionalCondition}
+					   ${temporalCondition} ) a
+			     , (SELECT gwID, panID, snID
+				      FROM sdm_Node
+					 ${spatialCondition} ) b
+			 WHERE a.gwID  = b.gwID
+			   AND a.panID = b.panID
+			   AND a.snID  = b.snID
 		]]>
 	</select>
 	
 	<select id="selectSensingValueSpatioTemporalByID" parameterType="SNSensingValueVO" resultType="egovMap">
 		<![CDATA[
 			SELECT a.snGID			AS snGID
-				 , a.sensingTime	AS sensingTime
-				 , a.sensorType		AS sensorType
-				 , a.sensingValue	AS sensingValue
-			  FROM sdm_SensingValue a
-			     , sdm_Node b
-			 WHERE a.snGID		 = #{GID}
-			   AND a.sensorType  = #{sensorType}
-			   AND a.snGID		 = b.GID
-			   ${additionalCondition}
-			   ${temporalCondition}
-			   ${spatialCondition}
+				 , a.sensingTime 	AS sensingTime 
+				 , a.sensorType 	AS sensorType
+				 , a.sensingValue 	AS sensingValue
+			  FROM (SELECT snGID
+			             , sensingTime
+						 , sensorType
+						 , sensingValue
+					  FROM sdm_SensingValue
+					 WHERE snGID = #{GID}
+					   AND ('ALL' = #{sensorType} OR sensorType = #{sensorType})   
+					   ${additionalCondition}
+					   ${temporalCondition} ) a
+			     , (SELECT GID
+				      FROM sdm_Node
+					 ${spatialCondition} ) b
+			 WHERE a.snGID = b.GID
 		]]>
 	</select>
 	
 	<select id="selectAccident" parameterType="SNAccidentVO" resultType="egovMap">
 		<![CDATA[
-			SELECT pipe_ftr_idn AS geoID
+			SELECT accidentID
+			     , ftr_idn AS geoID
 			     , longitude
 			     , latitude
 			     , ST_X(coordinate) AS x
@@ -335,14 +369,16 @@
 			     , accidentType
 			     , accidentShape
 			     , accidentDesc
-			  FROM ${accidentTable}
-			 WHERE pipe_ftr_idn = #{ftrIdn}
+			  FROM sdm_InfraAccident
+			 WHERE ftr_idn = #{ftrIdn}
+			   AND geoType = #{geoType}
 		]]>
 	</select>
 	
 	<select id="selectAccidentByRegion" parameterType="SNAccidentVO" resultType="egovMap">
 		<![CDATA[
-			SELECT pipe_ftr_idn AS geoID
+			SELECT accidentID
+			     , ftr_idn AS geoID
 			     , longitude
 			     , latitude
 			     , ST_X(coordinate) AS x
@@ -351,7 +387,8 @@
 			     , accidentType
 			     , accidentShape
 			     , accidentDesc
-			  FROM ${accidentTable}
+			  FROM sdm_InfraAccident
+			 WHERE geoType = #{geoType}
 			 ${spatialCondition}
 		]]>
 	</select>
@@ -436,11 +473,13 @@
 			     , NVL(subwaySri,0)      AS subwaySri
 			     , NVL(stationSri,0)     AS stationSri
 			     , NVL(geologySri,0)     AS geologySri
-			     , NVL(watergrade,' ')   AS watergrade
-				 , NVL(draingrade,' ')   AS draingrade
-				 , NVL(subwaygrade,' ')  AS subwaygrade
-				 , NVL(stationgrade,' ') AS stationgrade
-				 , NVL(geologygrade,' ') AS geologygrade
+			     , NVL(cellSri,0)        AS cellSri
+			     , NVL(waterGrade,' ')   AS waterGrade
+				 , NVL(drainGrade,' ')   AS drainGrade
+				 , NVL(subwayGrade,' ')  AS subwayGrade
+				 , NVL(stationGrade,' ') AS stationGrade
+				 , NVL(geologyGrade,' ') AS geologyGrade
+				 , NVL(cellGrade,' ')    AS cellGrade
 			  FROM sdm_SriGrid
 			 WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((${minX} ${minY}, ${maxX} ${minY}, ${maxX} ${maxY}, ${minX} ${maxY}, ${minX} ${minY}))',0), geom) = 1
 			   AND LEAST(NVL(waterSri,999),NVL(drainSri,999),NVL(subwaySri,999),NVL(stationSri,999),NVL(geologySri,999)) >= ${minValue}
@@ -460,13 +499,235 @@
 			     , NVL(subwaySri,0)      AS subwaySri
 			     , NVL(stationSri,0)     AS stationSri
 			     , NVL(geologySri,0)     AS geologySri
-			     , NVL(watergrade,' ')   AS watergrade
-				 , NVL(draingrade,' ')   AS draingrade
-				 , NVL(subwaygrade,' ')  AS subwaygrade
-				 , NVL(stationgrade,' ') AS stationgrade
-				 , NVL(geologygrade,' ') AS geologygrade
+			     , NVL(cellSri,0)        AS cellSri
+			     , NVL(waterGrade,' ')   AS waterGrade
+				 , NVL(drainGrade,' ')   AS drainGrade
+				 , NVL(subwayGrade,' ')  AS subwayGrade
+				 , NVL(stationGrade,' ') AS stationGrade
+				 , NVL(geologyGrade,' ') AS geologyGrade
+				 , NVL(cellGrade,' ')    AS cellGrade
 			  FROM sdm_SRIGrid
 			 WHERE cellID IN (${cellIDList})
+		]]>
+	</select>
+	
+	<select id="selectGridByColor" parameterType="snSriGridVO" resultType="egovMap">
+		<![CDATA[
+			SELECT cellID
+			     , NVL(waterSri,0)       AS waterSri
+			     , NVL(drainSri,0)       AS drainSri
+			     , NVL(subwaySri,0)      AS subwaySri
+			     , NVL(stationSri,0)     AS stationSri
+			     , NVL(geologySri,0)     AS geologySri
+			     , NVL(cellSri,0)        AS cellSri
+			     , NVL(waterGrade,' ')   AS waterGrade
+				 , NVL(drainGrade,' ')   AS drainGrade
+				 , NVL(subwayGrade,' ')  AS subwayGrade
+				 , NVL(stationGrade,' ') AS stationGrade
+				 , NVL(geologyGrade,' ') AS geologyGrade
+				 , NVL(cellGrade,' ')    AS cellGrade
+			  FROM sdm_SriGrid
+			 WHERE cellGrade = #{grade}
+		]]>
+	</select>
+	
+	<select id="selectGridBySRI" parameterType="snSriGridVO" resultType="egovMap">
+		<![CDATA[
+			SELECT cellID
+			     , NVL(waterSri,0)       AS waterSri
+			     , NVL(drainSri,0)       AS drainSri
+			     , NVL(subwaySri,0)      AS subwaySri
+			     , NVL(stationSri,0)     AS stationSri
+			     , NVL(geologySri,0)     AS geologySri
+			     , NVL(cellSri,0)        AS cellSri
+			     , NVL(waterGrade,' ')   AS waterGrade
+				 , NVL(drainGrade,' ')   AS drainGrade
+				 , NVL(subwayGrade,' ')  AS subwayGrade
+				 , NVL(stationGrade,' ') AS stationGrade
+				 , NVL(geologyGrade,' ') AS geologyGrade
+				 , NVL(cellGrade,' ')    AS cellGrade
+			  FROM sdm_SriGrid
+			 ${additionalCondition}
+		]]>
+	</select>
+	
+	<select id="selectInfraByColor" parameterType="snSriVO" resultType="egovMap">
+		<![CDATA[
+			SELECT geoID
+			     , geoType
+			     , bsri
+			     , level
+			  FROM (SELECT ftr_idn AS geoID
+					     , 'water' AS geoType
+					     , wtl_sri AS bsri
+					     , wtl_lev AS level
+					  FROM sdm_WaterPipeSri
+					 
+					 UNION ALL
+					 
+					SELECT ftr_idn AS geoID
+					     , 'sewer' AS geoType
+					     , sew_sri AS bsri
+					     , sew_lev AS level
+					  FROM sdm_DrainPipeSri
+					 
+					 UNION ALL
+					 
+					SELECT ftr_idn  AS geoID
+					     , 'subway' AS geoType
+					     , met_sri  AS bsri
+					     , met_lev  AS level
+					  FROM sdm_SubwayLineSri
+					 
+					 UNION ALL
+					 
+					SELECT ftr_idn    AS geoID
+					     , 'subway_s' AS geoType
+					     , sta_sri    AS bsri
+					     , sta_lev    AS level
+					  FROM sdm_SubwayStationSri )
+			 WHERE level = #{sriGrade}
+		]]>
+	</select>
+	
+	<select id="selectInfraBySRI" parameterType="snSriVO" resultType="egovMap">
+		<![CDATA[
+			SELECT geoID
+			     , geoType
+			     , bsri
+			     , level
+			  FROM (SELECT ftr_idn AS geoID
+					     , 'water' AS geoType
+					     , wtl_sri AS bsri
+					     , wtl_lev AS level
+					  FROM sdm_WaterPipeSri
+					 
+					 UNION ALL
+					 
+					SELECT ftr_idn AS geoID
+					     , 'sewer' AS geoType
+					     , sew_sri AS bsri
+					     , sew_lev AS level
+					  FROM sdm_DrainPipeSri
+					 
+					 UNION ALL
+					 
+					SELECT ftr_idn  AS geoID
+					     , 'subway' AS geoType
+					     , met_sri  AS bsri
+					     , met_lev  AS level
+					  FROM sdm_SubwayLineSri
+					 
+					 UNION ALL
+					 
+					SELECT ftr_idn    AS geoID
+					     , 'subway_s' AS geoType
+					     , sta_sri    AS bsri
+					     , sta_lev    AS level
+					  FROM sdm_SubwayStationSri )
+			 ${additionalCondition}
+		]]>
+	</select>
+	
+	<select id="selectWaterByAttribute" parameterType="snSriVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , wtl_sri AS bsri
+			     , wtl_lev AS level
+			  FROM sdm_WaterPipeSri
+			 ${additionalCondition}
+		]]>
+	</select>
+	<select id="selectSewerByAttribute" parameterType="snSriVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , sew_sri AS bsri
+			     , sew_lev AS level
+			  FROM sdm_WaterPipeSri
+			 ${additionalCondition}
+		]]>
+	</select>
+	<select id="selectSubwayByAttribute" parameterType="snSriVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , met_sri AS bsri
+			     , met_lev AS level
+			  FROM sdm_SubwayLineSri
+			 ${additionalCondition}
+		]]>
+	</select>
+	<select id="selectStationByAttribute" parameterType="snSriVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , sta_sri AS bsri
+			     , sta_lev AS level
+			  FROM sdm_SubwayStationSri
+			 ${additionalCondition}
+		]]>
+	</select>
+	
+	<select id="selectInfraInGrid" parameterType="snSriGridVO" resultType="egovMap">
+		<![CDATA[
+			SELECT gridIndex
+			     , geoID
+				 , geoType
+				 , bsri
+				 , level
+			  FROM (SELECT a.cellID  AS gridIndex
+					     , b.ftr_idn AS geoID
+						 , 'water'   AS geoType
+						 , c.wtl_sri AS bsri
+						 , c.wtl_lev AS level
+					  FROM sdm_SriGrid a
+					     , sdm_WaterPipe b
+						 , sdm_WaterPipeSri c
+					 WHERE ST_INTERSECTS(a.geom, b.geom) = 1
+					   AND b.ftr_idn = c.ftr_idn
+					   AND a.cellID IN (${cellIDList})
+					   
+					 UNION ALL
+					 
+					SELECT a.cellID  AS gridIndex
+					     , b.ftr_idn AS geoID
+						 , 'sewer'   AS geoType
+						 , c.sew_sri AS bsri
+						 , c.sew_lev AS level
+					  FROM sdm_SriGrid a
+					     , sdm_DrainPipe b
+						 , sdm_DrainPipeSri c
+					 WHERE ST_INTERSECTS(a.geom, b.geom) = 1
+					   AND b.ftr_idn = c.ftr_idn
+					   AND a.cellID IN (${cellIDList})
+					   
+					 UNION ALL
+					 
+					SELECT a.cellID  AS gridIndex
+					     , b.ftr_idn AS geoID
+						 , 'subway'  AS geoType
+						 , c.met_sri AS bsri
+						 , c.met_lev AS level
+					  FROM sdm_SriGrid a
+					     , sdm_SubwayLine b
+						 , sdm_SubwayLineSri c
+					 WHERE ST_INTERSECTS(a.geom, b.geom) = 1
+					   AND b.ftr_idn = c.ftr_idn
+					   AND a.cellID IN (${cellIDList})
+					   
+					 UNION ALL
+					 
+					SELECT a.cellID   AS gridIndex
+					     , b.ftr_idn  AS geoID
+						 , 'subway_s' AS geoType
+						 , c.sta_sri  AS bsri
+						 , c.sta_lev  AS level
+					  FROM sdm_SriGrid a
+					     , sdm_SubwayStation b
+						 , sdm_SubwayStationSri c
+					 WHERE ST_INTERSECTS(a.geom, b.geom) = 1
+					   AND b.ftr_idn = c.ftr_idn
+					   AND a.cellID IN (${cellIDList}) )
+			 ${additionalCondition}
+			 ORDER BY gridIndex, geoType, geoID
 		]]>
 	</select>
 	
@@ -1396,9 +1657,10 @@
 	<select id="selectExistingAccident" parameterType="SNAccidentVO" resultType="egovMap">
 		<![CDATA[
 			SELECT NVL(MAX('Y'), 'N') AS existYn
-			  FROM ${accidentTable}
-			 WHERE pipe_ftr_cde = (SELECT ftr_cde FROM ${geoTable} WHERE ftr_idn = #{ftrIdn})
-			   AND pipe_ftr_idn = #{ftrIdn}
+			  FROM sdm_InfraAccident
+			 WHERE geoType      = #{geoType}
+			   AND ftr_cde      = (SELECT ftr_cde FROM ${geoTable} WHERE ftr_idn = #{ftrIdn})
+			   AND ftr_idn      = #{ftrIdn}
 			   AND longitude    = #{longitude}
 			   AND latitude     = #{latitude}
 			   AND accidentTime = #{accidentTime}
@@ -1407,28 +1669,26 @@
 	
 	<insert id="insertAccident" parameterType="SNAccidentVO">
 		<![CDATA[
-			INSERT INTO ${accidentTable} (
-						pipe_ftr_cde
-					  , pipe_ftr_idn
+			INSERT INTO sdm_InfraAccident
+					   (geoType
+					  , ftr_cde
+					  , ftr_idn
 					  , longitude
 					  , latitude
 					  , coordinate
 					  , accidentTime
-					  , accidentDepth
-					  , accidentDegree
 					  , accidentType
 					  , accidentShape
 					  , accidentDesc
 					  )
 				VALUES (
-					    (SELECT ftr_cde FROM ${geoTable} WHERE ftr_idn = #{ftrIdn})
+					    #{geoType}
+					  , (SELECT ftr_cde FROM ${geoTable} WHERE ftr_idn = #{ftrIdn})
 					  , #{ftrIdn}
 					  , #{longitude}
 					  , #{latitude}
 					  , ST_POINTFROMTEXT('POINT(${X} ${Y})',0)
 					  , #{accidentTime}
-					  , #{accidentDepth}
-					  , #{accidentDegree}
 					  , #{accidentType}
 					  , #{accidentShape}
 					  , #{accidentDesc}
@@ -1512,6 +1772,235 @@
                AND UPPER(sensorType) = UPPER(#{sensorType})
 		]]>
 	</update>
+	
+	<insert id="insertInfraRepair" parameterType="infraRepairVO">
+		<![CDATA[
+			INSERT INTO sdm_InfraRepair (
+						geoType
+					  , ftr_cde
+					  , ftr_idn
+					  , repairDate
+					  , category
+					  , contents
+					  , longitude
+					  , latitude
+					  , coordinate
+					  )
+				VALUES (
+					    #{geoType}
+					  , (SELECT ftr_cde FROM ${geoTable} WHERE ftr_idn = #{ftrIdn})
+					  , #{ftrIdn}
+					  , #{repairDate}
+					  , #{category}
+					  , #{contents}
+					  , #{longitude}
+					  , #{latitude}
+					  , ${wkt}
+					  )  
+		]]>
+	</insert>
+	<select id="selectExistingInfra" parameterType="infraRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT NVL(MAX('Y'), 'N') AS existYn
+			  FROM ${geoTable} a
+			     , ${sriTable} b
+			 WHERE a.ftr_idn = b.ftr_idn
+			   AND a.ftr_idn = #{ftrIdn}
+		]]>
+	</select>
+	<select id="selectNewestInfraRepairID" parameterType="infraRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT MAX(repairID) AS repairID
+			  FROM sdm_InfraRepair
+		]]>
+	</select>
+	<update id="updateAccidentRepairID" parameterType="infraRepairVO">
+		<![CDATA[
+			UPDATE sdm_InfraAccident
+			   SET repairID = #{repairID}
+			 WHERE accidentID IN (${accidentIDList})
+		]]>
+	</update>
+	<update id="updateInfraReplace" parameterType="infraRepairVO">
+		<![CDATA[
+			UPDATE ${sriTable}
+			   SET ist_yea = SUBSTR(SYSDATE,0,4)
+			     , ist_dur = 1
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</update>
+	<update id="updateWaterPipeRepaired" parameterType="infraRepairVO">
+		<![CDATA[
+			UPDATE sdm_WaterPipeSri
+			   SET wtl_sri = wtl_sri * -1
+			     , wtl_lev = 'R'
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</update>
+	<update id="updateDrainPipeRepaired" parameterType="infraRepairVO">
+		<![CDATA[
+			UPDATE sdm_DrainPipeSri
+			   SET sew_sri = sew_sri * -1
+			     , sew_lev = 'R'
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</update>
+	<update id="updateSubwayLineRepaired" parameterType="infraRepairVO">
+		<![CDATA[
+			UPDATE sdm_SubwayLineSri
+			   SET met_sri = met_sri * -1
+			     , met_lev = 'R'
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</update>
+	<update id="updateSubwayStationRepaired" parameterType="infraRepairVO">
+		<![CDATA[
+			UPDATE sdm_SubwayStationSri
+			   SET sta_sri = sta_sri * -1
+			     , sta_lev = 'R'
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</update>
+	<update id="updateWaterPipeLekSigToZero" parameterType="infraRepairVO">
+		<![CDATA[
+			UPDATE sdm_WaterPipeSri
+			   SET lek_sig = 0
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</update>
+	<select id="selectInfraRepairWaterChange" parameterType="infraRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn
+			     , wtl_lev AS level
+			  FROM sdm_WaterPipeSri
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</select>
+	<select id="selectInfraRepairSewerChange" parameterType="infraRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn
+			     , sew_lev AS level
+			  FROM sdm_DrainPipeSri
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</select>
+	<select id="selectInfraRepairSubwayChange" parameterType="infraRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn
+			     , met_lev AS level
+			  FROM sdm_SubwayLineSri
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</select>
+	<select id="selectInfraRepairStationChange" parameterType="infraRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn
+			     , sta_lev AS level
+			  FROM sdm_SubwayStationSri
+			 WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</select>
+	<select id="selectInfraRepairGridChanged" parameterType="infraRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT cellID
+			     , NVL(cellSri,0)        AS cellSri
+			     , NVL(waterSri,0)       AS waterSri
+			     , NVL(drainSri,0)       AS drainSri
+			     , NVL(subwaySri,0)      AS subwaySri
+			     , NVL(stationSri,0)     AS stationSri
+			     , NVL(geologySri,0)     AS geologySri
+			  FROM sdm_SriGrid
+			 WHERE cellID IN (${cellIDList})
+		]]>
+	</select>
+	
+	<insert id="insertSubsidenceRepair" parameterType="subsidenceRepairVO">
+		<![CDATA[
+			INSERT INTO sdm_SubsidenceRepair (
+					    repairDate
+					  , target
+					  , contents
+					  , place
+					  , longitude
+					  , latitude
+					  , coordinate
+					  )
+				VALUES (
+					    #{repairDate}
+					  , #{target}
+					  , #{contents}
+					  , #{place}
+					  , #{longitude}
+					  , #{latitude}
+					  , ${wkt}
+					  )  
+		]]>
+	</insert>
+	<select id="selectNewestSubsidenceRepairID" parameterType="subsidenceRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT MAX(repairID) AS repairID
+			  FROM sdm_SubsidenceRepair
+		]]>
+	</select>
+	<insert id="insertSubsidenceRepairRel" parameterType="subsidenceRepairRelVO">
+		<![CDATA[
+			INSERT INTO sdm_SubsidenceRepairRel (
+					    repairID
+					  , geoType
+					  , ftr_cde
+					  , ftr_idn
+					  , distance
+					  )
+				VALUES (
+					    #{repairID}
+					  , #{geoType}
+					  , (SELECT ftr_cde FROM ${geoTable} WHERE ftr_idn = #{ftrIdn})
+					  , #{ftrIdn}
+					  , #{distance}
+					  )  
+		]]>
+	</insert>
+	<update id="updateSubsidenceRepairStationSri" parameterType="subsidenceRepairRelVO">
+		<![CDATA[
+			UPDATE sdm_SubwayStationSri
+			   SET ${updateColumns}
+			WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</update>
+	<update id="updateSubsidenceRepairSubwaySri" parameterType="subsidenceRepairRelVO">
+		<![CDATA[
+			UPDATE sdm_SubwayLineSri
+			   SET ${updateColumns}
+			WHERE ftr_idn = #{ftrIdn}
+		]]>
+	</update>
+	<select id="selectSubsidenceRepairSewerChange" parameterType="subsidenceRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , sew_sri AS sri
+			     , sew_lev AS level
+			  FROM sdm_DrainPipeSri
+			 WHERE ftr_idn IN (${sewerPipeIDList})
+		]]>
+	</select>
+	<select id="selectSubsidenceRepairSubwayChange" parameterType="subsidenceRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , met_sri AS sri
+			     , met_lev AS level
+			  FROM sdm_SubwayLineSri
+			 WHERE ftr_idn IN (${subwayIDList})
+		]]>
+	</select>
+	<select id="selectSubsidenceRepairStationChange" parameterType="subsidenceRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ftr_idn AS geoID
+			     , sta_sri AS sri
+			     , sta_lev AS level
+			  FROM sdm_SubwayStationSri
+			 WHERE ftr_idn IN (${stationIDList})
+		]]>
+	</select>
 	
 	<select id="selectExistingWaterManholePipeRel" parameterType="manholePipeRelVO" resultType="egovMap">
 		<![CDATA[
@@ -2136,6 +2625,7 @@
                                    AND ST_INTERSECTS(a.geom, b.geom) = 1 )
                AND ST_INTERSECTS(a.geom, b.geom) = 1
                AND b.ftr_idn = c.ftr_idn
+               AND c.wtl_lev != 'R'
           GROUP BY a.cellid
 		]]>
 	</select>
@@ -2162,6 +2652,7 @@
                                    AND ST_INTERSECTS(a.geom, b.geom) = 1 )
                AND ST_INTERSECTS(a.geom, b.geom) = 1
                AND b.ftr_idn = c.ftr_idn
+               AND c.sew_lev != 'R'
           GROUP BY a.cellid
 		]]>
 	</select>
@@ -2188,6 +2679,7 @@
                                    AND ST_INTERSECTS(a.geom, b.geom) = 1 )
                AND ST_INTERSECTS(a.geom, b.geom) = 1
                AND b.ftr_idn = c.ftr_idn
+               AND c.met_lev != 'R'
           GROUP BY a.cellid
 		]]>
 	</select>
@@ -2214,6 +2706,7 @@
                                    AND ST_INTERSECTS(a.geom, b.geom) = 1 )
                AND ST_INTERSECTS(a.geom, b.geom) = 1
                AND b.ftr_idn = c.ftr_idn
+               AND c.sta_lev != 'R'
           GROUP BY a.cellid
 		]]>
 	</select>
@@ -2426,6 +2919,123 @@
 			SELECT ftr_idn AS id
 				 , SUBSTR(ST_ASTEXT(geom),7,LENGTH(ST_ASTEXT(geom))-7) AS geom
 			  FROM sdm_DrainManhole
+		]]>
+	</select>
+	
+	<select id="selectSriGridByID" parameterType="snSriGridVO" resultType="egovMap">
+		<![CDATA[
+			SELECT cellID
+			     , NVL(waterSri,0)       AS waterSri
+			     , NVL(drainSri,0)       AS drainSri
+			     , NVL(subwaySri,0)      AS subwaySri
+			     , NVL(stationSri,0)     AS stationSri
+			     , NVL(geologySri,0)     AS geologySri
+			     , NVL(watergrade,' ')   AS waterGrade
+				 , NVL(draingrade,' ')   AS drainGrade
+				 , NVL(subwaygrade,' ')  AS subwayGrade
+				 , NVL(stationgrade,' ') AS stationGrade
+				 , NVL(geologygrade,' ') AS geologyGrade
+			  FROM sdm_SriGrid
+			 WHERE cellID = #{cellID}
+		]]>
+	</select>
+	<select id="selectSriGridAll" resultType="egovMap">
+		<![CDATA[
+			SELECT cellID
+			     , NVL(waterSri,0)       AS waterSri
+			     , NVL(drainSri,0)       AS drainSri
+			     , NVL(subwaySri,0)      AS subwaySri
+			     , NVL(stationSri,0)     AS stationSri
+			     , NVL(geologySri,0)     AS geologySri
+			     , NVL(watergrade,' ')   AS waterGrade
+				 , NVL(draingrade,' ')   AS drainGrade
+				 , NVL(subwaygrade,' ')  AS subwayGrade
+				 , NVL(stationgrade,' ') AS stationGrade
+				 , NVL(geologygrade,' ') AS geologyGrade
+			  FROM sdm_SriGrid
+		]]>
+	</select>
+	<update id="updateSriGridAll" parameterType="snSriGridVO">
+		<![CDATA[
+			UPDATE sdm_SriGrid
+			   SET cellSri   = #{sri}
+			     , cellGrade = #{grade} 
+			 WHERE cellID = #{cellID}
+		]]>
+	</update>
+	
+	<insert id="insertEvent" parameterType="eventVO">
+		<![CDATA[
+			INSERT INTO sdm_Event (
+					eventName
+				  , resourceID
+				  , eventValue
+				  , eventTime)
+			VALUES (#{eventName}
+				  , #{resourceID}
+				  , #{eventValue}
+				  , #{eventTime}
+				  )
+		]]>
+	</insert>
+	
+	<select id="selectEvent" parameterType="eventVO" resultType="egovMap">
+		<![CDATA[
+			SELECT eventName
+			     , resourceID
+			     , eventValue
+			     , eventTime
+			  FROM sdm_Event
+			 WHERE eventName IN (${eventName})
+			   ${temporalCondition} 			
+		]]>
+	</select>
+	
+	<select id="selectSensingValueByID" parameterType="SNSensingValueVO" resultType="egovMap">
+		<![CDATA[
+			SELECT ${topCondition}
+			       sensorType
+				 , sensingTime
+				 , sensingValue
+				 , sourceTable
+				 , snID
+				 , latitude
+				 , longitude
+			  FROM (${query})
+			 ${orderCondition}
+		]]>
+	</select>
+	
+	<select id="selectInfraRepair" parameterType="infraRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT geoType
+				 , ftr_idn
+				 , repairDate
+				 , category
+				 , contents
+				 , longitude
+				 , latitude
+			  FROM sdm_InfraRepair
+			 WHERE geoType  = #{geoType}
+			   AND (0 = #{ftrIdn} OR ftr_idn = #{ftrIdn})
+			   AND category = #{category}
+			   ${temporalCondition}
+		]]>
+	</select>
+	
+	<select id="selectSubsidenceRepair" parameterType="subsidenceRepairVO" resultType="egovMap">
+		<![CDATA[
+			SELECT target
+				 , place
+				 , repairDate
+				 , contents
+				 , longitude
+				 , latitude
+			  FROM sdm_SubsidenceRepair
+			 WHERE (0 = #{target} OR target = #{target})
+			   AND place LIKE '%'||#{place}||'%'
+			   ${temporalCondition}
+			   ${spatialCondition}
 		]]>
 	</select>
 	

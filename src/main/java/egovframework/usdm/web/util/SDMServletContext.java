@@ -20,28 +20,33 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import egovframework.usdm.service.MessageQueueVO;
+import egovframework.usdm.service.impl.APIInterfaceDAO;
 
 @WebListener
 public class SDMServletContext implements ServletContextListener{
  
 	@Override
     public void contextInitialized(ServletContextEvent sce) {
-		/*
     	try {
     		// ==================
 			//   MQ 메세지 전송 
 			// ==================
 			MessageQueueVO messageVO = new MessageQueueVO();
-			messageVO.setEventName("sdmRebooted");
+			messageVO.setEventName(UsdmUtils.MQ_REBOOT);
 			messageVO.setResourceID("1");
 			messageVO.setValue("1");
 			
 			UsdmUtils.sendMessageMQ(messageVO);
+			
+			// Event 기록 저장
+			/*
+			APIInterfaceDAO apiInterface = new APIInterfaceDAO();
+			apiInterface.insertEvent(messageVO);
+			*/
     	
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
-    	*/
     }
  
     @Override
@@ -52,7 +57,7 @@ public class SDMServletContext implements ServletContextListener{
 			//   MQ 메세지 전송 
 			// ==================
 			MessageQueueVO messageVO = new MessageQueueVO();
-			messageVO.setEventName("sdmShutdown");
+			messageVO.setEventName(UsdmUtils.MQ_SHUTDOWN);
 			messageVO.setResourceID("1");
 			messageVO.setValue("1");
 			

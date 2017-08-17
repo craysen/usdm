@@ -16,7 +16,12 @@
 package egovframework.usdm.service.impl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,6 +32,7 @@ import egovframework.rte.psl.dataaccess.util.EgovMap;
 //import egovframework.rte.psl.dataaccess.util.EgovMap;
 import egovframework.usdm.service.*;
 import egovframework.usdm.web.util.InvalidParameterException;
+import egovframework.usdm.web.util.NoResourceException;
 import egovframework.usdm.web.util.UsdmUtils;
 
 import org.springframework.stereotype.Repository;
@@ -113,6 +119,74 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 	// query/xSriGrid(2)
 	public List<?> selectXSriGrid(SNSriGridVO vo) throws Exception {
 		return list("apiInterfaceDAO.selectXSriGrid", vo);
+	}
+	
+	// query/getGridByColor(3)
+	public List<?> selectGridByColor(SNSriGridVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectGridByColor", vo);
+	}
+	
+	// query/getGridBySRI(3)
+	public List<?> selectGridBySRI(SNSriGridVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectGridBySRI", vo);
+	}
+	
+	// query/getInfraByColor(3)
+	public List<?> selectInfraByColor(SNSriVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectInfraByColor", vo);
+	}
+	
+	// query/getInfraBySRI(3)
+	public List<?> selectInfraBySRI(SNSriVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectInfraBySRI", vo);
+	}
+	
+	// query/getInfraByAttribute(3)
+	public List<?> selectInfraByAttribute(SNSriVO vo) throws Exception {
+		List<?> result = null;
+		
+		switch (vo.getGeoType()) {
+		case "water":
+			result = list("apiInterfaceDAO.selectWaterByAttribute", vo);
+			break;
+		case "sewer":
+			result = list("apiInterfaceDAO.selectSewerByAttribute", vo);
+			break;
+		case "subway":
+			result = list("apiInterfaceDAO.selectSubwayByAttribute", vo);
+			break;
+		case "subway_s":
+			result = list("apiInterfaceDAO.selectStationByAttribute", vo);
+			break;
+		}
+		
+		return result;
+	}
+	
+	// query/getInfraInGrid(3)
+	// query/getInfraInGridBySRI(3)
+	public List<?> selectInfraInGrid(SNSriGridVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectInfraInGrid", vo);
+	}
+	
+	// query/getSensingValueByID(3)
+	public List<?> selectSensingValueByID(SNSensingValueVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectSensingValueByID", vo);
+	}
+	
+	// query/repairHistory(3)
+	public List<?> selectInfraRepair(InfraRepairVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectInfraRepair", vo);
+	}
+	
+	// query/repairHistorySubsidence(3)
+	public List<?> selectSubsidenceRepair(SubsidenceRepairVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectSubsidenceRepair", vo);
+	}
+	
+	// query/getEvent(3)
+	public List<?> selectEvent(EventVO vo) throws Exception {
+		return list("apiInterfaceDAO.selectEvent", vo);
 	}
 	
 	// query/getWaterManhole(2)
@@ -485,6 +559,19 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		
 		insert("apiInterfaceDAO.insertAccident", vo);
 		
+		// ==================
+		//   MQ 메세지 전송 
+		// ==================
+		MessageQueueVO messageVO = new MessageQueueVO();
+		messageVO.setEventName(UsdmUtils.MQ_ACCIDENTOCCURED);
+		messageVO.setResourceID(vo.getFtrIdn());
+		messageVO.setValue(vo.getGeoType());
+		
+		UsdmUtils.sendMessageMQ(messageVO);
+		
+		// Event 기록 저장
+		insertEvent(messageVO);
+		
 		return 0;
 	}
 	
@@ -517,6 +604,432 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 			insert("apiInterfaceDAO.insertLeakThreshold", vo);
 		else
 			update("apiInterfaceDAO.updateLeakThreshold", vo);
+	}
+	
+	// information/repairInfra(3)
+	public String insertInfraRepair(InfraRepairVO vo) throws Exception {
+		String cellIDList = "";
+		
+		SNSriVO sriVO = new SNSriVO();
+		sriVO.setGeoID(String.valueOf(vo.getFtrIdn()));
+		
+		// 매설물 및 SRI 데이터 존재여부 조회
+		EgovMap existYn = (EgovMap) select("apiInterfaceDAO.selectExistingInfra", vo);
+		
+		if (existYn.get("existyn").equals("N"))
+			return "";
+		
+		// ==================================================================================
+		//  1. 복구정보 생성
+		// ==================================================================================
+		insert("apiInterfaceDAO.insertInfraRepair", vo);
+		
+		// 새로 생성된 복구ID 조회
+		EgovMap newRepairID = (EgovMap) select ("apiInterfaceDAO.selectNewestInfraRepairID", vo);
+		vo.setRepairID((int)newRepairID.get("repairid"));
+		
+		// ==================================================================================
+		//  2. 사고정보에 복구ID update
+		// ==================================================================================
+		if (vo.getAccidentIDList() != null && !vo.getAccidentIDList().equals(""))
+			update ("apiInterfaceDAO.updateAccidentRepairID", vo);
+		
+		// ==================================================================================
+		//  3. SRI update 및 재계산
+		// ==================================================================================
+		switch (vo.getCategory()) {
+		// 교체
+		case 1:
+			// 매설년도와 사용기간 update
+			update ("apiInterfaceDAO.updateInfraReplace", vo);
+			
+			// SRI 재계산
+			switch (vo.getGeoType()) {
+			case "water":
+				calculateWaterBSRI(sriVO);
+				break;
+			case "sewer":
+				calculateSewerBSRI(sriVO);
+				break;
+			case "subway":
+				calculateSubwayBSRI(sriVO);
+				break;
+			case "subway_s":
+				calculateStationBSRI(sriVO);
+				break;
+			case "geology": // TBD
+				break;
+			}
+			
+			break;
+
+		// 전체보수
+		case 2:
+		// 부분보수
+		case 3:
+			// SRI값을 음수로, 등급을 'R'로 update
+			// SRI 재계산은 하지 않는다
+			switch (vo.getGeoType()) {
+			case "water":
+				update ("apiInterfaceDAO.updateWaterPipeRepaired", vo);
+				break;
+			case "sewer":
+				update ("apiInterfaceDAO.updateDrainPipeRepaired", vo);
+				break;
+			case "subway":
+				update ("apiInterfaceDAO.updateSubwayLineRepaired", vo);
+				break;
+			case "subway_s":
+				update ("apiInterfaceDAO.updateSubwayStationRepaired", vo);
+				break;
+			case "geology": // TBD
+				break;
+			}
+			
+			break;
+			
+		// 취소
+		case 9:
+			switch (vo.getGeoType()) {
+			// 상수도인 경우 누수음을 0으로 update
+			case "water":
+				update ("apiInterfaceDAO.updateWaterPipeLekSigToZero", vo);
+				
+				// SRI 재계산
+				calculateWaterBSRI(sriVO);
+				
+				break;
+				
+			// TBD
+			case "sewer":
+			case "subway":
+			case "subway_s":
+			case "geology":
+				break;
+			}
+			
+			break;
+		}
+		
+		// ==================================================================================
+		//  4. 그리드 재계산
+		// ==================================================================================
+		cellIDList = updateGridSRI(vo.getGeoType(), sriVO);
+		
+		return cellIDList;
+	}
+	public EgovMap selectInfraRepairGeoChange(InfraRepairVO vo) throws Exception {
+		EgovMap result = null;
+		
+		switch (vo.getGeoType()) {
+		case "water":
+			result = (EgovMap) select("apiInterfaceDAO.selectInfraRepairWaterChange", vo);
+			break;
+		case "sewer":
+			result = (EgovMap) select("apiInterfaceDAO.selectInfraRepairSewerChange", vo);
+			break;
+		case "subway":
+			result = (EgovMap) select("apiInterfaceDAO.selectInfraRepairSubwayChange", vo);
+			break;
+		case "subway_s":
+			result = (EgovMap) select("apiInterfaceDAO.selectInfraRepairStationChange", vo);
+			break;
+		case "geology": // TBD
+			break;
+		}
+
+		return result;
+	}
+	public List<?> selectInfraRepairGridChanged(InfraRepairVO vo) throws Exception {
+		return (List<EgovMap>) list("apiInterfaceDAO.selectInfraRepairGridChanged", vo);
+	}
+	
+	// information/repairSubsidence(3)
+	public String insertSubsidenceRepair(SubsidenceRepairVO vo) throws Exception {
+		String cellIDList          = "";
+		String cellIDListBySewer   = "";
+		String cellIDListByStation = "";
+		String cellIDListBySubway  = "";
+		
+		String geoType = "";
+		
+		List<String> sewerPipeList = vo.getSewerPipeList();
+		List<String> subwayList    = vo.getSubwayList();
+		List<String> stationList   = vo.getStationList();
+		
+		// 매설물 및 SRI 데이터 존재여부 조회
+		if (sewerPipeList != null) {
+			for (int i=0; i<sewerPipeList.size(); i++) {
+				geoType = "sewer";
+				
+				InfraRepairVO infraVO = new InfraRepairVO();
+				infraVO.setFtrIdn(Integer.parseInt(sewerPipeList.get(i)));
+				infraVO.setGeoTable(UsdmUtils.getGeoTableName(geoType));
+				infraVO.setSriTable(UsdmUtils.getSRITableName(geoType));
+				
+				EgovMap existYn = (EgovMap) select("apiInterfaceDAO.selectExistingInfra", infraVO);
+				
+				if (existYn.get("existyn").equals("N"))
+					return "";
+			}
+		}
+		if (subwayList != null) {
+			for (int i=0; i<subwayList.size(); i++) {
+				geoType = "subway";
+				
+				InfraRepairVO infraVO = new InfraRepairVO();
+				infraVO.setFtrIdn(Integer.parseInt(subwayList.get(i)));
+				infraVO.setGeoTable(UsdmUtils.getGeoTableName(geoType));
+				infraVO.setSriTable(UsdmUtils.getSRITableName(geoType));
+				
+				EgovMap existYn = (EgovMap) select("apiInterfaceDAO.selectExistingInfra", infraVO);
+				
+				if (existYn.get("existyn").equals("N"))
+					return "";
+			}
+		}
+		if (stationList != null) {
+			for (int i=0; i<stationList.size(); i++) {
+				geoType = "subway_s";
+				
+				InfraRepairVO infraVO = new InfraRepairVO();
+				infraVO.setFtrIdn(Integer.parseInt(stationList.get(i)));
+				infraVO.setGeoTable(UsdmUtils.getGeoTableName(geoType));
+				infraVO.setSriTable(UsdmUtils.getSRITableName(geoType));
+				
+				EgovMap existYn = (EgovMap) select("apiInterfaceDAO.selectExistingInfra", infraVO);
+				
+				if (existYn.get("existyn").equals("N"))
+					return "";
+			}
+		}
+		
+		// ==================================================================================
+		//  1. 복구정보 생성
+		// ==================================================================================
+		insert("apiInterfaceDAO.insertSubsidenceRepair", vo);
+		
+		// 새로 생성된 복구ID 조회
+		EgovMap newRepairID = (EgovMap) select ("apiInterfaceDAO.selectNewestSubsidenceRepairID", vo);
+		vo.setRepairID((int)newRepairID.get("repairid"));
+		
+		// ==================================================================================
+		//  2. 사고정보에 복구ID update
+		// ==================================================================================
+		if (vo.getAccidentIDList() != null && !vo.getAccidentIDList().equals("")) {
+			InfraRepairVO infraVO = new InfraRepairVO();
+			infraVO.setRepairID(vo.getRepairID());
+			infraVO.setAccidentIDList(vo.getAccidentIDList());
+			
+			update ("apiInterfaceDAO.updateAccidentRepairID", infraVO);
+		}
+		
+		// ==================================================================================
+		//  3. SRI update 및 SRI 재계산, 그리드 재계산
+		// ==================================================================================
+		double sewerDistance   = vo.getSewerDistance();
+		double subwayDistance  = vo.getSubwayDistance();
+		double stationDistance = vo.getStationDistance();
+		
+		int ftrIdn;
+		
+		String updateColumns = "";
+		
+		SubsidenceRepairRelVO relVO = new SubsidenceRepairRelVO();
+		
+		// ==================================================================================
+		//  3-1. 복구가 영향을 미치는 하수관이 존재하면
+		// ==================================================================================
+		if (sewerPipeList != null) {
+			geoType = "sewer";
+			
+			for (int i=0; i<sewerPipeList.size(); i++) {
+				ftrIdn = Integer.parseInt(sewerPipeList.get(i));
+				
+				// 복구-매설물 관계정보 생성
+				relVO.setRepairID(vo.getRepairID());
+				relVO.setGeoType(geoType);
+				relVO.setFtrIdn(ftrIdn);
+				relVO.setDistance(sewerDistance);
+				relVO.setGeoTable(UsdmUtils.getGeoTableName(geoType));
+				
+				insert ("apiInterfaceDAO.insertSubsidenceRepairRel", relVO);
+
+				// 하수도 SRI 계산을 위한 측정값 변경 (GPR측정값 update)
+				//relVO.setUpdateColumns(updateColumns);
+				
+				//update ("apiInterfaceDAO.updateSubsidenceRepairStationSri", relVO);
+				
+				// SRI 재계산
+				SNSriVO sriVO = new SNSriVO();
+				sriVO.setGeoID(String.valueOf(ftrIdn));
+				
+				calculateSewerBSRI(sriVO);
+				
+				// 그리드 재계산
+				cellIDListBySewer = updateGridSRI(geoType, sriVO);
+			}
+		}
+		
+		// ==================================================================================
+		//  3-2. 복구가 영향을 미치는 철도역사가 존재하면
+		// ==================================================================================
+		if (stationList != null) {
+			geoType = "subway_s";
+			
+			for (int i=0; i<stationList.size(); i++) {
+				ftrIdn = Integer.parseInt(stationList.get(i));
+
+				// 복구-매설물 관계정보 생성
+				relVO.setRepairID(vo.getRepairID());
+				relVO.setGeoType(geoType);
+				relVO.setFtrIdn(ftrIdn);
+				relVO.setDistance(stationDistance);
+				relVO.setGeoTable(UsdmUtils.getGeoTableName(geoType));
+				
+				insert ("apiInterfaceDAO.insertSubsidenceRepairRel", relVO);
+				
+				// 역사 SRI 계산을 위한 측정값 변경
+				// 복구대상 = 지반침하
+				switch (vo.getTarget()) {
+				case 11: // 복구대상 = 지반침하
+				case 12: // 복구대상 = 동공/공동
+					if (stationDistance <= 50) {
+						updateColumns  = "grd_200 = CASE WHEN grd_200 = 0 THEN 0 ELSE grd_200-1 END,";
+						updateColumns += "grd_100 = CASE WHEN grd_100 = 0 THEN 0 ELSE grd_100-1 END,";
+						updateColumns += "grd_50  = CASE WHEN grd_50  = 0 THEN 0 ELSE grd_50-1  END";
+					}
+					else if (stationDistance <= 100) {
+						updateColumns  = "grd_200 = CASE WHEN grd_200 = 0 THEN 0 ELSE grd_200-1 END,";
+						updateColumns += "grd_100 = CASE WHEN grd_100 = 0 THEN 0 ELSE grd_100-1 END";
+					}
+					else if (stationDistance <= 200) {
+						updateColumns  = "grd_200 = CASE WHEN grd_200 = 0 THEN 0 ELSE grd_200-1 END";
+					}
+					
+					break;
+					
+				case 13: // 복구대상 = 도로함몰
+					if (stationDistance <= 50) {
+						updateColumns  = "rod_200 = CASE WHEN rod_200 = 0 THEN 0 ELSE rod_200-1 END,";
+						updateColumns += "rod_100 = CASE WHEN rod_100 = 0 THEN 0 ELSE rod_100-1 END,";
+						updateColumns += "rod_50  = CASE WHEN rod_50  = 0 THEN 0 ELSE rod_50-1  END";
+					}
+					else if (stationDistance <= 100) {
+						updateColumns  = "rod_200 = CASE WHEN rod_200 = 0 THEN 0 ELSE rod_200-1 END,";
+						updateColumns += "rod_100 = CASE WHEN rod_100 = 0 THEN 0 ELSE rod_100-1 END";
+					}
+					else if (stationDistance <= 200) {
+						updateColumns  = "rod_200 = CASE WHEN rod_200 = 0 THEN 0 ELSE rod_200-1 END";
+					}
+				}
+				
+				relVO.setUpdateColumns(updateColumns);
+				
+				update ("apiInterfaceDAO.updateSubsidenceRepairStationSri", relVO);
+				
+				// SRI 재계산
+				SNSriVO sriVO = new SNSriVO();
+				sriVO.setGeoID(String.valueOf(ftrIdn));
+				
+				calculateStationBSRI(sriVO);
+				
+				// 그리드 재계산
+				cellIDListByStation = updateGridSRI(geoType, sriVO);
+			}
+		}
+				
+		// ==================================================================================
+		//  3-3. 복구가 영향을 미치는 철도선로가 존재하면
+		// ==================================================================================
+		if (subwayList != null) {
+			geoType = "subway";
+			
+			for (int i=0; i<subwayList.size(); i++) {
+				ftrIdn = Integer.parseInt(subwayList.get(i));
+				
+				// 복구-매설물 관계정보 생성
+				relVO.setRepairID(vo.getRepairID());
+				relVO.setGeoType(geoType);
+				relVO.setFtrIdn(ftrIdn);
+				relVO.setDistance(subwayDistance);
+				relVO.setGeoTable(UsdmUtils.getGeoTableName(geoType));
+				
+				insert ("apiInterfaceDAO.insertSubsidenceRepairRel", relVO);
+
+				// 선로 SRI 계산을 위한 측정값 변경
+				switch (vo.getTarget()) {
+				case 11: // 복구대상 = 지반침하
+				case 12: // 복구대상 = 동공/공동
+					if (subwayDistance <= 50) {
+						updateColumns  = "grd_200 = CASE WHEN grd_200 = 0 THEN 0 ELSE grd_200-1 END,";
+						updateColumns += "grd_100 = CASE WHEN grd_100 = 0 THEN 0 ELSE grd_100-1 END,";
+						updateColumns += "grd_50  = CASE WHEN grd_50  = 0 THEN 0 ELSE grd_50-1  END";
+					}
+					else if (subwayDistance <= 100) {
+						updateColumns  = "grd_200 = CASE WHEN grd_200 = 0 THEN 0 ELSE grd_200-1 END,";
+						updateColumns += "grd_100 = CASE WHEN grd_100 = 0 THEN 0 ELSE grd_100-1 END";
+					}
+					else if (subwayDistance <= 200) {
+						updateColumns  = "grd_200 = CASE WHEN grd_200 = 0 THEN 0 ELSE grd_200-1 END";
+					}
+					
+					break;
+				
+				case 13: // 복구대상 = 도로함몰
+					if (subwayDistance <= 50) {
+						updateColumns  = "rod_200 = CASE WHEN rod_200 = 0 THEN 0 ELSE rod_200-1 END,";
+						updateColumns += "rod_100 = CASE WHEN rod_100 = 0 THEN 0 ELSE rod_100-1 END,";
+						updateColumns += "rod_50  = CASE WHEN rod_50  = 0 THEN 0 ELSE rod_50-1  END";
+					}
+					else if (subwayDistance <= 100) {
+						updateColumns  = "rod_200 = CASE WHEN rod_200 = 0 THEN 0 ELSE rod_200-1 END,";
+						updateColumns += "rod_100 = CASE WHEN rod_100 = 0 THEN 0 ELSE rod_100-1 END";
+					}
+					else if (subwayDistance <= 200) {
+						updateColumns  = "rod_200 = CASE WHEN rod_200 = 0 THEN 0 ELSE rod_200-1 END";
+					}
+					
+					break;
+				}
+				
+				relVO.setUpdateColumns(updateColumns);
+				
+				update ("apiInterfaceDAO.updateSubsidenceRepairSubwaySri", relVO);
+				
+				// SRI 재계산
+				SNSriVO sriVO = new SNSriVO();
+				sriVO.setGeoID(String.valueOf(ftrIdn));
+				
+				calculateSubwayBSRI(sriVO);
+				
+				// 그리드 재계산
+				cellIDListBySubway = updateGridSRI(geoType, sriVO);
+			}
+		}
+		
+		cellIDList += cellIDListBySewer;
+		
+		if (!cellIDListByStation.equals("")) {
+			if (!cellIDList.equals("")) cellIDList += ",";
+			cellIDList += cellIDListByStation;
+		}
+		
+		if (!cellIDListBySubway.equals("")) {
+			if (!cellIDList.equals("")) cellIDList += ",";
+			cellIDList += cellIDListBySubway;
+		}
+		
+		return cellIDList;
+	}
+	public List<?> selectSubsidenceRepairSewerChange(SubsidenceRepairVO vo) throws Exception {
+		return list ("apiInterfaceDAO.selectSubsidenceRepairSewerChange", vo);
+	}
+	public List<?> selectSubsidenceRepairSubwayChange(SubsidenceRepairVO vo) throws Exception {
+		return list ("apiInterfaceDAO.selectSubsidenceRepairSubwayChange", vo);
+	}
+	public List<?> selectSubsidenceRepairStationChange(SubsidenceRepairVO vo) throws Exception {
+		return list ("apiInterfaceDAO.selectSubsidenceRepairStationChange", vo);
 	}
 	
 	// information/geoobjectListRequest(2)
@@ -647,8 +1160,46 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		
 		if (existYn.get("existyn").equals("Y"))
 			result = -1;
-		else
+		else {
+			// UDM의 binary data 내용 분석
+			// Binary data는 hex-string이며 little-endian 방식으로 구성되어 있다
+			// 이 String은 hex-string임을 나타내기 위해 "0x~"로 시작하므로 이 두 글자는 잘라낸다
+			String message = vo.getMessageBinaryData().substring(2);
+			
+			// 이를 byte 배열로 변환 -> ByteBuffer에 저장
+			ByteBuffer bb = ByteBuffer.wrap(new BigInteger(message,16).toByteArray());
+			bb.order(ByteOrder.LITTLE_ENDIAN);
+			
+			// UDM 식별자(2 bytes)를 ByteBuffer에서 읽어들인다
+			short id = bb.getShort();
+			
+			// UDM의 식별자가 9(lowUartActivity) 또는 17(lowBattery)인 경우 MQ메세지 전송
+			if (id == 9 || id == 17) {
+				long   	timestamp 	= (long)bb.getInt()*1000;		// timestamp (4 bytes)
+				short	gid 		= bb.getShort();				// 노드의 GID (2 bytes)
+				double	battery 	= (double)bb.getShort()/1000;	// 배터리 잔량 (2 bytes)
+				/*
+				double	temperature	= (double)bb.getShort()/1000;	// 온도 (2 bytes)
+				double	humidity	= (double)bb.getShort()/1000;	// 습도 (2 bytes)
+				*/
+				
+				// ==================
+				//   MQ 메세지 전송 
+				// ==================
+				MessageQueueVO messageVO = new MessageQueueVO();
+				messageVO.setEventName(id==9 ? UsdmUtils.MQ_LOWUARTACTIVITY : UsdmUtils.MQ_LOWBATTERY);
+				messageVO.setResourceID(String.valueOf(gid));
+				messageVO.setValue(String.valueOf(battery));
+				messageVO.setTimestamp(UsdmUtils.convertDateToStr(timestamp, "yyyyMMdd'T'HHmmss"));
+				
+				UsdmUtils.sendMessageMQ(messageVO);
+				
+				// Event 기록 저장
+				insertEvent(messageVO);
+			}
+			
 			insert("apiInterfaceDAO.insertUserDefinedMessage", vo);
+		}
 		
 		return result;
 	}
@@ -802,11 +1353,14 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 				//   MQ 메세지 전송 
 				// ==================
 				MessageQueueVO messageVO = new MessageQueueVO();
-				messageVO.setEventName("rfidStateChanged");
+				messageVO.setEventName(UsdmUtils.MQ_RFIDSTATECHANGED);
 				messageVO.setResourceID(String.valueOf(vo.getRfid()));
 				messageVO.setValue(vo.getState());
 				
 				UsdmUtils.sendMessageMQ(messageVO);
+				
+				// Event 기록 저장
+				insertEvent(messageVO);
 			}
 			
 			update("apiInterfaceDAO.updateRfidState", vo);
@@ -1047,9 +1601,11 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		wtl_sri = 100 - wtl_sri;
 		
 		// B5.위험등급 설정
-		if      (wtl_sri >= 55) wtl_lev = "C";
-		else if (wtl_sri >= 24)	wtl_lev = "B";
-		else 					wtl_lev = "A";
+		/*
+		if      (wtl_sri >= 55) wtl_lev = "A";
+		else if (wtl_sri >= 25)	wtl_lev = "B";
+		else 					wtl_lev = "C";
+		*/
 		
 		/******************************
 		 * [B] 위험점수,등급 계산 END *
@@ -1058,7 +1614,7 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		// 계산결과 update
 		vo.setAssessValue(Double.toString(wtl_sta));
 		vo.setSriValue(Double.toString(wtl_sri));
-		vo.setSriGrade(wtl_lev);
+		vo.setSriGrade(UsdmUtils.getWaterSRIGrade(wtl_sri));
 		
 		update("apiInterfaceDAO.updateWaterPipeSRI", vo);
 		
@@ -1108,8 +1664,8 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		String 	draTyp = (String)drainSRIMap.get("draTyp");							// 배수형식
 		char 	rodTyp = (char)drainSRIMap.get("rodTyp");							// 도로현황
 		int 	pipMat = ((BigDecimal)drainSRIMap.get("pipMat")).intValue();		// 이력정보
-		double	sewCtv = ((BigDecimal)drainSRIMap.get("sewCtv")).doubleValue();		// 내부상태
-		double	sewGpr = ((BigDecimal)drainSRIMap.get("sewGpr")).doubleValue();		// 동공상태
+		//double	sewCtv = ((BigDecimal)drainSRIMap.get("sewCtv")).doubleValue();		// 내부상태
+		//double	sewGpr = ((BigDecimal)drainSRIMap.get("sewGpr")).doubleValue();		// 동공상태
 		
 		/*****************************
 		 * [A] 상태평가값 계산 START *
@@ -1218,9 +1774,11 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		
 		sew_sri = 100 - sew_sta;
 		
-		if      (sew_sri >= 55) sew_lev = "C";
-		else if (sew_sri >= 24)	sew_lev = "B";
-		else 					sew_lev = "A";
+		/*
+		if      (sew_sri >= 55) sew_lev = "A";
+		else if (sew_sri >= 25)	sew_lev = "B";
+		else 					sew_lev = "C";
+		*/
 		
 		/******************************
 		 * [B] 위험점수,등급 계산 END *
@@ -1229,7 +1787,7 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		// 계산결과 update
 		vo.setAssessValue(Double.toString(sew_sta));
 		vo.setSriValue(Double.toString(sew_sri));
-		vo.setSriGrade(sew_lev);
+		vo.setSriGrade(UsdmUtils.getSewerSRIGrade(sew_sri));
 		
 		update("apiInterfaceDAO.updateDrainPipeSRI", vo);
 		
@@ -1432,13 +1990,15 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		//=====================
 		// [A10] 위험등급 계산 
 		//=====================
-		if      (met_sri >= 60) met_lev = "C";
-		else if (met_sri >= 30) met_lev = "B";
-		else 					met_lev = "A";
+		/*
+		if      (met_sri > 60)	met_lev = "A";
+		else if (met_sri > 30)	met_lev = "B";
+		else 					met_lev = "C";
+		*/
 		
 		// 계산결과 update
 		vo.setSriValue(Double.toString(met_sri));
-		vo.setSriGrade(met_lev);
+		vo.setSriGrade(UsdmUtils.getSubwayLineSRIGrade(met_sri));
 		
 		update("apiInterfaceDAO.updateSubwayLineSRI", vo);
 		
@@ -1619,13 +2179,15 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		//====================
 		// [A8] 위험등급 계산 
 		//====================
-		if      (sta_sri >= 60) sta_lev = "C";
-		else if (sta_sri >= 30) sta_lev = "B";
-		else 					sta_lev = "A";
+		/*
+		if      (sta_sri > 60) 	sta_lev = "A";
+		else if (sta_sri > 30) 	sta_lev = "B";
+		else 					sta_lev = "C";
+		*/
 		
 		// 계산결과 update
 		vo.setSriValue(Double.toString(sta_sri));
-		vo.setSriGrade(sta_lev);
+		vo.setSriGrade(UsdmUtils.getSubwayStationSRIGrade(sta_sri));
 		
 		update("apiInterfaceDAO.updateSubwayStationSRI", vo);
 		
@@ -1633,7 +2195,7 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 	}
 	
 	// SRI Grid 값을 update한다.
-	public int updateGridSRI(String geoType, SNSriVO sriVo) throws Exception {
+	public String updateGridSRI(String geoType, SNSriVO sriVo) throws Exception {
 		String selectSqlID;
 		String updateSqlID;
 		
@@ -1663,12 +2225,12 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 			throw new InvalidParameterException("unsupported geo-object type");
 		}
 		
-		// geo-object가 포함되는 grid cell의 ID와 최소BSRI값 조회
+		// geo-object가 포함되는 grid cell의 ID와 최대 BSRI값 조회
 		List<EgovMap> BSRIList = (List<EgovMap>) list(selectSqlID, sriVo);
 		
 		int cellID;
 		double sriValue;
-		char sriGrade = ' ';
+		String sriGrade = "";
 		
 		// MQ 메세지에 전송할 값
 		String cellIDList    = "";
@@ -1681,24 +2243,20 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 			
 			switch (geoType) {
 			case "water": 		// 상수도
+				sriGrade = UsdmUtils.getWaterSRIGrade(sriValue);
+				break;
 			case "sewer": 		// 하수도
-				if      (sriValue >= 55) 	sriGrade = 'C';
-				else if (sriValue >= 24) 	sriGrade = 'B';
-				else						sriGrade = 'A';
-				
+				sriGrade = UsdmUtils.getSewerSRIGrade(sriValue);
 				break;
-				
 			case "subway":		// 지하철
-			case "subway_s":	// 지하철역사
-				if      (sriValue >= 60) 	sriGrade = 'C';
-				else if (sriValue >= 30) 	sriGrade = 'B';
-				else						sriGrade = 'A';
-				
+				sriGrade = UsdmUtils.getSubwayLineSRIGrade(sriValue);
 				break;
-				
+			case "subway_s":	// 지하철역사
+				sriGrade = UsdmUtils.getSubwayStationSRIGrade(sriValue);				
+				break;
 			case "geology":	// 지질정보(TBD)
 			default:
-				sriGrade = ' ';
+				sriGrade = "";
 			}
 			
 			SNSriGridVO gridVo = new SNSriGridVO();
@@ -1709,6 +2267,9 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 			gridVo.setLastUpdate(System.currentTimeMillis());
 			
 			update(updateSqlID, gridVo);
+			
+			// 그리드의 대표SRI값과 등급 update
+			updateSriGridCellGrade(cellID);
 			
 			cellIDList    += cellID;
 			cellValueList += sriValue;
@@ -1723,13 +2284,112 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 		//   MQ 메세지 전송 
 		// ==================
 		MessageQueueVO messageVO = new MessageQueueVO();
-		messageVO.setEventName("sriValueChanged");
+		messageVO.setEventName(UsdmUtils.MQ_SRICHANGED);
 		messageVO.setResourceID(cellIDList);
 		messageVO.setValue(cellValueList);
 		
 		UsdmUtils.sendMessageMQ(messageVO);
 		
-		return 0;
+		// Event 기록 저장
+		insertEvent(messageVO);
+		
+		return cellIDList;
+	}
+	
+	// 그리드 cell의 대표SRI와 등급을 update한다.
+	public void updateSriGridCellGrade(int cellID) throws Exception {
+		List<EgovMap> queryResult = null; 
+		
+		// cellID가 0이 아닌 경우(하나의 그리드만 update)
+		if (cellID > 0) {
+			SNSriGridVO gridVo = new SNSriGridVO();
+			gridVo.setCellID(cellID);
+
+			// 지정한 그리드의 geotype별 SRI값과 등급 조회
+			queryResult = (List<EgovMap>) list("apiInterfaceDAO.selectSriGridByID", gridVo);
+		}
+		// cellID가 0인 경우(모든 그리드를 update)
+		// 최초 시스템 설치 후 그리드 데이터 초기화에 사용 (query/updateSriGridAll) 
+		else {
+			// 모든 그리드의 geotype별 SRI값과 등급 조회
+			queryResult = (List<EgovMap>) list("apiInterfaceDAO.selectSriGridAll", null);
+		}
+		
+		int sourceIndex;
+		
+		// layer의 index
+		// 이 값은 정렬순서에 따른 결과값 추출에 영향을 미침
+		final int drainIndex   = 0;
+		final int waterIndex   = 1;
+		final int subwayIndex  = 2;
+		final int stationIndex = 3;
+		final int geologyIndex = 4;
+		
+		// 각 layer의 명칭
+		// List에 추가하는 순서는 index와 동일해야 함
+		List<String> sourceLayer = new ArrayList<String>();
+		sourceLayer.add("sewer");
+		sourceLayer.add("water");
+		sourceLayer.add("subway");
+		sourceLayer.add("subway_s");
+		sourceLayer.add("geology");
+
+		EgovMap queryMap = new EgovMap();
+		
+		// grid의 SRI값 update
+		for (int i=0; i<queryResult.size(); i++) {
+			queryMap = (EgovMap)queryResult.get(i);
+			
+			// 각 layer의 SRI값
+			// array에 추가하는 순서는 index와 동일해야 함
+			double[] sriArray = new double[5];
+			sriArray[drainIndex]   = (double)queryMap.get("drainsri");
+			sriArray[waterIndex]   = (double)queryMap.get("watersri");
+			sriArray[subwayIndex]  = (double)queryMap.get("subwaysri");
+			sriArray[stationIndex] = (double)queryMap.get("stationsri");
+			sriArray[geologyIndex] = (double)queryMap.get("geologysri");
+			
+			String[] gradeArray = new String[5];
+			gradeArray[drainIndex]   = (String)queryResult.get(i).get("draingrade");
+			gradeArray[waterIndex]   = (String)queryResult.get(i).get("watergrade");
+			gradeArray[subwayIndex]  = (String)queryResult.get(i).get("subwaygrade");
+			gradeArray[stationIndex] = (String)queryResult.get(i).get("stationgrade");
+			gradeArray[geologyIndex] = (String)queryResult.get(i).get("geologygrade");
+			
+			// 그리드의 대표SRI값 선정
+			// 1순위는 등급, 2순위는 점수
+			// 1. 동일등급일 경우 상/하수도가 지하철선로/역사에 우선한다. (상/하수도에 우선순위 부여(5),지하철선로/역사(3),지질정보(1))
+			// 2. 상/하수도가 동일한 등급일 경우 높은 점수가 대표값이 된다.
+			//    지하철선로/역사가 동일한 등급일 경우 높은 점수가 대표값이 된다.
+			// 3. 상/하수도가 동일한 등급과 동일한 점수를 갖는 경우 하수도가 대표값이 된다.
+			//    지하철선로/역사가 동일한 등급과 동일한 점수를 갖는 경우 선로가 대표값이 된다.
+			
+			// 선정 방식은 2가지에 의존한다.
+			// 1. Java의 문자열 정렬방식에 의해 등급, 우선순위, 000.00으로 formatting된 SRI값을 연결한 문자열 정렬
+			// 2. 동일한 등급, 우선순위, SRI값을 갖는 경우 List의 index가 작은 항목이 선택됨
+			//    하수도가 상수도에 우선하므로 gradeList 내에서 더 작은 index를 갖는다.(지하철선로/역사도 마찬가지)
+			
+			// List에 추가하는 순서는 index와 동일해야 함
+			List<String> gradeList = new ArrayList<String>();
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("draingrade"),   sriArray[drainIndex],   5));
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("watergrade"),   sriArray[waterIndex],   5));
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("subwaygrade"),  sriArray[subwayIndex],  3));
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("stationgrade"), sriArray[stationIndex], 3));
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("geologygrade"), sriArray[geologyIndex], 1));
+			
+			// 대표BSRI의 index
+			sourceIndex = gradeList.indexOf(Collections.max(gradeList));
+			
+			// grid의 대표SRI와 등급 update
+			SNSriGridVO updateGridVo = new SNSriGridVO();
+			
+			updateGridVo.setCellID((int)queryMap.get("cellid"));
+			updateGridVo.setSri(sriArray[sourceIndex]);
+			updateGridVo.setGrade(gradeArray[sourceIndex]);
+			updateGridVo.setLastUpdate(System.currentTimeMillis());
+			
+			update("apiInterfaceDAO.updateSriGridAll", updateGridVo);
+		}
 	}
 	
 	// query/waterPipe2WGS
@@ -1745,4 +2405,30 @@ public class APIInterfaceDAO extends EgovAbstractDAO {
 	public List<?> selectDrainManholeGeometry() throws Exception {
 		return list("apiInterfaceDAO.selectDrainManholeGeometry", null);
 	}
+	
+	// query/updateSriGridAll
+	public void updateSriGridAll() throws Exception {
+		updateSriGridCellGrade(0);
+	}
+
+	// RabbitMQ 메세지가 전송될 때 event 기록을 저장한다
+	public void insertEvent(MessageQueueVO messageVO) throws Exception {
+		long eventTime = 0;
+		
+		if (messageVO.getTimestamp() != null) {
+			eventTime = UsdmUtils.convertStrToDate(messageVO.getTimestamp(), "yyyyMMdd'T'HHmmss");
+		}
+		else {
+			eventTime = System.currentTimeMillis();
+		}
+		
+		EventVO vo = new EventVO();
+		vo.setEventName(messageVO.getEventName());
+		vo.setResourceID(messageVO.getResourceID());
+		vo.setEventValue(messageVO.getValue());
+		vo.setEventTime(eventTime);
+		
+		insert("apiInterfaceDAO.insertEvent", vo);
+	}
+		
 }

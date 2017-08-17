@@ -107,6 +107,57 @@ public class APIInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 		return apiInterfaceDAO.selectXSriGrid(vo);
 	}
 	
+	// query/getGridByColor(3)
+	public List<?> selectGridByColor(SNSriGridVO vo) throws Exception {
+		return apiInterfaceDAO.selectGridByColor(vo);
+	}
+	
+	// query/getGridBySRI(3)
+	public List<?> selectGridBySRI(SNSriGridVO vo) throws Exception {
+		return apiInterfaceDAO.selectGridBySRI(vo);
+	}
+	
+	// query/getInfraByColor(3)
+	public List<?> selectInfraByColor(SNSriVO vo) throws Exception {
+		return apiInterfaceDAO.selectInfraByColor(vo);
+	}
+		
+	// query/getInfraBySRI(3)
+	public List<?> selectInfraBySRI(SNSriVO vo) throws Exception {
+		return apiInterfaceDAO.selectInfraBySRI(vo);
+	}
+	
+	// query/getInfraByAttribute(3)
+	public List<?> selectInfraByAttribute(SNSriVO vo) throws Exception {
+		return apiInterfaceDAO.selectInfraByAttribute(vo);
+	}
+	
+	// query/getInfraInGrid(3)
+	// query/getInfraInGridBySRI(3)
+	public List<?> selectInfraInGrid(SNSriGridVO vo) throws Exception {
+		return apiInterfaceDAO.selectInfraInGrid(vo);
+	}
+	
+	// query/getSensingValueByID(3)
+	public List<?> selectSensingValueByID(SNSensingValueVO vo) throws Exception {
+		return apiInterfaceDAO.selectSensingValueByID(vo);
+	}
+	
+	// query/repairHistory(3)
+	public List<?> selectInfraRepair(InfraRepairVO vo) throws Exception {
+		return apiInterfaceDAO.selectInfraRepair(vo);
+	}
+	
+	// query/repairHistorySubsidence(3)
+	public List<?> selectSubsidenceRepair(SubsidenceRepairVO vo) throws Exception {
+		return apiInterfaceDAO.selectSubsidenceRepair(vo);
+	}
+	
+	// query/getEvent(3)
+	public List<?> selectEvent(EventVO vo) throws Exception {
+		return apiInterfaceDAO.selectEvent(vo);
+	}
+		
 	// query/getWaterManhole(2)
 	public List<?> selectWaterManholePipeRel(ManholePipeRelVO vo) throws Exception {
 		return apiInterfaceDAO.selectWaterManholePipeRel(vo);
@@ -455,6 +506,47 @@ public class APIInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 			e.printStackTrace();
 		}
 	}
+	
+	// information/repairInfra(3)
+	public String insertInfraRepair(InfraRepairVO vo) throws Exception {
+		String result = "";
+		
+		try {
+			result = apiInterfaceDAO.insertInfraRepair(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	public EgovMap selectInfraRepairGeoChange(InfraRepairVO vo) throws Exception {
+		return apiInterfaceDAO.selectInfraRepairGeoChange(vo);
+	}
+	public List<?> selectInfraRepairGridChanged(InfraRepairVO vo) throws Exception {
+		return apiInterfaceDAO.selectInfraRepairGridChanged(vo);
+	}
+	
+	// information/repairSubsidence(3)
+	public String insertSubsidenceRepair(SubsidenceRepairVO vo) throws Exception {
+		String result = "";
+		
+		try {
+			result = apiInterfaceDAO.insertSubsidenceRepair(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	public List<?> selectSubsidenceRepairSewerChange(SubsidenceRepairVO vo) throws Exception {
+		return apiInterfaceDAO.selectSubsidenceRepairSewerChange(vo);
+	}
+	public List<?> selectSubsidenceRepairSubwayChange(SubsidenceRepairVO vo) throws Exception {
+		return apiInterfaceDAO.selectSubsidenceRepairSubwayChange(vo);
+	}
+	public List<?> selectSubsidenceRepairStationChange(SubsidenceRepairVO vo) throws Exception {
+		return apiInterfaceDAO.selectSubsidenceRepairStationChange(vo);
+	}
 		
 	// information/geoobjectListRequest(2)
 	public List<?> selectGeoobjectList(SNSensingValueVO vo) throws Exception {
@@ -704,5 +796,10 @@ public class APIInterfaceServiceImpl extends EgovAbstractServiceImpl implements 
 	public List<?> selectDrainManholeGeometry() throws Exception {
 		return apiInterfaceDAO.selectDrainManholeGeometry();
 	}
-	
+
+	// query/updateSriGridAll
+	public void updateSriGridAll() throws Exception {
+		apiInterfaceDAO.updateSriGridAll();
+	}
+		
 }

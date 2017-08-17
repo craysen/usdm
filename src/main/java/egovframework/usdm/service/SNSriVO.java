@@ -47,6 +47,9 @@ public class SNSriVO extends UsdmDefaultVO {
 	
 	private String sriValue;
 	private String sriGrade;
+
+	private String geoType;
+	private String additionalCondition;
 	
 	public String getGeoID() {
 		return geoID;
@@ -132,36 +135,6 @@ public class SNSriVO extends UsdmDefaultVO {
 	public void setStructureGrade(String structureGrade) {
 		this.structureGrade = structureGrade;
 	}
-	public String getEvaDistance() {
-		return evaDistance;
-	}
-	public void setEvaDistance(String evaDistance) {
-		this.evaDistance = evaDistance;
-	}
-	public String getEvaDepth() {
-		return evaDepth;
-	}
-	public void setEvaDepth(String evaDepth) {
-		this.evaDepth = evaDepth;
-	}
-	public String getCollectingWell() {
-		return collectingWell;
-	}
-	public void setCollectingWell(String collectingWell) {
-		this.collectingWell = collectingWell;
-	}
-	public String getSriValue() {
-		return sriValue;
-	}
-	public void setSriValue(String sriValue) {
-		this.sriValue = sriValue;
-	}
-	public String getSriGrade() {
-		return sriGrade;
-	}
-	public void setSriGrade(String sriGrade) {
-		this.sriGrade = sriGrade;
-	}
 	public String getGroundCount50() {
 		return groundCount50;
 	}
@@ -197,6 +170,48 @@ public class SNSriVO extends UsdmDefaultVO {
 	}
 	public void setRoadCount200(String roadCount200) {
 		this.roadCount200 = roadCount200;
+	}
+	public String getEvaDistance() {
+		return evaDistance;
+	}
+	public void setEvaDistance(String evaDistance) {
+		this.evaDistance = evaDistance;
+	}
+	public String getEvaDepth() {
+		return evaDepth;
+	}
+	public void setEvaDepth(String evaDepth) {
+		this.evaDepth = evaDepth;
+	}
+	public String getCollectingWell() {
+		return collectingWell;
+	}
+	public void setCollectingWell(String collectingWell) {
+		this.collectingWell = collectingWell;
+	}
+	public String getSriValue() {
+		return sriValue;
+	}
+	public void setSriValue(String sriValue) {
+		this.sriValue = sriValue;
+	}
+	public String getSriGrade() {
+		return sriGrade;
+	}
+	public void setSriGrade(String sriGrade) {
+		this.sriGrade = sriGrade;
+	}
+	public String getAdditionalCondition() {
+		return additionalCondition;
+	}
+	public void setAdditionalCondition(String additionalCondition) {
+		this.additionalCondition = additionalCondition;
+	}
+	public String getGeoType() {
+		return geoType;
+	}
+	public void setGeoType(String geoType) {
+		this.geoType = geoType;
 	}
 	
 }

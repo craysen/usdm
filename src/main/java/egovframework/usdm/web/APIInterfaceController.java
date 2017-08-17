@@ -15,10 +15,8 @@
  */
 package egovframework.usdm.web;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -117,64 +115,81 @@ public class APIInterfaceController {
 				panID	= UsdmUtils.getPanIDFromAddress(targetList.get(i));
 				snID 	= UsdmUtils.getSnIDFromAddress(targetList.get(i));
 				tdID 	= UsdmUtils.getTdIDFromAddress(targetList.get(i));
-				
-				for (int j=0; j<sensorTypeList.size(); j++) {
-					sensorType = sensorTypeList.get(j);
-					
-					additionalCondition  = "";
-					additionalCondition1 = "";
-					logicalOperator		 = "";
-					additionalCondition2 = "";
-					
-					if (conditionList != null) {
-						// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
-						for (int k=0; k<conditionList.size(); k++) {
-							conditionMap = conditionList.get(k);
-							
-							if (conditionMap.get("tdType").equals(sensorType)) {
-								if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
-									throw new InvalidParameterException();
-								}
-								
-								if (logicalOperator.equals("")) {
-									additionalCondition1 = "sensingValue "
-														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-														 + (String)conditionMap.get("value");
-								}
-								else {
-									additionalCondition2 = "sensingValue "
-														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-														 + (String)conditionMap.get("value");
-								}
-						
-								if (!conditionMap.get("logicalOp").equals("")) {
-									logicalOperator = (String)conditionMap.get("logicalOp");
-								}
-							}
-						}
-						
-						if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
-							if (logicalOperator.equals("")) {
-								additionalCondition = " AND " + additionalCondition1;
-							}
-							else {
-								additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
-							}
-						}
-					}
-					
+
+				if (UsdmUtils.containsIgnoreCase(sensorTypeList, "ALL")) {
 					SNSensingValueVO sensingValueVO = new SNSensingValueVO();
 					sensingValueVO.setGwID(gwID);
 					sensingValueVO.setPanID(panID);
 					sensingValueVO.setSnID(snID);
 					sensingValueVO.setTdID(tdID);
-					sensingValueVO.setSensorType(sensorType);
-					sensingValueVO.setAdditionalCondition(additionalCondition);
+					sensingValueVO.setSensorType("ALL");
+					sensingValueVO.setAdditionalCondition("");
 					
-					//tempResult = apiInterfaceService.selectSensingValueQuery(sensingValueVO);
 					tempResult = apiInterfaceService.selectSensingValueLatest(sensingValueVO);
 					
-					queryResult.addAll((List<EgovMap>)tempResult);
+					if (tempResult != null)
+						queryResult.addAll((List<EgovMap>)tempResult);
+				}
+				else {
+					for (int j=0; j<sensorTypeList.size(); j++) {
+						sensorType = sensorTypeList.get(j);
+						
+						additionalCondition  = "";
+						additionalCondition1 = "";
+						logicalOperator		 = "";
+						additionalCondition2 = "";
+						
+						if (conditionList != null) {
+							// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
+							for (int k=0; k<conditionList.size(); k++) {
+								conditionMap = conditionList.get(k);
+								
+								if (conditionMap.get("tdType").equals(sensorType)) {
+									if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
+										throw new InvalidParameterException();
+									}
+									
+									if (logicalOperator.equals("")) {
+										additionalCondition1 = "sensingValue "
+															 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+															 + (String)conditionMap.get("value");
+									}
+									else {
+										additionalCondition2 = "sensingValue "
+															 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+															 + (String)conditionMap.get("value");
+									}
+							
+									if (!conditionMap.get("logicalOp").equals("")) {
+										logicalOperator = (String)conditionMap.get("logicalOp");
+									}
+								}
+							}
+							
+							if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
+								if (logicalOperator.equals("")) {
+									additionalCondition = " AND " + additionalCondition1;
+								}
+								else {
+									additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
+								}
+							}
+						}
+						
+						SNSensingValueVO sensingValueVO = new SNSensingValueVO();
+						sensingValueVO.setGwID(gwID);
+						sensingValueVO.setPanID(panID);
+						sensingValueVO.setSnID(snID);
+						sensingValueVO.setTdID(tdID);
+						sensingValueVO.setSensorType(sensorType);
+						sensingValueVO.setAdditionalCondition(additionalCondition);
+						
+						//tempResult = apiInterfaceService.selectSensingValueQuery(sensingValueVO);
+						tempResult = apiInterfaceService.selectSensingValueLatest(sensingValueVO);
+						
+						if (tempResult != null)
+							queryResult.addAll((List<EgovMap>)tempResult);
+					}
 				}
 			}
 			
@@ -274,60 +289,74 @@ public class APIInterfaceController {
 			for (int i=0; i<targetList.size(); i++) {
 				GID = targetList.get(i);
 				
-				for (int j=0; j<sensorTypeList.size(); j++) {
-					sensorType = sensorTypeList.get(j);
-					
-					additionalCondition  = "";
-					additionalCondition1 = "";
-					logicalOperator		 = "";
-					additionalCondition2 = "";
-					
-					if (conditionList != null) {
-						// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
-						for (int k=0; k<conditionList.size(); k++) {
-							conditionMap = conditionList.get(k);
-							
-							if (conditionMap.get("tdType").equals(sensorType)) {
-								if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
-									throw new InvalidParameterException();
-								}
-								
-								if (logicalOperator.equals("")) {
-									additionalCondition1 = "sensingValue "
-														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-														 + (String)conditionMap.get("value");
-								}
-								else {
-									additionalCondition2 = "sensingValue "
-														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-														 + (String)conditionMap.get("value");
-								}
-						
-								if (!conditionMap.get("logicalOp").equals("")) {
-									logicalOperator = (String)conditionMap.get("logicalOp");
-								}
-							}
-						}
-						
-						if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
-							if (logicalOperator.equals("")) {
-								additionalCondition = " AND " + additionalCondition1;
-							}
-							else {
-								additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
-							}
-						}
-					}
-					
+				if (UsdmUtils.containsIgnoreCase(sensorTypeList, "ALL")) {
 					SNSensingValueVO sensingValueVO = new SNSensingValueVO();
 					sensingValueVO.setGID(GID);
-					sensingValueVO.setSensorType(sensorType);
-					sensingValueVO.setAdditionalCondition(additionalCondition);
+					sensingValueVO.setSensorType("ALL");
+					sensingValueVO.setAdditionalCondition("");
 					
-					//tempResult = apiInterfaceService.selectSensingValueQueryByID(sensingValueVO);
 					tempResult = apiInterfaceService.selectSensingValueLatestByID(sensingValueVO);
 					
-					queryResult.addAll((List<EgovMap>)tempResult);
+					if (tempResult != null)
+						queryResult.addAll((List<EgovMap>)tempResult);
+				}
+				else {
+					for (int j=0; j<sensorTypeList.size(); j++) {
+						sensorType = sensorTypeList.get(j);
+						
+						additionalCondition  = "";
+						additionalCondition1 = "";
+						logicalOperator		 = "";
+						additionalCondition2 = "";
+						
+						if (conditionList != null) {
+							// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
+							for (int k=0; k<conditionList.size(); k++) {
+								conditionMap = conditionList.get(k);
+								
+								if (conditionMap.get("tdType").equals(sensorType)) {
+									if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
+										throw new InvalidParameterException();
+									}
+									
+									if (logicalOperator.equals("")) {
+										additionalCondition1 = "sensingValue "
+															 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+															 + (String)conditionMap.get("value");
+									}
+									else {
+										additionalCondition2 = "sensingValue "
+															 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+															 + (String)conditionMap.get("value");
+									}
+							
+									if (!conditionMap.get("logicalOp").equals("")) {
+										logicalOperator = (String)conditionMap.get("logicalOp");
+									}
+								}
+							}
+							
+							if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
+								if (logicalOperator.equals("")) {
+									additionalCondition = " AND " + additionalCondition1;
+								}
+								else {
+									additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
+								}
+							}
+						}
+						
+						SNSensingValueVO sensingValueVO = new SNSensingValueVO();
+						sensingValueVO.setGID(GID);
+						sensingValueVO.setSensorType(sensorType);
+						sensingValueVO.setAdditionalCondition(additionalCondition);
+						
+						//tempResult = apiInterfaceService.selectSensingValueQueryByID(sensingValueVO);
+						tempResult = apiInterfaceService.selectSensingValueLatestByID(sensingValueVO);
+						
+						if (tempResult != null)
+							queryResult.addAll((List<EgovMap>)tempResult);
+					}
 				}
 			}
 			
@@ -464,7 +493,7 @@ public class APIInterfaceController {
 				        if (i<coordinateList.size()-1) coordinateStr += ",";
 					}
 					
-					spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), position) = 1";
+					spatialCondition += " WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), position) = 1";
 				}
 				// Circle
 				else if (spatialType.equals("Circle")) {
@@ -488,7 +517,7 @@ public class APIInterfaceController {
 				                       + minX + " " + maxY + ","
 				                       + minX + " " + minY;
 				    
-				    spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), position) = 1";
+				    spatialCondition += " WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), position) = 1";
 				    spatialCondition += " AND SQRT(POWER(ABS(ST_X(position)-" + tmX + "),2) + POWER(ABS(ST_Y(position)-" + tmY + "),2)) <= " + radius;
 				}
 				else {
@@ -505,64 +534,83 @@ public class APIInterfaceController {
 				snID 	= UsdmUtils.getSnIDFromAddress(targetList.get(i));
 				tdID 	= UsdmUtils.getTdIDFromAddress(targetList.get(i));
 				
-				for (int j=0; j<sensorTypeList.size(); j++) {
-					sensorType = sensorTypeList.get(j);
-					
-					additionalCondition  = "";
-					additionalCondition1 = "";
-					logicalOperator		 = "";
-					additionalCondition2 = "";
-					
-					if (conditionList != null) {
-						// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
-						for (int k=0; k<conditionList.size(); k++) {
-							conditionMap = conditionList.get(k);
-							
-							if (conditionMap.get("tdType").equals(sensorType)) {
-								if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
-									throw new InvalidParameterException();
-								}
-								
-								if (logicalOperator.equals("")) {
-									additionalCondition1 = "sensingValue "
-														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-														 + (String)conditionMap.get("value");
-								}
-								else {
-									additionalCondition2 = "sensingValue "
-														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-														 + (String)conditionMap.get("value");
-								}
-						
-								if (!conditionMap.get("logicalOp").equals("")) {
-									logicalOperator = (String)conditionMap.get("logicalOp");
-								}
-							}
-						}
-						
-						if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
-							if (logicalOperator.equals("")) {
-								additionalCondition = " AND " + additionalCondition1;
-							}
-							else {
-								additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
-							}
-						}
-					}
-
+				if (UsdmUtils.containsIgnoreCase(sensorTypeList, "ALL")) {
 					SNSensingValueVO sensingValueVO = new SNSensingValueVO();
 					sensingValueVO.setGwID(gwID);
 					sensingValueVO.setPanID(panID);
 					sensingValueVO.setSnID(snID);
 					sensingValueVO.setTdID(tdID);
-					sensingValueVO.setSensorType(sensorType);
-					sensingValueVO.setAdditionalCondition(additionalCondition);
+					sensingValueVO.setSensorType("ALL");
+					sensingValueVO.setAdditionalCondition("");
 					sensingValueVO.setTemporalCondition(temporalCondition);
 					sensingValueVO.setSpatialCondition(spatialCondition);
 					
 					tempResult = apiInterfaceService.selectSensingValueSpatioTemporal(sensingValueVO);
 					
-					queryResult.addAll((List<EgovMap>)tempResult);
+					if (tempResult != null)
+						queryResult.addAll((List<EgovMap>)tempResult);
+				}
+				else {
+					for (int j=0; j<sensorTypeList.size(); j++) {
+						sensorType = sensorTypeList.get(j);
+						
+						additionalCondition  = "";
+						additionalCondition1 = "";
+						logicalOperator		 = "";
+						additionalCondition2 = "";
+						
+						if (conditionList != null) {
+							// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
+							for (int k=0; k<conditionList.size(); k++) {
+								conditionMap = conditionList.get(k);
+								
+								if (conditionMap.get("tdType").equals(sensorType)) {
+									if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
+										throw new InvalidParameterException();
+									}
+									
+									if (logicalOperator.equals("")) {
+										additionalCondition1 = "sensingValue "
+															 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+															 + (String)conditionMap.get("value");
+									}
+									else {
+										additionalCondition2 = "sensingValue "
+															 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+															 + (String)conditionMap.get("value");
+									}
+							
+									if (!conditionMap.get("logicalOp").equals("")) {
+										logicalOperator = (String)conditionMap.get("logicalOp");
+									}
+								}
+							}
+							
+							if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
+								if (logicalOperator.equals("")) {
+									additionalCondition = " AND " + additionalCondition1;
+								}
+								else {
+									additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
+								}
+							}
+						}
+	
+						SNSensingValueVO sensingValueVO = new SNSensingValueVO();
+						sensingValueVO.setGwID(gwID);
+						sensingValueVO.setPanID(panID);
+						sensingValueVO.setSnID(snID);
+						sensingValueVO.setTdID(tdID);
+						sensingValueVO.setSensorType(sensorType);
+						sensingValueVO.setAdditionalCondition(additionalCondition);
+						sensingValueVO.setTemporalCondition(temporalCondition);
+						sensingValueVO.setSpatialCondition(spatialCondition);
+						
+						tempResult = apiInterfaceService.selectSensingValueSpatioTemporal(sensingValueVO);
+						
+						if (tempResult != null)
+							queryResult.addAll((List<EgovMap>)tempResult);
+					}
 				}
 			}
 			
@@ -696,7 +744,7 @@ public class APIInterfaceController {
 				        if (i<coordinateList.size()-1) coordinateStr += ",";
 					}
 					
-					spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), position) = 1";
+					spatialCondition += " WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), position) = 1";
 				}
 				// Circle
 				else if (spatialType.equals("Circle")) {
@@ -720,7 +768,7 @@ public class APIInterfaceController {
 				                       + minX + " " + maxY + ","
 				                       + minX + " " + minY;
 				    
-				    spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), position) = 1";
+				    spatialCondition += " WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), position) = 1";
 				    spatialCondition += " AND SQRT(POWER(ABS(ST_X(position)-" + tmX + "),2) + POWER(ABS(ST_Y(position)-" + tmY + "),2)) <= " + radius;
 				}
 				else {
@@ -734,61 +782,77 @@ public class APIInterfaceController {
 			for (int i=0; i<targetList.size(); i++) {
 				GID	= targetList.get(i);
 				
-				for (int j=0; j<sensorTypeList.size(); j++) {
-					sensorType = sensorTypeList.get(j);
-					
-					additionalCondition  = "";
-					additionalCondition1 = "";
-					logicalOperator		 = "";
-					additionalCondition2 = "";
-					
-					if (conditionList != null) {
-						// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
-						for (int k=0; k<conditionList.size(); k++) {
-							conditionMap = conditionList.get(k);
-							
-							if (conditionMap.get("tdType").equals(sensorType)) {
-								if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
-									throw new InvalidParameterException();
-								}
-								
-								if (logicalOperator.equals("")) {
-									additionalCondition1 = "sensingValue "
-														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-														 + (String)conditionMap.get("value");
-								}
-								else {
-									additionalCondition2 = "sensingValue "
-														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-														 + (String)conditionMap.get("value");
-								}
-						
-								if (!conditionMap.get("logicalOp").equals("")) {
-									logicalOperator = (String)conditionMap.get("logicalOp");
-								}
-							}
-						}
-						
-						if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
-							if (logicalOperator.equals("")) {
-								additionalCondition = " AND " + additionalCondition1;
-							}
-							else {
-								additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
-							}
-						}
-					}
-
+				if (UsdmUtils.containsIgnoreCase(sensorTypeList, "ALL")) {
 					SNSensingValueVO sensingValueVO = new SNSensingValueVO();
 					sensingValueVO.setGID(GID);
-					sensingValueVO.setSensorType(sensorType);
-					sensingValueVO.setAdditionalCondition(additionalCondition);
+					sensingValueVO.setSensorType("ALL");
+					sensingValueVO.setAdditionalCondition("");
 					sensingValueVO.setTemporalCondition(temporalCondition);
 					sensingValueVO.setSpatialCondition(spatialCondition);
 					
 					tempResult = apiInterfaceService.selectSensingValueSpatioTemporalByID(sensingValueVO);
 					
-					queryResult.addAll((List<EgovMap>)tempResult);
+					if (tempResult != null)
+						queryResult.addAll((List<EgovMap>)tempResult);
+				}
+				else {
+					for (int j=0; j<sensorTypeList.size(); j++) {
+						sensorType = sensorTypeList.get(j);
+						
+						additionalCondition  = "";
+						additionalCondition1 = "";
+						logicalOperator		 = "";
+						additionalCondition2 = "";
+						
+						if (conditionList != null) {
+							// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
+							for (int k=0; k<conditionList.size(); k++) {
+								conditionMap = conditionList.get(k);
+								
+								if (conditionMap.get("tdType").equals(sensorType)) {
+									if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
+										throw new InvalidParameterException();
+									}
+									
+									if (logicalOperator.equals("")) {
+										additionalCondition1 = "sensingValue "
+															 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+															 + (String)conditionMap.get("value");
+									}
+									else {
+										additionalCondition2 = "sensingValue "
+															 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+															 + (String)conditionMap.get("value");
+									}
+							
+									if (!conditionMap.get("logicalOp").equals("")) {
+										logicalOperator = (String)conditionMap.get("logicalOp");
+									}
+								}
+							}
+							
+							if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
+								if (logicalOperator.equals("")) {
+									additionalCondition = " AND " + additionalCondition1;
+								}
+								else {
+									additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
+								}
+							}
+						}
+	
+						SNSensingValueVO sensingValueVO = new SNSensingValueVO();
+						sensingValueVO.setGID(GID);
+						sensingValueVO.setSensorType(sensorType);
+						sensingValueVO.setAdditionalCondition(additionalCondition);
+						sensingValueVO.setTemporalCondition(temporalCondition);
+						sensingValueVO.setSpatialCondition(spatialCondition);
+						
+						tempResult = apiInterfaceService.selectSensingValueSpatioTemporalByID(sensingValueVO);
+						
+						if (tempResult != null)
+							queryResult.addAll((List<EgovMap>)tempResult);
+					}
 				}
 			}
 			
@@ -924,7 +988,7 @@ public class APIInterfaceController {
 				        if (i<coordinateList.size()-1) coordinateStr += ",";
 				    }
 				    
-				    spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), position) = 1";
+				    spatialCondition += " WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), position) = 1";
 				}
 				// Circle
 				else if (spatialType.equals("Circle")) {
@@ -945,7 +1009,7 @@ public class APIInterfaceController {
 				                       + minX + " " + maxY + ","
 				                       + minX + " " + minY;
 				    
-				    spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), position) = 1";
+				    spatialCondition += " WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), position) = 1";
 				    spatialCondition += " AND SQRT(POWER(ABS(ST_X(position)-" + tmX + "),2) + POWER(ABS(ST_Y(position)-" + tmY + "),2)) <= " + radius;
 				}
 				else {
@@ -962,64 +1026,83 @@ public class APIInterfaceController {
 				snID 	= UsdmUtils.getSnIDFromAddress(targetList.get(i));
 				tdID 	= UsdmUtils.getTdIDFromAddress(targetList.get(i));
 				
-				for (int j=0; j<sensorTypeList.size(); j++) {
-					sensorType = sensorTypeList.get(j);
-					
-					additionalCondition  = "";
-					additionalCondition1 = "";
-					logicalOperator		 = "";
-					additionalCondition2 = "";
-					
-					if (conditionList != null) {
-						// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
-						for (int k=0; k<conditionList.size(); k++) {
-							conditionMap = conditionList.get(k);
-							
-							if (conditionMap.get("tdType").equals(sensorType)) {
-								if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
-									throw new InvalidParameterException();
-								}
-								
-								if (logicalOperator.equals("")) {
-									additionalCondition1 = "sensingValue "
-											+ UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-											+ (String)conditionMap.get("value");
-								}
-								else {
-									additionalCondition2 = "sensingValue "
-											+ UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-											+ (String)conditionMap.get("value");
-								}
-								
-								if (!conditionMap.get("logicalOp").equals("")) {
-									logicalOperator = (String)conditionMap.get("logicalOp");
-								}
-							}
-						}
-						
-						if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
-							if (logicalOperator.equals("")) {
-								additionalCondition = " AND " + additionalCondition1;
-							}
-							else {
-								additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
-							}
-						}
-					}
-					
+				if (UsdmUtils.containsIgnoreCase(sensorTypeList, "ALL")) {
 					SNSensingValueVO sensingValueVO = new SNSensingValueVO();
 					sensingValueVO.setGwID(gwID);
 					sensingValueVO.setPanID(panID);
 					sensingValueVO.setSnID(snID);
 					sensingValueVO.setTdID(tdID);
-					sensingValueVO.setSensorType(sensorType);
-					sensingValueVO.setAdditionalCondition(additionalCondition);
+					sensingValueVO.setSensorType("ALL");
+					sensingValueVO.setAdditionalCondition("");
 					sensingValueVO.setTemporalCondition(temporalCondition);
 					sensingValueVO.setSpatialCondition(spatialCondition);
 					
 					tempResult = apiInterfaceService.selectSensingValueSpatioTemporal(sensingValueVO);
 					
-					queryResult.addAll((List<EgovMap>)tempResult);
+					if (tempResult != null)
+						queryResult.addAll((List<EgovMap>)tempResult);
+				}
+				else {
+					for (int j=0; j<sensorTypeList.size(); j++) {
+						sensorType = sensorTypeList.get(j);
+						
+						additionalCondition  = "";
+						additionalCondition1 = "";
+						logicalOperator		 = "";
+						additionalCondition2 = "";
+						
+						if (conditionList != null) {
+							// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
+							for (int k=0; k<conditionList.size(); k++) {
+								conditionMap = conditionList.get(k);
+								
+								if (conditionMap.get("tdType").equals(sensorType)) {
+									if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
+										throw new InvalidParameterException();
+									}
+									
+									if (logicalOperator.equals("")) {
+										additionalCondition1 = "sensingValue "
+												+ UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+												+ (String)conditionMap.get("value");
+									}
+									else {
+										additionalCondition2 = "sensingValue "
+												+ UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+												+ (String)conditionMap.get("value");
+									}
+									
+									if (!conditionMap.get("logicalOp").equals("")) {
+										logicalOperator = (String)conditionMap.get("logicalOp");
+									}
+								}
+							}
+							
+							if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
+								if (logicalOperator.equals("")) {
+									additionalCondition = " AND " + additionalCondition1;
+								}
+								else {
+									additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
+								}
+							}
+						}
+						
+						SNSensingValueVO sensingValueVO = new SNSensingValueVO();
+						sensingValueVO.setGwID(gwID);
+						sensingValueVO.setPanID(panID);
+						sensingValueVO.setSnID(snID);
+						sensingValueVO.setTdID(tdID);
+						sensingValueVO.setSensorType(sensorType);
+						sensingValueVO.setAdditionalCondition(additionalCondition);
+						sensingValueVO.setTemporalCondition(temporalCondition);
+						sensingValueVO.setSpatialCondition(spatialCondition);
+						
+						tempResult = apiInterfaceService.selectSensingValueSpatioTemporal(sensingValueVO);
+						
+						if (tempResult != null)
+							queryResult.addAll((List<EgovMap>)tempResult);
+					}
 				}
 			}
 			
@@ -1153,7 +1236,7 @@ public class APIInterfaceController {
 				        if (i<coordinateList.size()-1) coordinateStr += ",";
 				    }
 				    
-				    spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), position) = 1";
+				    spatialCondition += " WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), position) = 1";
 				}
 				// Circle
 				else if (spatialType.equals("Circle")) {
@@ -1174,7 +1257,7 @@ public class APIInterfaceController {
 				                       + minX + " " + maxY + ","
 				                       + minX + " " + minY;
 				    
-				    spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), position) = 1";
+				    spatialCondition += " WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), position) = 1";
 				    spatialCondition += " AND SQRT(POWER(ABS(ST_X(position)-" + tmX + "),2) + POWER(ABS(ST_Y(position)-" + tmY + "),2)) <= " + radius;
 				}
 				else {
@@ -1188,61 +1271,77 @@ public class APIInterfaceController {
 			for (int i=0; i<targetList.size(); i++) {
 				GID	= targetList.get(i);
 				
-				for (int j=0; j<sensorTypeList.size(); j++) {
-					sensorType = sensorTypeList.get(j);
-					
-					additionalCondition  = "";
-					additionalCondition1 = "";
-					logicalOperator		 = "";
-					additionalCondition2 = "";
-					
-					if (conditionList != null) {
-						// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
-						for (int k=0; k<conditionList.size(); k++) {
-							conditionMap = conditionList.get(k);
-							
-							if (conditionMap.get("tdType").equals(sensorType)) {
-								if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
-									throw new InvalidParameterException();
-								}
-								
-								if (logicalOperator.equals("")) {
-									additionalCondition1 = "sensingValue "
-											+ UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-											+ (String)conditionMap.get("value");
-								}
-								else {
-									additionalCondition2 = "sensingValue "
-											+ UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
-											+ (String)conditionMap.get("value");
-								}
-								
-								if (!conditionMap.get("logicalOp").equals("")) {
-									logicalOperator = (String)conditionMap.get("logicalOp");
-								}
-							}
-						}
-						
-						if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
-							if (logicalOperator.equals("")) {
-								additionalCondition = " AND " + additionalCondition1;
-							}
-							else {
-								additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
-							}
-						}
-					}
-					
+				if (UsdmUtils.containsIgnoreCase(sensorTypeList, "ALL")) {
 					SNSensingValueVO sensingValueVO = new SNSensingValueVO();
 					sensingValueVO.setGID(GID);
-					sensingValueVO.setSensorType(sensorType);
-					sensingValueVO.setAdditionalCondition(additionalCondition);
+					sensingValueVO.setSensorType("ALL");
+					sensingValueVO.setAdditionalCondition("");
 					sensingValueVO.setTemporalCondition(temporalCondition);
 					sensingValueVO.setSpatialCondition(spatialCondition);
 					
 					tempResult = apiInterfaceService.selectSensingValueSpatioTemporalByID(sensingValueVO);
 					
-					queryResult.addAll((List<EgovMap>)tempResult);
+					if (tempResult != null)
+						queryResult.addAll((List<EgovMap>)tempResult);
+				}
+				else {
+					for (int j=0; j<sensorTypeList.size(); j++) {
+						sensorType = sensorTypeList.get(j);
+						
+						additionalCondition  = "";
+						additionalCondition1 = "";
+						logicalOperator		 = "";
+						additionalCondition2 = "";
+						
+						if (conditionList != null) {
+							// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
+							for (int k=0; k<conditionList.size(); k++) {
+								conditionMap = conditionList.get(k);
+								
+								if (conditionMap.get("tdType").equals(sensorType)) {
+									if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
+										throw new InvalidParameterException();
+									}
+									
+									if (logicalOperator.equals("")) {
+										additionalCondition1 = "sensingValue "
+												+ UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+												+ (String)conditionMap.get("value");
+									}
+									else {
+										additionalCondition2 = "sensingValue "
+												+ UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+												+ (String)conditionMap.get("value");
+									}
+									
+									if (!conditionMap.get("logicalOp").equals("")) {
+										logicalOperator = (String)conditionMap.get("logicalOp");
+									}
+								}
+							}
+							
+							if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
+								if (logicalOperator.equals("")) {
+									additionalCondition = " AND " + additionalCondition1;
+								}
+								else {
+									additionalCondition = " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
+								}
+							}
+						}
+						
+						SNSensingValueVO sensingValueVO = new SNSensingValueVO();
+						sensingValueVO.setGID(GID);
+						sensingValueVO.setSensorType(sensorType);
+						sensingValueVO.setAdditionalCondition(additionalCondition);
+						sensingValueVO.setTemporalCondition(temporalCondition);
+						sensingValueVO.setSpatialCondition(spatialCondition);
+						
+						tempResult = apiInterfaceService.selectSensingValueSpatioTemporalByID(sensingValueVO);
+						
+						if (tempResult != null)
+							queryResult.addAll((List<EgovMap>)tempResult);
+					}
 				}
 			}
 			
@@ -1326,7 +1425,7 @@ public class APIInterfaceController {
 			/****************************/
 
 			SNAccidentVO accidentVO = new SNAccidentVO();
-			accidentVO.setAccidentTable(UsdmUtils.getAccidentTableName(geoType));
+			accidentVO.setGeoType(geoType);
 			accidentVO.setFtrIdn(geoID);
 			
 			List<?> queryResult = apiInterfaceService.selectAccident(accidentVO);
@@ -1342,6 +1441,7 @@ public class APIInterfaceController {
 				coordinate.put("latitude",  queryMap.get("latitude").toString());
 
 				Map<String, Object> accidentResult = new LinkedHashMap<String, Object>();
+				accidentResult.put("serialNumber",	queryMap.get("accidentid").toString());
 				accidentResult.put("geoID",			queryMap.get("geoid").toString());
 				accidentResult.put("geoType",		geoType);
 				accidentResult.put("coordinate",	coordinate);
@@ -1425,7 +1525,7 @@ public class APIInterfaceController {
 			/****************************/
 			
 			SNAccidentVO accidentVO = new SNAccidentVO();
-			accidentVO.setAccidentTable(UsdmUtils.getAccidentTableName(geoType));
+			accidentVO.setGeoType(geoType);
 			accidentVO.setFtrIdn(geoID);
 			
 			List<?> queryResult	= apiInterfaceService.selectAccident(accidentVO);
@@ -1441,6 +1541,7 @@ public class APIInterfaceController {
 				coordinate.put("Y", queryMap.get("y").toString());
 
 				Map<String, Object> accidentResult = new LinkedHashMap<String, Object>();
+				accidentResult.put("serialNumber",	queryMap.get("accidentid").toString());
 				accidentResult.put("geoID",			queryMap.get("geoid").toString());
 				accidentResult.put("geoType",		geoType);
 				accidentResult.put("coordinate",	coordinate);
@@ -1544,7 +1645,7 @@ public class APIInterfaceController {
 						coordinateStr += ",";
 				}
 				
-				spatialCondition += "WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), coordinate) = 1";
+				spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), coordinate) = 1";
 			}
 			// Circle
 			else if (spatialType.equals("Circle")) {
@@ -1568,7 +1669,7 @@ public class APIInterfaceController {
 								   + minX + " " + maxY + ","
 								   + minX + " " + minY;
 				
-				spatialCondition += "WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), coordinate) = 1";
+				spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), coordinate) = 1";
 				spatialCondition += " AND SQRT(POWER(ABS(ST_X(coordinate)-" + tmX + "),2) + POWER(ABS(ST_Y(coordinate)-" + tmY + "),2)) <= " + radius;
 			}
 			else {
@@ -1591,7 +1692,7 @@ public class APIInterfaceController {
 				/****************************/
 			
 				SNAccidentVO accidentVO = new SNAccidentVO();
-				accidentVO.setAccidentTable(UsdmUtils.getAccidentTableName(geoType));
+				accidentVO.setGeoType(geoType);
 				accidentVO.setSpatialCondition(spatialCondition);
 				
 				List<?> queryResult	= apiInterfaceService.selectAccidentByRegion(accidentVO);
@@ -1604,6 +1705,7 @@ public class APIInterfaceController {
 					coordinate.put("longitude", queryMap.get("longitude").toString());
 					coordinate.put("latitude",  queryMap.get("latitude").toString());
 					
+					accidentResult.put("serialNumber",	queryMap.get("accidentid").toString());
 					accidentResult.put("geoID",			queryMap.get("geoid").toString());
 					accidentResult.put("geoType",		geoType);
 					accidentResult.put("coordinate",	coordinate);
@@ -1708,7 +1810,7 @@ public class APIInterfaceController {
 						coordinateStr += ",";
 				}
 				
-				spatialCondition += "WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), coordinate) = 1";
+				spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + coordinateStr + "))',0), coordinate) = 1";
 			}
 			// Circle
 			else if (spatialType.equals("Circle")) {
@@ -1729,7 +1831,7 @@ public class APIInterfaceController {
 								   + minX + " " + maxY + ","
 								   + minX + " " + minY;
 				
-				spatialCondition += "WHERE ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), coordinate) = 1";
+				spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), coordinate) = 1";
 				spatialCondition += " AND SQRT(POWER(ABS(ST_X(coordinate)-" + tmX + "),2) + POWER(ABS(ST_Y(coordinate)-" + tmY + "),2)) <= " + radius;
 			}
 			else {
@@ -1752,7 +1854,7 @@ public class APIInterfaceController {
 				/****************************/
 				
 				SNAccidentVO accidentVO = new SNAccidentVO();
-				accidentVO.setAccidentTable(UsdmUtils.getAccidentTableName(geoType));
+				accidentVO.setGeoType(geoType);
 				accidentVO.setSpatialCondition(spatialCondition);
 				
 				List<?> queryResult	= apiInterfaceService.selectAccidentByRegion(accidentVO);
@@ -1765,6 +1867,7 @@ public class APIInterfaceController {
 					coordinate.put("longitude", queryMap.get("longitude").toString());
 					coordinate.put("latitude",  queryMap.get("latitude").toString());
 					
+					accidentResult.put("serialNumber",	queryMap.get("accidentid").toString());
 					accidentResult.put("geoID",			queryMap.get("geoid").toString());
 					accidentResult.put("geoType",		geoType);
 					accidentResult.put("coordinate",	coordinate);
@@ -2181,68 +2284,33 @@ public class APIInterfaceController {
 			EgovMap queryMap = new EgovMap();
 			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
 			
-			int sourceIndex;
+			double cellSri = 0;
+			String cellGrade = "";
 			
-			// layer의 index
-			// 이 값은 정렬순서에 따른 결과값 추출에 영향을 미침
-			final int drainIndex   = 0;
-			final int waterIndex   = 1;
-			final int subwayIndex  = 2;
-			final int stationIndex = 3;
-			final int geologyIndex = 4;
-			
-			// 각 layer의 명칭
-			// List에 추가하는 순서는 index와 동일해야 함
-			List<String> sourceLayer = new ArrayList<String>();
-			sourceLayer.add("sewer");
-			sourceLayer.add("water");
-			sourceLayer.add("subway");
-			sourceLayer.add("subway_s");
-			sourceLayer.add("geology");
-			
-			DecimalFormat df = new DecimalFormat("000.00");
+			String sourceLayer = "";
 			
 			for (int i=0; i<queryResult.size(); i++) {
 				queryMap = (EgovMap)queryResult.get(i);
 				
-				// 각 layer의 SRI값
-				// array에 추가하는 순서는 index와 동일해야 함
-				double[] sriArray = new double[5];
-				sriArray[drainIndex]   = (double)queryMap.get("drainsri");
-				sriArray[waterIndex]   = (double)queryMap.get("watersri");
-				sriArray[subwayIndex]  = (double)queryMap.get("subwaysri");
-				sriArray[stationIndex] = (double)queryMap.get("stationsri");
-				sriArray[geologyIndex] = (double)queryMap.get("geologysri");
+				cellSri   = (double)queryMap.get("cellsri");
+				cellGrade = queryMap.get("cellgrade").toString();
 				
-				// 그리드의 대표SRI값 선정
-				// 1순위는 등급, 2순위는 점수
-				// 1. 동일등급일 경우 상/하수도가 지하철선로/역사에 우선한다. (상/하수도에 우선순위 부여(5),지하철선로/역사(3),지질정보(1))
-				// 2. 상/하수도가 동일한 등급일 경우 높은 점수가 대표값이 된다.
-				//    지하철선로/역사가 동일한 등급일 경우 높은 점수가 대표값이 된다.
-				// 3. 상/하수도가 동일한 등급과 동일한 점수를 갖는 경우 하수도가 대표값이 된다.
-				//    지하철선로/역사가 동일한 등급과 동일한 점수를 갖는 경우 선로가 대표값이 된다.
-				
-				// 선정 방식은 2가지에 의존한다.
-				// 1. Java의 문자열 정렬방식에 의해 등급, 우선순위, 000.00으로 formatting된 SRI값을 연결한 문자열 정렬
-				// 2. 동일한 등급, 우선순위, SRI값을 갖는 경우 List의 index가 작은 항목이 선택됨
-				//    하수도가 상수도에 우선하므로 gradeList 내에서 더 작은 index를 갖는다.(지하철선로/역사도 마찬가지)
-				
-				// List에 추가하는 순서는 index와 동일해야 함
-				List<String> gradeList = new ArrayList<String>();
-				gradeList.add((String)queryMap.get("draingrade")   + "5" + df.format(sriArray[drainIndex]));
-				gradeList.add((String)queryMap.get("watergrade")   + "5" + df.format(sriArray[waterIndex]));
-				gradeList.add((String)queryMap.get("subwaygrade")  + "3" + df.format(sriArray[subwayIndex]));
-				gradeList.add((String)queryMap.get("stationgrade") + "3" + df.format(sriArray[stationIndex]));
-				gradeList.add((String)queryMap.get("geologygrade") + "1" + df.format(sriArray[geologyIndex]));
-				
-				// 대표BSRI의 index
-				sourceIndex = gradeList.indexOf(Collections.max(gradeList));
+				if (cellSri == (double)queryMap.get("drainsri") && cellGrade.equals(queryMap.get("draingrade").toString()))
+					sourceLayer = "sewer";
+				else if (cellSri == (double)queryMap.get("watersri") && cellGrade.equals(queryMap.get("watergrade").toString()))
+					sourceLayer = "water";
+				else if (cellSri == (double)queryMap.get("subwaysri") && cellGrade.equals(queryMap.get("subwaygrade").toString()))
+					sourceLayer = "subway";
+				else if (cellSri == (double)queryMap.get("stationsri") && cellGrade.equals(queryMap.get("stationgrade").toString()))
+					sourceLayer = "subway_s";
+				else if (cellSri == (double)queryMap.get("geologysri") && cellGrade.equals(queryMap.get("geologygrade").toString()))
+					sourceLayer = "geology";
 				
 				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
 				
 				resultSet.put("gridIndex",   queryMap.get("cellid").toString());
-				resultSet.put("sriValue",    Double.toString(sriArray[sourceIndex]));
-				resultSet.put("sourceLayer", sourceLayer.get(sourceIndex));
+				resultSet.put("sriValue",    Double.toString(cellSri));
+				resultSet.put("sourceLayer", sourceLayer);
 				
 				resultSetList.add(resultSet);
 			}
@@ -2325,63 +2393,18 @@ public class APIInterfaceController {
 			EgovMap queryMap = new EgovMap();
 			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
 
-			int sourceIndex;
-			
-			// layer의 index
-			// 이 값은 정렬순서에 따른 결과값 추출에 영향을 미침
-			final int drainIndex   = 0;
-			final int waterIndex   = 1;
-			final int subwayIndex  = 2;
-			final int stationIndex = 3;
-			final int geologyIndex = 4;
-			
-			DecimalFormat df = new DecimalFormat("000.00");
-			
 			for (int i=0; i<queryResult.size(); i++) {
 				queryMap = (EgovMap)queryResult.get(i);
-				
-				// 각 layer의 SRI값
-				// array에 추가하는 순서는 index와 동일해야 함
-				double[] sriArray = new double[5];
-				sriArray[drainIndex]   = (double)queryMap.get("drainsri");
-				sriArray[waterIndex]   = (double)queryMap.get("watersri");
-				sriArray[subwayIndex]  = (double)queryMap.get("subwaysri");
-				sriArray[stationIndex] = (double)queryMap.get("stationsri");
-				sriArray[geologyIndex] = (double)queryMap.get("geologysri");
-				
-				// 그리드의 대표SRI값 선정
-				// 1순위는 등급, 2순위는 점수
-				// 1. 동일등급일 경우 상/하수도가 지하철선로/역사에 우선한다. (상/하수도에 우선순위 부여(5),지하철선로/역사(3),지질정보(1))
-				// 2. 상/하수도가 동일한 등급일 경우 높은 점수가 대표값이 된다.
-				//    지하철선로/역사가 동일한 등급일 경우 높은 점수가 대표값이 된다.
-				// 3. 상/하수도가 동일한 등급과 동일한 점수를 갖는 경우 하수도가 대표값이 된다.
-				//    지하철선로/역사가 동일한 등급과 동일한 점수를 갖는 경우 선로가 대표값이 된다.
-				
-				// 선정 방식은 2가지에 의존한다.
-				// 1. Java의 문자열 정렬방식에 의해 등급, 우선순위, 000.00으로 formatting된 SRI값을 연결한 문자열 정렬
-				// 2. 동일한 등급, 우선순위, SRI값을 갖는 경우 List의 index가 작은 항목이 선택됨
-				//    하수도가 상수도에 우선하므로 gradeList 내에서 더 작은 index를 갖는다.(지하철선로/역사도 마찬가지)
-				
-				// List에 추가하는 순서는 index와 동일해야 함
-				List<String> gradeList = new ArrayList<String>();
-				gradeList.add((String)queryMap.get("draingrade")   + "5" + df.format(sriArray[drainIndex]));
-				gradeList.add((String)queryMap.get("watergrade")   + "5" + df.format(sriArray[waterIndex]));
-				gradeList.add((String)queryMap.get("subwaygrade")  + "3" + df.format(sriArray[subwayIndex]));
-				gradeList.add((String)queryMap.get("stationgrade") + "3" + df.format(sriArray[stationIndex]));
-				gradeList.add((String)queryMap.get("geologygrade") + "1" + df.format(sriArray[geologyIndex]));
-				
-				// 대표BSRI의 index
-				sourceIndex = gradeList.indexOf(Collections.max(gradeList));
 				
 				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
 				
 				resultSet.put("gridIndex", queryMap.get("cellid").toString());
-				resultSet.put("rSRI",      Double.toString(sriArray[sourceIndex]));
-				resultSet.put("wSRI",      Double.toString(sriArray[waterIndex]));
-				resultSet.put("sSRI",      Double.toString(sriArray[drainIndex]));
-				resultSet.put("mSRI",      Double.toString(sriArray[stationIndex]));
-				resultSet.put("tSRI",      Double.toString(sriArray[subwayIndex]));
-				resultSet.put("gSRI",      Double.toString(sriArray[geologyIndex]));
+				resultSet.put("rSRI",      queryMap.get("cellsri").toString());
+				resultSet.put("wSRI",      queryMap.get("watersri").toString());
+				resultSet.put("sSRI",      queryMap.get("drainsri").toString());
+				resultSet.put("mSRI",      queryMap.get("stationsri").toString());
+				resultSet.put("tSRI",      queryMap.get("subwaysri").toString());
+				resultSet.put("gSRI",      queryMap.get("geologysri").toString());
 				
 				resultSetList.add(resultSet);
 			}
@@ -2521,6 +2544,1378 @@ public class APIInterfaceController {
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
 		UsdmUtils.writeLog("/query/getWaterManhole", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getSensingValueByID
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/query/getSensingValueByID", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetSensingValueByID(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			String snID = UsdmUtils.getStringValue(filter, "snID");
+			//String type = UsdmUtils.getStringValue(filter, "type");
+			
+			int targetTable = UsdmUtils.getIntegerValue(filter, "targetTable");
+			int sortType 	= UsdmUtils.getIntegerValue(filter, "sortType");
+			int count 		= UsdmUtils.getIntegerValue(filter, "count");
+			
+			List<String> tdTypeList	= (ArrayList<String>)filter.get("tdTypeList");
+			
+			List<Map<String, Object>> conditionList = (ArrayList<Map<String, Object>>)filter.get("conditionList");
+			
+			Map<String, Object> temporalConditionMap = (Map<String, Object>)filter.get("temporalCondition");
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (tdTypeList == null)	throw new InvalidParameterException("parameter 'tdTypeList' has no value");
+			
+			if (!(targetTable==1 || targetTable==2 || targetTable==3))
+				throw new InvalidParameterException("parameter 'targetTable' has invalid value");
+			
+			if (!(sortType==1 || sortType==2))
+				throw new InvalidParameterException("parameter 'sortType' has invalid value");
+			
+			if (count < 0)
+				throw new InvalidParameterException("parameter 'count' has invalid value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			// 정렬 방식
+			String orderCondition = "ORDER BY sensingTime";
+			if (sortType == 2) orderCondition += " DESC";
+			
+			// Fetch count
+			String topCondition = "";
+			if (count > 0) topCondition = "TOP " + count;
+			
+			String temporalCondition = "";
+			
+			// 시간조건이 존재하는 경우
+			if (temporalConditionMap != null) {
+				long startTime = UsdmUtils.convertStrToDate((String)temporalConditionMap.get("startTime"), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+				long endTime   = UsdmUtils.convertStrToDate((String)temporalConditionMap.get("endTime"),   "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+				
+				temporalCondition = " AND sensingTime >= " + startTime + " AND sensingTime <= " + endTime;
+			}
+			
+			List<?> queryResult = null;
+			
+			String tdType = "";
+			
+			String validQuery 	= "";
+			String invalidQuery	= "";
+			String query 		= "";
+			
+			validQuery    = "SELECT b.GID AS snID, b.latitude, b.longitude, a.sensorType, a.sensingTime, a.sensingValue, '1' AS sourceTable";
+			validQuery   += "  FROM sdm_SensingValue a, sdm_Node b";
+			validQuery   += " WHERE a.snGID = b.GID AND b.GID = " + snID + temporalCondition;
+			
+			invalidQuery  = "SELECT b.GID AS snID, b.latitude, b.longitude, a.sensorType, a.sensingTime, a.sensingValue, '2' AS sourceTable";
+			invalidQuery += "  FROM sdm_SensingValueInvalid a, sdm_Node b";
+			invalidQuery += " WHERE a.snGID = b.GID AND b.GID = " + snID + temporalCondition;
+			
+			// 모든 센서타입을 조회하는 경우
+			if (UsdmUtils.containsIgnoreCase(tdTypeList, "ALL")) {
+				switch (targetTable) {
+				case 1:
+					query = validQuery;
+					break;
+				case 2:
+					query = invalidQuery;
+					break;
+				case 3:
+					query = validQuery + " UNION ALL " + invalidQuery;
+					break;
+				}
+			}
+			// 특정 센서타입을 조회하는 경우
+			else {
+				Map<String, Object> conditionMap = new LinkedHashMap<String, Object>();
+				
+				String additionalCondition 	= "";
+				String additionalCondition1 = "";
+				String logicalOperator		= "";
+				String additionalCondition2 = "";
+				
+				for (int i=0; i<tdTypeList.size(); i++) {
+					tdType = tdTypeList.get(i);
+					
+					additionalCondition  = " AND sensorType='" + tdType + "'";
+					additionalCondition1 = "";
+					logicalOperator		 = "";
+					additionalCondition2 = "";
+					
+					if (conditionList != null) {
+						// conditionList에서 sensorType과 동일한 tdType을 갖는 element 검색
+						for (int j=0; j<conditionList.size(); j++) {
+							conditionMap = conditionList.get(j);
+							
+							if (conditionMap.get("tdType").equals(tdType)) {
+								if (!additionalCondition1.equals("") && !additionalCondition2.equals("")) {
+									throw new InvalidParameterException();
+								}
+								
+								if (logicalOperator.equals("")) {
+									additionalCondition1 = "sensingValue "
+														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+														 + (String)conditionMap.get("value");
+								}
+								else {
+									additionalCondition2 = "sensingValue "
+														 + UsdmUtils.getOperator((String)conditionMap.get("operation")) + " "
+														 + (String)conditionMap.get("value");
+								}
+						
+								if (!conditionMap.get("logicalOp").equals("")) {
+									logicalOperator = (String)conditionMap.get("logicalOp");
+								}
+							}
+						}
+						
+						if (!additionalCondition1.equals("") || !additionalCondition2.equals("")) {
+							if (logicalOperator.equals("")) {
+								additionalCondition += " AND " + additionalCondition1;
+							}
+							else {
+								additionalCondition += " AND (" + additionalCondition1 + " " + logicalOperator + " " + additionalCondition2 + ")";
+							}
+						}
+					}
+					
+					switch (targetTable) {
+					case 1:
+						query += validQuery + additionalCondition;
+						break;
+					case 2:
+						query += invalidQuery + additionalCondition;
+						break;
+					case 3:
+						query += validQuery + additionalCondition + " UNION ALL " + invalidQuery + additionalCondition;
+						break;
+					}
+					
+					if (i < tdTypeList.size()-1) query += " UNION ALL ";
+				}
+			}
+			
+			SNSensingValueVO sensingValueVO = new SNSensingValueVO();
+			sensingValueVO.setQuery(query);
+			sensingValueVO.setTopCondition(topCondition);
+			sensingValueVO.setOrderCondition(orderCondition);
+			sensingValueVO.setTemporalCondition(temporalCondition);
+			
+			queryResult = apiInterfaceService.selectSensingValueByID(sensingValueVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> sensingValueList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				Map<String, Object> sensingValue = new LinkedHashMap<String, Object>();
+				sensingValue.put("tdType", 			queryMap.get("sensortype").toString());
+				sensingValue.put("sensingTime",  	UsdmUtils.convertDateToStr((double)queryMap.get("sensingtime"), "yyyy-MM-dd HH:mm:ss.SSS"));
+				sensingValue.put("sensingValue",	queryMap.get("sensingvalue").toString());
+				sensingValue.put("sourceTable",		Integer.parseInt(queryMap.get("sourcetable").toString()));
+				
+				sensingValueList.add(sensingValue);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("snID",  		snID);
+			responseMessage.put("latitude",  	((EgovMap)queryResult.get(0)).get("latitude").toString());
+			responseMessage.put("longitude",  	((EgovMap)queryResult.get(0)).get("longitude").toString());
+			responseMessage.put("resultSet",  	sensingValueList);
+		
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+		
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getSensingValueByID", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/repairHistory
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/query/repairHistory", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryRepairHistory(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			String geoType = UsdmUtils.getStringValue(filter, "geoType");
+			String geoID   = UsdmUtils.getStringValue(filter, "geoID");
+			
+			int category = UsdmUtils.getIntegerValue(filter, "category");
+			
+			Map<String, Object> temporalConditionMap = (Map<String, Object>)filter.get("temporalCondition");
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (temporalConditionMap == null)	throw new InvalidParameterException("parameter 'temporalCondition' has no value");
+			
+			if (!(category==1 || category==2 || category==3 || category==9 || category==0))
+				throw new InvalidParameterException("parameter 'category' has invalid value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			int ftrIdn = 0;
+			
+			if (!geoID.equalsIgnoreCase("ALL"))
+				ftrIdn = Integer.parseInt(geoID);
+			
+			long startTime = UsdmUtils.convertStrToDate((String)temporalConditionMap.get("startTime"), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+			long endTime   = UsdmUtils.convertStrToDate((String)temporalConditionMap.get("endTime"),   "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+			
+			String temporalCondition = " AND repairDate >= " + startTime + " AND repairDate <= " + endTime;
+			
+			InfraRepairVO repairVO = new InfraRepairVO();
+			
+			repairVO.setGeoType(geoType);
+			repairVO.setFtrIdn(ftrIdn);
+			repairVO.setCategory(category);
+			repairVO.setTemporalCondition(temporalCondition);
+			
+			List<?> queryResult = apiInterfaceService.selectInfraRepair(repairVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultMapList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+				
+				resultMap.put("geoType", 	queryMap.get("geotype").toString());
+				resultMap.put("geoID",  	queryMap.get("ftrIdn").toString());
+				resultMap.put("date",		UsdmUtils.convertDateToStr((double)queryMap.get("repairdate"), "yyyy-MM-dd"));
+				resultMap.put("category",	Integer.parseInt(queryMap.get("category").toString()));
+				resultMap.put("contents", 	queryMap.get("contents").toString());
+
+				if (queryMap.get("longitude") != null && queryMap.get("latitude") != null) {
+					Map<String, Object> coordinateMap = new LinkedHashMap<String, Object>();
+					
+					coordinateMap.put("longitude", queryMap.get("longitude").toString());
+					coordinateMap.put("latitude",  queryMap.get("latitude").toString());
+					
+					resultMap.put("coordinate", coordinateMap);
+				}
+				
+				resultMapList.add(resultMap);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("resultSet",  	resultMapList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/repairHistory", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/repairHistorySubsidence
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/query/repairHistorySubsidence", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryRepairHistorySubsidence(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			int 	target	= UsdmUtils.getIntegerValue(filter, "target");
+			String 	place 	= UsdmUtils.getStringValue(filter, "place");
+			
+			Map<String, Object> temporalConditionMap = (Map<String, Object>)filter.get("temporalCondition");
+			
+			List<?> spatialConditionList = (List<?>)filter.get("spatialCondition");
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (temporalConditionMap == null)	throw new InvalidParameterException("parameter 'temporalCondition' has no value");
+			if (spatialConditionList == null)	throw new InvalidParameterException("parameter 'spatialCondition' has no value");
+			
+			if (!(target==11 || target==12 || target==0))
+				throw new InvalidParameterException("parameter 'target' has invalid value");
+			
+			if (spatialConditionList.size() != 4)
+				throw new InvalidParameterException("parameter 'spatialCondition' must have 4 elements");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+
+			String temporalCondition = "";
+			String spatialCondition  = "";
+			
+			long startTime = UsdmUtils.convertStrToDate((String)temporalConditionMap.get("startTime"), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+			long endTime   = UsdmUtils.convertStrToDate((String)temporalConditionMap.get("endTime"),   "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+			
+			temporalCondition = " AND repairDate >= " + startTime + " AND repairDate <= " + endTime;
+
+			String minX = spatialConditionList.get(0).toString();
+			String minY = spatialConditionList.get(1).toString();
+		    String maxX = spatialConditionList.get(2).toString();
+		    String maxY = spatialConditionList.get(3).toString();
+		    
+		    String mbrPolygon  = minX + " " + minY + ","
+		                       + maxX + " " + minY + ","
+		                       + maxX + " " + maxY + ","
+		                       + minX + " " + maxY + ","
+		                       + minX + " " + minY;
+		    
+		    spatialCondition += " AND ST_INTERSECTS(ST_GEOMFROMTEXT('POLYGON((" + mbrPolygon + "))',0), coordinate) = 1";
+		    
+			SubsidenceRepairVO repairVO = new SubsidenceRepairVO();
+			
+			repairVO.setTarget(target);
+			repairVO.setPlace(place);
+			repairVO.setTemporalCondition(temporalCondition);
+			repairVO.setSpatialCondition(spatialCondition);
+			
+			List<?> queryResult = apiInterfaceService.selectSubsidenceRepair(repairVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultMapList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+
+				Map<String, Object> coordinateMap = new LinkedHashMap<String, Object>();
+				coordinateMap.put("longitude", queryMap.get("longitude").toString());
+				coordinateMap.put("latitude",  queryMap.get("latitude").toString());
+				
+				Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+				resultMap.put("target", 	Integer.parseInt(queryMap.get("target").toString()));
+				resultMap.put("place", 		queryMap.get("place").toString());
+				resultMap.put("date",		UsdmUtils.convertDateToStr((double)queryMap.get("repairdate"), "yyyy-MM-dd"));
+				resultMap.put("contents", 	queryMap.get("contents").toString());
+				resultMap.put("coordinate", coordinateMap);
+				
+				resultMapList.add(resultMap);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("resultSet",  	resultMapList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/repairHistorySubsidence", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getEvent
+	@RequestMapping(value="/query/getEvent", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetEvent(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			List<Integer> targetList = (List<Integer>)filter.get("targetList");
+			
+			Map<String, Object> temporalConditionMap = (Map<String, Object>)filter.get("temporalCondition");
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (targetList == null) 			throw new InvalidParameterException("parameter 'targetList' has no value");
+			if (temporalConditionMap == null) 	throw new InvalidParameterException("parameter 'temporalCondition' has no value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			List<String> eventNameList = new ArrayList<String>();
+			
+			for (int i=0; i<targetList.size(); i++) {
+				switch (targetList.get(i)) {
+				case 1:
+					eventNameList.add(UsdmUtils.MQ_REBOOT);
+					break;
+				case 2:
+					eventNameList.add(UsdmUtils.MQ_SRICHANGED);
+					break;
+				case 3:
+					eventNameList.add(UsdmUtils.MQ_LEAKOCCURED);
+					break;
+				case 4:
+					eventNameList.add(UsdmUtils.MQ_ACCIDENTOCCURED);
+					break;
+				case 5:
+					eventNameList.add(UsdmUtils.MQ_RFIDSTATECHANGED);
+					break;
+				case 9:
+					eventNameList.add(UsdmUtils.MQ_LOWBATTERY);
+					break;
+				case 11:
+					eventNameList.add(UsdmUtils.MQ_LOWUARTACTIVITY);
+					break;
+				default:
+					continue;
+				}
+			}
+			
+			long startTime = UsdmUtils.convertStrToDate((String)temporalConditionMap.get("startTime"), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+			long endTime   = UsdmUtils.convertStrToDate((String)temporalConditionMap.get("endTime"),   "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+			
+			EventVO eventVO = new EventVO();
+			eventVO.setEventName(UsdmUtils.getInOperatorString(eventNameList));
+			eventVO.setTemporalCondition(" AND eventTime >= " + startTime + " AND eventTime <= " + endTime);
+			
+			List<?> queryResult = apiInterfaceService.selectEvent(eventVO);
+
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				
+				resultSet.put("eventName",	queryMap.get("eventname").toString());
+				resultSet.put("resourceID", queryMap.get("resourceid").toString());
+				resultSet.put("value", 		queryMap.get("eventvalue").toString());
+				resultSet.put("timestamp",  UsdmUtils.convertDateToStr((double)queryMap.get("eventtime"), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("resultSet",	resultSetList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getEvent", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getGridByColor
+	@RequestMapping(value="/query/getGridByColor", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetGridByColor(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			String level = UsdmUtils.getStringValue(filter, "level").toUpperCase();
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			SNSriGridVO sriGridVO = new SNSriGridVO();
+			sriGridVO.setGrade(level);
+			
+			List<?> queryResult = apiInterfaceService.selectGridByColor(sriGridVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			double cellSri = 0;
+			String sourceLayer = "";
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				cellSri = (double)queryMap.get("cellsri");
+				
+				if (cellSri == (double)queryMap.get("drainsri") && level.equals(queryMap.get("draingrade").toString()))
+					sourceLayer = "sewer";
+				else if (cellSri == (double)queryMap.get("watersri") && level.equals(queryMap.get("watergrade").toString()))
+					sourceLayer = "water";
+				else if (cellSri == (double)queryMap.get("subwaysri") && level.equals(queryMap.get("subwaygrade").toString()))
+					sourceLayer = "subway";
+				else if (cellSri == (double)queryMap.get("stationsri") && level.equals(queryMap.get("stationgrade").toString()))
+					sourceLayer = "subway_s";
+				else if (cellSri == (double)queryMap.get("geologysri") && level.equals(queryMap.get("geologygrade").toString()))
+					sourceLayer = "geology";
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				
+				resultSet.put("gridIndex",	 queryMap.get("cellid").toString());
+				resultSet.put("sriValue",    cellSri);
+				resultSet.put("sourceLayer", sourceLayer);
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("gridInfoList",	resultSetList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getGridByColor", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getGridBySRI
+	@RequestMapping(value="/query/getGridBySRI", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetGridBySRI(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			Double sriValue   = UsdmUtils.getDoubleValue(filter, "sriValue");
+			String relationOp = UsdmUtils.getStringValue(filter, "relationOp");
+			Double operand    = UsdmUtils.getDoubleValue(filter, "operand", false);
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (relationOp.equalsIgnoreCase("BT") || relationOp.equalsIgnoreCase("BE"))
+				if (operand == UsdmUtils.NULL_DOUBLE)
+					throw new InvalidParameterException("parameter 'operand' has no value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			String additionalCondition = "";
+			
+			if (relationOp.equalsIgnoreCase("BT")) {
+				additionalCondition = "WHERE cellSri > " + sriValue + " AND cellSri < " + operand;
+			}
+			else if (relationOp.equalsIgnoreCase("BE")) {
+				additionalCondition = "WHERE cellSri >= " + sriValue + " AND cellSri <= " + operand;
+			}
+			else {
+				additionalCondition = "WHERE cellSri " + UsdmUtils.getOperator(relationOp) + sriValue; 
+			}
+			
+			SNSriGridVO sriGridVO = new SNSriGridVO();
+			sriGridVO.setAdditionalCondition(additionalCondition);
+			
+			List<?> queryResult = apiInterfaceService.selectGridBySRI(sriGridVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			double cellSri = 0;
+			String cellGrade   = "";
+			String sourceLayer = "";
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				cellSri = (double)queryMap.get("cellsri");
+				cellGrade = (String)queryMap.get("cellgrade");
+				
+				if (cellSri == (double)queryMap.get("drainsri") && cellGrade.equals(queryMap.get("draingrade").toString()))
+					sourceLayer = "sewer";
+				else if (cellSri == (double)queryMap.get("watersri") && cellGrade.equals(queryMap.get("watergrade").toString()))
+					sourceLayer = "water";
+				else if (cellSri == (double)queryMap.get("subwaysri") && cellGrade.equals(queryMap.get("subwaygrade").toString()))
+					sourceLayer = "subway";
+				else if (cellSri == (double)queryMap.get("stationsri") && cellGrade.equals(queryMap.get("stationgrade").toString()))
+					sourceLayer = "subway_s";
+				else if (cellSri == (double)queryMap.get("geologysri") && cellGrade.equals(queryMap.get("geologygrade").toString()))
+					sourceLayer = "geology";
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				
+				resultSet.put("gridIndex",	 queryMap.get("cellid").toString());
+				resultSet.put("sriValue",    cellSri);
+				resultSet.put("sourceLayer", sourceLayer);
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("gridInfoList",	resultSetList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getGridBySRI", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getInfraByColor
+	@RequestMapping(value="/query/getInfraByColor", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetInfraByColor(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			String level = UsdmUtils.getStringValue(filter, "level").toUpperCase();
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			SNSriVO sriVO = new SNSriVO();
+			sriVO.setSriGrade(level);
+			
+			List<?> queryResult = apiInterfaceService.selectInfraByColor(sriVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				
+				resultSet.put("geoID",	 	queryMap.get("geoid").toString());
+				resultSet.put("geoType",	queryMap.get("geotype").toString());
+				resultSet.put("BSRI", 		queryMap.get("bsri").toString());
+				resultSet.put("level", 		queryMap.get("level").toString());
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("infraInfoList", resultSetList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getInfraByColor", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getInfraBySRI
+	@RequestMapping(value="/query/getInfraBySRI", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetInfraBySRI(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			Double sriValue   = UsdmUtils.getDoubleValue(filter, "sriValue");
+			String relationOp = UsdmUtils.getStringValue(filter, "relationOp");
+			Double operand    = UsdmUtils.getDoubleValue(filter, "operand", false);
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (relationOp.equalsIgnoreCase("BT") || relationOp.equalsIgnoreCase("BE"))
+				if (operand == UsdmUtils.NULL_DOUBLE)
+					throw new InvalidParameterException("parameter 'operand' has no value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			String additionalCondition = "";
+			
+			if (relationOp.equalsIgnoreCase("BT")) {
+				additionalCondition = "WHERE bsri > " + sriValue + " AND bsri < " + operand;
+			}
+			else if (relationOp.equalsIgnoreCase("BE")) {
+				additionalCondition = "WHERE bsri >= " + sriValue + " AND bsri <= " + operand;
+			}
+			else {
+				additionalCondition = "WHERE bsri " + UsdmUtils.getOperator(relationOp) + sriValue; 
+			}
+			
+			SNSriVO sriVO = new SNSriVO();
+			sriVO.setAdditionalCondition(additionalCondition);
+			
+			List<?> queryResult = apiInterfaceService.selectInfraBySRI(sriVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				
+				resultSet.put("geoID",	 	queryMap.get("geoid").toString());
+				resultSet.put("geoType",	queryMap.get("geotype").toString());
+				resultSet.put("BSRI", 		queryMap.get("bsri").toString());
+				resultSet.put("level", 		queryMap.get("level").toString());
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("infraInfoList", resultSetList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getInfraBySRI", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getInfraByAttribute
+	@RequestMapping(value="/query/getInfraByAttribute", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetInfraByAttribute(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			String target     		= UsdmUtils.getStringValue(filter, "target");
+			String attribute  		= UsdmUtils.getStringValue(filter, "attribute");
+			String attributeValue	= UsdmUtils.getStringValue(filter, "attributeValue");
+			String relationOp 		= UsdmUtils.getStringValue(filter, "relationOp");
+			String operand    		= UsdmUtils.getStringValue(filter, "operand", false);
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (relationOp.equalsIgnoreCase("BT") || relationOp.equalsIgnoreCase("BE"))
+				if (operand == null)
+					throw new InvalidParameterException("parameter 'operand' has no value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			String additionalCondition = "";
+			
+			if (relationOp.equalsIgnoreCase("BT")) {
+				additionalCondition = "WHERE " + attribute + " > " + attributeValue + " AND " + attribute + " < " + operand;
+			}
+			else if (relationOp.equalsIgnoreCase("BE")) {
+				additionalCondition = "WHERE " + attribute + " >= " + attributeValue + " AND " + attribute + " <= " + operand;
+			}
+			else {
+				additionalCondition = "WHERE " + attribute + UsdmUtils.getOperator(relationOp) + attributeValue;
+			}
+			
+			SNSriVO sriVO = new SNSriVO();
+			sriVO.setGeoType(target);
+			sriVO.setAdditionalCondition(additionalCondition);
+			
+			List<?> queryResult = apiInterfaceService.selectInfraByAttribute(sriVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				
+				resultSet.put("geoID",	 	queryMap.get("geoid").toString());
+				resultSet.put("geoType",	target);
+				resultSet.put("BSRI", 		queryMap.get("bsri").toString());
+				resultSet.put("level", 		queryMap.get("level").toString());
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("infraInfoList", resultSetList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getInfraByAttribute", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getInfraInGrid
+	@RequestMapping(value="/query/getInfraInGrid", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetInfraInGrid(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+
+			List<String> gridList   = (List<String>)filter.get("gridList");
+			List<String> targetList = (List<String>)filter.get("targetList");
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (gridList == null)   throw new InvalidParameterException("parameter 'gridList' has no value");
+			if (targetList == null) throw new InvalidParameterException("parameter 'targetList' has no value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			String cellIDList = UsdmUtils.getInOperatorString(gridList);
+			String typeList   = UsdmUtils.getInOperatorString(targetList);
+			
+			String additionalCondition = "WHERE geoType IN (" + typeList + ")";
+			
+			SNSriGridVO sriGridVO = new SNSriGridVO();
+			sriGridVO.setCellIDList(cellIDList);
+			sriGridVO.setAdditionalCondition(additionalCondition);
+			
+			List<?> queryResult = apiInterfaceService.selectInfraInGrid(sriGridVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				
+				resultSet.put("gridIndex",	queryMap.get("gridindex").toString());
+				resultSet.put("geoID",	 	queryMap.get("geoid").toString());
+				resultSet.put("geoType",	queryMap.get("geotype").toString());
+				resultSet.put("BSRI", 		queryMap.get("bsri").toString());
+				resultSet.put("level", 		queryMap.get("level").toString());
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("infraInfoList", resultSetList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getInfraInGrid", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// query/getInfraInGridBySRI
+	@RequestMapping(value="/query/getInfraInGridBySRI", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonQueryGetInfraInGridBySRI(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			List<String> gridList   = (List<String>)filter.get("gridList");
+			List<String> targetList = (List<String>)filter.get("targetList");
+			
+			Double sriValue   = UsdmUtils.getDoubleValue(filter, "sriValue");
+			String relationOp = UsdmUtils.getStringValue(filter, "relationOp");
+			Double operand    = UsdmUtils.getDoubleValue(filter, "operand", false);
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (gridList == null)   throw new InvalidParameterException("parameter 'gridList' has no value");
+			if (targetList == null) throw new InvalidParameterException("parameter 'targetList' has no value");
+			
+			if (relationOp.equalsIgnoreCase("BT") || relationOp.equalsIgnoreCase("BE"))
+				if (operand == UsdmUtils.NULL_DOUBLE)
+					throw new InvalidParameterException("parameter 'operand' has no value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			String cellIDList = UsdmUtils.getInOperatorString(gridList);
+			String typeList   = UsdmUtils.getInOperatorString(targetList);
+			
+			String additionalCondition = "WHERE geoType IN (" + typeList + ")";
+			
+			if (relationOp.equalsIgnoreCase("BT")) {
+				additionalCondition += " AND bsri > " + sriValue + " AND bsri < " + operand;
+			}
+			else if (relationOp.equalsIgnoreCase("BE")) {
+				additionalCondition += " AND bsri >= " + sriValue + " AND bsri <= " + operand;
+			}
+			else {
+				additionalCondition += " AND bsri " + UsdmUtils.getOperator(relationOp) + sriValue; 
+			}
+			
+			SNSriGridVO sriGridVO = new SNSriGridVO();
+			sriGridVO.setCellIDList(cellIDList);
+			sriGridVO.setAdditionalCondition(additionalCondition);
+			
+			List<?> queryResult = apiInterfaceService.selectInfraInGrid(sriGridVO);
+			
+			if (queryResult.isEmpty()) throw new NoResourceException();
+			
+			EgovMap queryMap = new EgovMap();
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<queryResult.size(); i++) {
+				queryMap = (EgovMap)queryResult.get(i);
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				
+				resultSet.put("gridIndex",	queryMap.get("gridindex").toString());
+				resultSet.put("geoID",	 	queryMap.get("geoid").toString());
+				resultSet.put("geoType",	queryMap.get("geotype").toString());
+				resultSet.put("BSRI", 		queryMap.get("bsri").toString());
+				resultSet.put("level", 		queryMap.get("level").toString());
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("infraInfoList", resultSetList);
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/getInfraInGridBySRI", filterJSON, responseJson);
 		
 		return responseJson;
 	}
@@ -4375,8 +5770,8 @@ public class APIInterfaceController {
             
 			SNAccidentVO accidentVO = new SNAccidentVO();
 			
+			accidentVO.setGeoType(geoType);
 			accidentVO.setGeoTable(UsdmUtils.getGeoTableName(geoType));
-			accidentVO.setAccidentTable(UsdmUtils.getAccidentTableName(geoType));
 			accidentVO.setFtrIdn(geoID);
 			accidentVO.setLongitude(longitude);
 			accidentVO.setLatitude(latitude);
@@ -4397,16 +5792,6 @@ public class APIInterfaceController {
 			response.setStatus(SUCCESS_STATUS);
 			responseMessage.put("responseCode", SUCCESS_CODE);
 			responseMessage.put("responseMsg",  SUCCESS_MSG);
-			
-			// ==================
-			//   MQ 메세지 전송 
-			// ==================
-			MessageQueueVO messageVO = new MessageQueueVO();
-			messageVO.setEventName("accidentOccurred");
-			messageVO.setResourceID(geoID);
-			messageVO.setValue(geoType);
-			
-			UsdmUtils.sendMessageMQ(messageVO);
 		
 		} catch (InvalidSessionKeyException e) {
 			e.printStackTrace();
@@ -4772,6 +6157,355 @@ public class APIInterfaceController {
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
 		UsdmUtils.writeLog("/information/setLeakThreshold", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// information/repairInfra
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/information/repairInfra", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonInformationRepairInfra(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+
+			int category = UsdmUtils.getIntegerValue(filter, "category");
+			
+			String geoType 	= UsdmUtils.getStringValue(filter, "geoType");
+			String date 	= UsdmUtils.getStringValue(filter, "date");
+			String contents	= UsdmUtils.getStringValue(filter, "contents");
+			String geoID 	= UsdmUtils.getStringValue(filter, "geoID");
+			
+			List<Integer> accidentList = (List<Integer>)filter.get("accidentList");
+			
+			Map<String, Object> locPartRepair = (Map<String, Object>)filter.get("locPartRepair");
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (!(geoType.equals("water") || geoType.equals("sewer") || geoType.equals("subway") || geoType.equals("subway_s") || geoType.equals("geology")))
+				throw new InvalidParameterException("parameter 'geoType' has invalid value");
+			
+			if (!(category==1 || category==2 || category==3 || category==9))
+				throw new InvalidParameterException("parameter 'category' has invalid value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			InfraRepairVO repairVO = new InfraRepairVO();
+			
+			repairVO.setGeoType(geoType);
+			repairVO.setFtrIdn(Integer.parseInt(geoID));
+			repairVO.setRepairDate(UsdmUtils.convertStrToDate(date, "yyyy-MM-dd"));
+			repairVO.setCategory(category);
+			repairVO.setContents(contents);
+			repairVO.setGeoTable(UsdmUtils.getGeoTableName(geoType));
+			repairVO.setSriTable(UsdmUtils.getSRITableName(geoType));
+			
+			if (accidentList != null)
+				repairVO.setAccidentIDList(UsdmUtils.getInOperatorString(accidentList));
+			
+			if (locPartRepair != null) {
+				double longitude = Double.parseDouble(locPartRepair.get("longitude").toString());
+				double latitude  = Double.parseDouble(locPartRepair.get("latitude").toString());
+				
+				String wkt = "ST_POINTFROMTEXT('POINT(" + latitude + " " + longitude + ")',0)";
+				
+				repairVO.setLongitude(longitude);
+				repairVO.setLatitude(latitude);
+				repairVO.setWkt(wkt);
+			}
+			
+			// 매설물 복구정보 생성
+			String cellIDList = apiInterfaceService.insertInfraRepair(repairVO);
+			
+			if (cellIDList.equals("")) throw new NoResourceException(); 
+				
+			// 변경된 매설물 SRI 조회
+			EgovMap geoChangeResult = apiInterfaceService.selectInfraRepairGeoChange(repairVO);
+
+			Map<String, Object> geoResultSet = new LinkedHashMap<String, Object>();
+			geoResultSet.put("geoID",    geoChangeResult.get("ftrIdn").toString());
+			geoResultSet.put("sriLevel", geoChangeResult.get("level").toString());
+			
+			List<Map<String, Object>> geoResultSetList  = new ArrayList<Map<String, Object>>();
+			geoResultSetList.add(geoResultSet);
+			
+			// 변경된 그리드 조회
+			repairVO.setCellIDList(cellIDList);
+			List<?> gridChangedResult = apiInterfaceService.selectInfraRepairGridChanged(repairVO);
+			
+			List<Map<String, Object>> resultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<gridChangedResult.size(); i++) {
+				EgovMap queryMap = (EgovMap)gridChangedResult.get(i);
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				resultSet.put("gridIndex",	queryMap.get("cellid").toString());
+				resultSet.put("rSRI",	 	queryMap.get("cellsri").toString());
+				resultSet.put("wSRI",	 	queryMap.get("watersri").toString());
+				resultSet.put("sSRI",	 	queryMap.get("drainsri").toString());
+				resultSet.put("mSRI",	 	queryMap.get("subwaysri").toString());
+				resultSet.put("tSRI",	 	queryMap.get("stationsri").toString());
+				resultSet.put("gSRI",	 	queryMap.get("geologysri").toString());
+				
+				resultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("geoChanged",   geoResultSetList);
+			responseMessage.put("gridChanged",  resultSetList);
+			
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/information/repairInfra", filterJSON, responseJson);
+		
+		return responseJson;
+	}
+	
+	// information/repairSubsidence
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/information/repairSubsidence", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonInformationRepairSubsidence(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			// convert JSON to map
+			Map<String, Object> filter = UsdmUtils.convertJsonToMap(filterJSON);
+			
+			// read JSON contents from map
+			String sessionKey = (String)filter.get("sessionKey");
+			
+			int target = UsdmUtils.getIntegerValue(filter, "target");
+			
+			String date 	= UsdmUtils.getStringValue(filter, "date");
+			String contents	= UsdmUtils.getStringValue(filter, "contents");
+			String place	= UsdmUtils.getStringValue(filter, "place");
+			
+			Map<String, Object> locRepair = (Map<String, Object>)filter.get("locRepair");
+			
+			List<String> sewerPipeList = (List<String>)filter.get("sPipeList");
+			List<String> stationList   = (List<String>)filter.get("mStationList");
+			List<String> subwayList    = (List<String>)filter.get("tSubwayList");
+			
+			double sewerDistance   = UsdmUtils.getDoubleValue(filter, "sDistance", false);
+			double stationDistance = UsdmUtils.getDoubleValue(filter, "mDistance", false);
+			double subwayDistance  = UsdmUtils.getDoubleValue(filter, "tDistance", false);
+			
+			List<Integer> accidentList = (List<Integer>)filter.get("accidentList");
+			
+			/******************************/
+			/* message validation : start */
+			/******************************/
+			
+			if (!validateSessionKey(sessionKey)) throw new InvalidSessionKeyException();
+			
+			if (!(target==11 || target==12 || target==13))
+				throw new InvalidParameterException("parameter 'target' has invalid value");
+			
+			if (locRepair == null) throw new InvalidParameterException("parameter 'locRepair' has no value");
+			
+			if (sewerPipeList != null && sewerDistance == UsdmUtils.NULL_DOUBLE)
+				throw new InvalidParameterException("parameter 'sDistance' has no value");
+			
+			if (stationList != null && stationDistance == UsdmUtils.NULL_DOUBLE)
+				throw new InvalidParameterException("parameter 'mDistance' has no value");
+			
+			if (subwayList != null && subwayDistance == UsdmUtils.NULL_DOUBLE)
+				throw new InvalidParameterException("parameter 'tDistance' has no value");
+			
+			/****************************/
+			/* message validation : end */
+			/****************************/
+			
+			double longitude = Double.parseDouble(locRepair.get("longitude").toString());
+			double latitude  = Double.parseDouble(locRepair.get("latitude").toString());
+				
+			String wkt = "ST_POINTFROMTEXT('POINT(" + latitude + " " + longitude + ")',0)";
+			
+			SubsidenceRepairVO repairVO = new SubsidenceRepairVO();
+			
+			repairVO.setTarget(target);
+			repairVO.setRepairDate(UsdmUtils.convertStrToDate(date, "yyyy-MM-dd"));
+			repairVO.setContents(contents);
+			repairVO.setPlace(place);
+			repairVO.setLongitude(longitude);
+			repairVO.setLatitude(latitude);
+			repairVO.setWkt(wkt);
+			repairVO.setSewerPipeList(sewerPipeList);
+			repairVO.setStationList(stationList);
+			repairVO.setSubwayList(subwayList);
+			repairVO.setSewerDistance(sewerDistance);
+			repairVO.setStationDistance(stationDistance);
+			repairVO.setSubwayDistance(subwayDistance);
+			repairVO.setSewerPipeIDList(UsdmUtils.getInOperatorString(sewerPipeList));
+			repairVO.setStationIDList(UsdmUtils.getInOperatorString(stationList));
+			repairVO.setSubwayIDList(UsdmUtils.getInOperatorString(subwayList));
+			
+			if (accidentList != null)
+				repairVO.setAccidentIDList(UsdmUtils.getInOperatorString(accidentList));
+			
+			// 지반침하/동공 복구정보 생성
+			String cellIDList = apiInterfaceService.insertSubsidenceRepair(repairVO);
+			
+			if (cellIDList.equals("")) throw new NoResourceException();
+
+			// 매설물 SRI 조회
+			List<Map<String, Object>> geoResultSetList  = new ArrayList<Map<String, Object>>();
+			
+			// 변경된 하수관 조회
+			if (sewerPipeList != null) {
+				List<?> geoChangeResult = apiInterfaceService.selectSubsidenceRepairSewerChange(repairVO);
+				
+				for (int i=0; i<geoChangeResult.size(); i++) {
+					EgovMap queryMap = (EgovMap)geoChangeResult.get(i);
+					
+					Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+					resultSet.put("geoID",		queryMap.get("geoid").toString());
+					resultSet.put("geoType",	"sewer");
+					resultSet.put("sriValue",	queryMap.get("sri").toString());
+					resultSet.put("sriLevel",	queryMap.get("level").toString());
+					
+					geoResultSetList.add(resultSet);
+				}
+			}
+			// 변경된 역사 조회
+			if (stationList != null) {
+				List<?> geoChangeResult = apiInterfaceService.selectSubsidenceRepairStationChange(repairVO);
+				
+				for (int i=0; i<geoChangeResult.size(); i++) {
+					EgovMap queryMap = (EgovMap)geoChangeResult.get(i);
+					
+					Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+					resultSet.put("geoID",		queryMap.get("geoid").toString());
+					resultSet.put("geoType",	"subway_s");
+					resultSet.put("sriValue",	queryMap.get("sri").toString());
+					resultSet.put("sriLevel",	queryMap.get("level").toString());
+					
+					geoResultSetList.add(resultSet);
+				}
+			}
+			// 변경된 선로 조회
+			if (subwayList != null) {
+				List<?> geoChangeResult = apiInterfaceService.selectSubsidenceRepairSubwayChange(repairVO);
+				
+				for (int i=0; i<geoChangeResult.size(); i++) {
+					EgovMap queryMap = (EgovMap)geoChangeResult.get(i);
+					
+					Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+					resultSet.put("geoID",		queryMap.get("geoid").toString());
+					resultSet.put("geoType",	"subway");
+					resultSet.put("sriValue",	queryMap.get("sri").toString());
+					resultSet.put("sriLevel",	queryMap.get("level").toString());
+					
+					geoResultSetList.add(resultSet);
+				}
+			}
+			
+			// 변경된 그리드 조회
+			InfraRepairVO infraRepairVO = new InfraRepairVO();
+			infraRepairVO.setCellIDList(cellIDList);
+			List<?> gridChangedResult = apiInterfaceService.selectInfraRepairGridChanged(infraRepairVO);
+			
+			List<Map<String, Object>> gridResultSetList = new ArrayList<Map<String, Object>>();
+			
+			for (int i=0; i<gridChangedResult.size(); i++) {
+				EgovMap queryMap = (EgovMap)gridChangedResult.get(i);
+				
+				Map<String, Object> resultSet = new LinkedHashMap<String, Object>();
+				resultSet.put("gridIndex",	queryMap.get("cellid").toString());
+				resultSet.put("rSRI",	 	queryMap.get("cellsri").toString());
+				resultSet.put("wSRI",	 	queryMap.get("watersri").toString());
+				resultSet.put("sSRI",	 	queryMap.get("drainsri").toString());
+				resultSet.put("mSRI",	 	queryMap.get("subwaysri").toString());
+				resultSet.put("tSRI",	 	queryMap.get("stationsri").toString());
+				resultSet.put("gSRI",	 	queryMap.get("geologysri").toString());
+				
+				gridResultSetList.add(resultSet);
+			}
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			responseMessage.put("geoChanged",   geoResultSetList);
+			responseMessage.put("gridChanged",  gridResultSetList);
+			
+			
+		} catch (InvalidSessionKeyException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (InvalidParameterException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (NoResourceException e) {
+			e.printStackTrace();
+			
+			response.setStatus(e.getStatus());
+			responseMessage.put("responseCode", e.getCode());
+			responseMessage.put("responseMsg",  e.getMessage());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/information/repairSubsidence", filterJSON, responseJson);
 		
 		return responseJson;
 	}
@@ -8999,6 +10733,35 @@ public class APIInterfaceController {
 		}
 		
 		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		return responseJson;
+	}
+	
+	// 모든 SRI그리드의 대표SRI값과 등급을 계산하여 update한다
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/query/updateSriGridAll", method=RequestMethod.POST, produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public String jsonUpdateSriGridAll(@RequestBody String filterJSON, HttpServletResponse response) {
+		Map<String, Object> responseMessage = new HashMap<String, Object>();
+		String responseJson = "";
+		
+		try {
+			apiInterfaceService.updateSriGridAll();
+			
+			response.setStatus(SUCCESS_STATUS);
+			responseMessage.put("responseCode", SUCCESS_CODE);
+			responseMessage.put("responseMsg",  SUCCESS_MSG);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			response.setStatus(FAILED_STATUS);
+			responseMessage.put("responseCode", FAILED_CODE);
+			responseMessage.put("responseMsg",  FAILED_MSG + " (" + e.getCause() + ")");
+		}
+		
+		responseJson = UsdmUtils.convertObjToJson(responseMessage);
+		UsdmUtils.writeLog("/query/updateSriGridAll", filterJSON, responseJson);
+		
 		return responseJson;
 	}
 	

@@ -32,7 +32,14 @@
 		<typeAlias alias="snFirmwareVO" type="egovframework.usdm.service.SNFirmwareVO"/>
 		<typeAlias alias="snFirmwareUpdateHistoryVO" type="egovframework.usdm.service.SNFirmwareUpdateHistoryVO"/>
 		
+		<typeAlias alias="infraRepairVO" type="egovframework.usdm.service.InfraRepairVO"/>
+		<typeAlias alias="subsidenceRepairVO" type="egovframework.usdm.service.SubsidenceRepairVO"/>
+		<typeAlias alias="subsidenceRepairRelVO" type="egovframework.usdm.service.SubsidenceRepairRelVO"/>
+		
 		<typeAlias alias="rfidVO" type="egovframework.usdm.service.RfidVO"/>
 		<typeAlias alias="userDefinedMessageVO" type="egovframework.usdm.service.UserDefinedMessageVO"/>
+		
+		<typeAlias alias="messageQueueVO" type="egovframework.usdm.service.MessageQueueVO"/>
+		<typeAlias alias="eventVO" type="egovframework.usdm.service.EventVO"/>
     </typeAliases>
 </configuration>

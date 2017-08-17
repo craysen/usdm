@@ -1722,7 +1722,7 @@ public class MWSInterfaceController {
 				responseMessage.put("responseCode", "600");
 				responseMessage.put("responseMsg",  "Report Success");
 				break;
-			case 1:
+			case 1:	// node가 존재하지 않음
 				responseMessage.put("responseCode", "602");
 				responseMessage.put("responseMsg",  "Report Success: Non-existing Sensor Node");
 				break;
@@ -1736,7 +1736,11 @@ public class MWSInterfaceController {
 			e.printStackTrace();
 			
 			switch (result) {
-			case -1:	// sensing value가 valid 범위 벗어남
+			case -1:	// transducer가 존재하지 않음
+				responseMessage.put("responseCode", "605");
+				responseMessage.put("responseMsg", "Report Error: Non-existing Transducer");
+				break;
+			case -2:	// sensing value가 valid 범위 벗어남
 				responseMessage.put("responseCode", "603");
 				responseMessage.put("responseMsg",  "Report Error: Sensing Value Out Of Range");
 				break;

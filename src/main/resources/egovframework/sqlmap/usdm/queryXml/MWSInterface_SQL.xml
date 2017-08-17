@@ -5,14 +5,15 @@
 
 	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
 	
-	<typeAlias alias="loginSessionVO" type="egovframework.usdm.service.LoginSessionVO"/>
-	<typeAlias alias="snGatewayVO"    type="egovframework.usdm.service.SNGatewayVO"/>
-	<typeAlias alias="snPanVO"        type="egovframework.usdm.service.SNPanVO"/>
-	<typeAlias alias="snNodeVO"       type="egovframework.usdm.service.SNNodeVO"/>
-	<typeAlias alias="snTransducerVO" type="egovframework.usdm.service.SNTransducerVO"/>
+	<typeAlias alias="loginSessionVO" 	type="egovframework.usdm.service.LoginSessionVO"/>
+	<typeAlias alias="snGatewayVO"    	type="egovframework.usdm.service.SNGatewayVO"/>
+	<typeAlias alias="snPanVO"        	type="egovframework.usdm.service.SNPanVO"/>
+	<typeAlias alias="snNodeVO"       	type="egovframework.usdm.service.SNNodeVO"/>
+	<typeAlias alias="snTransducerVO" 	type="egovframework.usdm.service.SNTransducerVO"/>
 	<typeAlias alias="snSensingValueVO" type="egovframework.usdm.service.SNSensingValueVO"/>
 	<typeAlias alias="snSriVO" 			type="egovframework.usdm.service.SNSriVO"/>
 	<typeAlias alias="snSriGridVO" 		type="egovframework.usdm.service.SNSriGridVO"/>
+	<typeAlias alias="eventVO" 			type="egovframework.usdm.service.EventVO"/>
 
 	<resultMap id="loginSession" class="loginSessionVO">
 		<result property="userID" column="userID"/>
@@ -129,6 +130,14 @@
 		<result property="sensorType" column="sensorType"/>
 		<result property="sensingValue" column="sensingValue"/>
 		<result property="binaryValue" column="binaryValue"/>
+	</resultMap>
+	
+	<resultMap id="event" class="EventVO">
+		<result property="eventName" column="eventName"/>
+		<result property="resourceID" column="resourceID"/>
+		<result property="eventValue" column="eventValue"/>
+		<result property="eventTime" column="eventTime"/>
+		<result property="temporalCondition" column="temporalCondition"/>
 	</resultMap>
 	
 	<select id="mwsInterfaceDAO.validateSessionKey" parameterClass="loginSessionVO" resultClass="egovMap">
@@ -1629,5 +1638,46 @@
 			 WHERE GID = #GID#
 		]]>
 	</update>
+	
+	<select id="mwsInterfaceDAO.selectSriGridByID" parameterClass="snSriGridVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT cellID
+			     , NVL(waterSri,0)       AS waterSri
+			     , NVL(drainSri,0)       AS drainSri
+			     , NVL(subwaySri,0)      AS subwaySri
+			     , NVL(stationSri,0)     AS stationSri
+			     , NVL(geologySri,0)     AS geologySri
+			     , NVL(watergrade,' ')   AS waterGrade
+				 , NVL(draingrade,' ')   AS drainGrade
+				 , NVL(subwaygrade,' ')  AS subwayGrade
+				 , NVL(stationgrade,' ') AS stationGrade
+				 , NVL(geologygrade,' ') AS geologyGrade
+			  FROM sdm_SriGrid
+			 WHERE cellID = #cellID#
+		]]>
+	</select>
+	<update id="mwsInterfaceDAO.updateSriGridAll" parameterClass="snSriGridVO">
+		<![CDATA[
+			UPDATE sdm_SriGrid
+			   SET cellSri   = #sri#
+			     , cellGrade = #grade# 
+			 WHERE cellID = #cellID#
+		]]>
+	</update>
+	
+	<insert id="mwsInterfaceDAO.insertEvent" parameterClass="eventVO">
+		<![CDATA[
+			INSERT INTO sdm_Event (
+					eventName
+				  , resourceID
+				  , eventValue
+				  , eventTime)
+			VALUES (#eventName#
+				  , #resourceID#
+				  , #eventValue#
+				  , #eventTime#
+				  )
+		]]>
+	</insert>
 	
 </sqlMap>

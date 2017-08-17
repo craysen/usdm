@@ -17,6 +17,7 @@ package egovframework.usdm.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -451,7 +452,7 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 		
 		if (value < rangeMin || value > rangeMax) {
 			insert("mwsInterfaceDAO.insertSensingValueInvalidByGID", vo);
-			return -1;
+			return -2;
 		}
 		
 		// 센싱값 저장
@@ -534,7 +535,7 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 			//   MQ 메세지 전송 
 			// ==================
 			MessageQueueVO messageVO = new MessageQueueVO();
-			messageVO.setEventName("leakOccurred");
+			messageVO.setEventName(UsdmUtils.MQ_LEAKOCCURED);
 			messageVO.setValue(String.valueOf(vo.getSensingValue()));
 			
 			if (vo.getGwID() != null)
@@ -543,6 +544,9 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 				messageVO.setResourceID(vo.getGID());
 			
 			UsdmUtils.sendMessageMQ(messageVO);
+			
+			// Event 기록 저장
+			insertEvent(messageVO);
 		}
 	}
 	
@@ -625,11 +629,14 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 						//   MQ 메세지 전송 
 						// ==================
 						MessageQueueVO messageVO = new MessageQueueVO();
-						messageVO.setEventName("leakOccurred");
+						messageVO.setEventName(UsdmUtils.MQ_LEAKOCCURED);
 						messageVO.setValue(String.valueOf(dbVO.getSensingValue()));
 						messageVO.setResourceID(dbVO.getGID());
 						
 						UsdmUtils.sendMessageMQ(messageVO);
+						
+						// Event 기록 저장
+						insertEvent(messageVO);
 					}
 					
 					// counter update
@@ -848,18 +855,20 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 		wtl_sri = 100 - wtl_sri;
 		
 		// B5.위험등급 설정
-		if      (wtl_sri >= 55) wtl_lev = "C";
-		else if (wtl_sri >= 24)	wtl_lev = "B";
-		else 					wtl_lev = "A";
+		/*
+		if      (wtl_sri >= 55) wtl_lev = "A";
+		else if (wtl_sri >= 25)	wtl_lev = "B";
+		else 					wtl_lev = "C";
+		*/
 		
 		/******************************
 		 * [B] 위험점수,등급 계산 END *
 		 ******************************/
-				
+		
 		// 계산결과 update
 		vo.setAssessValue(Double.toString(wtl_sta));
 		vo.setSriValue(Double.toString(wtl_sri));
-		vo.setSriGrade(wtl_lev);
+		vo.setSriGrade(UsdmUtils.getWaterSRIGrade(wtl_sri));
 		
 		update("mwsInterfaceDAO.updateWaterPipeSRI", vo);
 		
@@ -867,7 +876,7 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 	}
 	
 	// SRI Grid 값을 update한다.
-	public int updateGridSRI(String geoType, SNSriVO sriVo) throws Exception {
+	public String updateGridSRI(String geoType, SNSriVO sriVo) throws Exception {
 		String selectSqlID;
 		String updateSqlID;
 		
@@ -915,21 +924,17 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 			
 			switch (geoType) {
 			case "water": 		// 상수도
+				sriGrade = UsdmUtils.getWaterSRIGrade(sriValue);
+				break;
 			case "sewer": 		// 하수도
-				if      (sriValue >= 55) 	sriGrade = "C";
-				else if (sriValue >= 24) 	sriGrade = "B";
-				else						sriGrade = "A";
-				
+				sriGrade = UsdmUtils.getSewerSRIGrade(sriValue);
 				break;
-				
 			case "subway":		// 지하철
-			case "subway_s":	// 지하철역사
-				if      (sriValue >= 60) 	sriGrade = "C";
-				else if (sriValue >= 30) 	sriGrade = "B";
-				else						sriGrade = "A";
-				
+				sriGrade = UsdmUtils.getSubwayLineSRIGrade(sriValue);
 				break;
-				
+			case "subway_s":	// 지하철역사
+				sriGrade = UsdmUtils.getSubwayStationSRIGrade(sriValue);				
+				break;
 			case "geology":	// 지질정보(TBD)
 			default:
 				sriGrade = "";
@@ -944,6 +949,9 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 			
 			update(updateSqlID, gridVo);
 			
+			// 그리드의 대표SRI값과 등급 update
+			updateSriGridCellGrade(cellID);
+			
 			cellIDList    += cellID;
 			cellValueList += sriValue;
 			
@@ -957,13 +965,101 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 		//   MQ 메세지 전송 
 		// ==================
 		MessageQueueVO messageVO = new MessageQueueVO();
-		messageVO.setEventName("sriValueChanged");
+		messageVO.setEventName(UsdmUtils.MQ_SRICHANGED);
 		messageVO.setResourceID(cellIDList);
 		messageVO.setValue(cellValueList);
 		
 		UsdmUtils.sendMessageMQ(messageVO);
 		
-		return 0;
+		// Event 기록 저장
+		insertEvent(messageVO);
+		
+		return cellIDList;
+	}
+	
+	// 그리드 cell의 대표SRI와 등급을 update한다.
+	public void updateSriGridCellGrade(int cellID) throws Exception {
+		SNSriGridVO gridVo = new SNSriGridVO();
+		gridVo.setCellID(cellID);
+
+		// 지정한 그리드의 geotype별 SRI값과 등급 조회
+		List<EgovMap> queryResult = (List<EgovMap>) list("mwsInterfaceDAO.selectSriGridByID", gridVo);
+		
+		int sourceIndex;
+		
+		// layer의 index
+		// 이 값은 정렬순서에 따른 결과값 추출에 영향을 미침
+		final int drainIndex   = 0;
+		final int waterIndex   = 1;
+		final int subwayIndex  = 2;
+		final int stationIndex = 3;
+		final int geologyIndex = 4;
+		
+		// 각 layer의 명칭
+		// List에 추가하는 순서는 index와 동일해야 함
+		List<String> sourceLayer = new ArrayList<String>();
+		sourceLayer.add("sewer");
+		sourceLayer.add("water");
+		sourceLayer.add("subway");
+		sourceLayer.add("subway_s");
+		sourceLayer.add("geology");
+
+		EgovMap queryMap = new EgovMap();
+		
+		// grid의 SRI값 update
+		for (int i=0; i<queryResult.size(); i++) {
+			queryMap = (EgovMap)queryResult.get(i);
+			
+			// 각 layer의 SRI값
+			// array에 추가하는 순서는 index와 동일해야 함
+			double[] sriArray = new double[5];
+			sriArray[drainIndex]   = (double)queryMap.get("drainsri");
+			sriArray[waterIndex]   = (double)queryMap.get("watersri");
+			sriArray[subwayIndex]  = (double)queryMap.get("subwaysri");
+			sriArray[stationIndex] = (double)queryMap.get("stationsri");
+			sriArray[geologyIndex] = (double)queryMap.get("geologysri");
+			
+			String[] gradeArray = new String[5];
+			gradeArray[drainIndex]   = (String)queryResult.get(i).get("draingrade");
+			gradeArray[waterIndex]   = (String)queryResult.get(i).get("watergrade");
+			gradeArray[subwayIndex]  = (String)queryResult.get(i).get("subwaygrade");
+			gradeArray[stationIndex] = (String)queryResult.get(i).get("stationgrade");
+			gradeArray[geologyIndex] = (String)queryResult.get(i).get("geologygrade");
+			
+			// 그리드의 대표SRI값 선정
+			// 1순위는 등급, 2순위는 점수
+			// 1. 동일등급일 경우 상/하수도가 지하철선로/역사에 우선한다. (상/하수도에 우선순위 부여(5),지하철선로/역사(3),지질정보(1))
+			// 2. 상/하수도가 동일한 등급일 경우 높은 점수가 대표값이 된다.
+			//    지하철선로/역사가 동일한 등급일 경우 높은 점수가 대표값이 된다.
+			// 3. 상/하수도가 동일한 등급과 동일한 점수를 갖는 경우 하수도가 대표값이 된다.
+			//    지하철선로/역사가 동일한 등급과 동일한 점수를 갖는 경우 선로가 대표값이 된다.
+			
+			// 선정 방식은 2가지에 의존한다.
+			// 1. Java의 문자열 정렬방식에 의해 등급, 우선순위, 000.00으로 formatting된 SRI값을 연결한 문자열 정렬
+			// 2. 동일한 등급, 우선순위, SRI값을 갖는 경우 List의 index가 작은 항목이 선택됨
+			//    하수도가 상수도에 우선하므로 gradeList 내에서 더 작은 index를 갖는다.(지하철선로/역사도 마찬가지)
+			
+			// List에 추가하는 순서는 index와 동일해야 함
+			List<String> gradeList = new ArrayList<String>();
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("draingrade"),   sriArray[drainIndex],   5));
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("watergrade"),   sriArray[waterIndex],   5));
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("subwaygrade"),  sriArray[subwayIndex],  3));
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("stationgrade"), sriArray[stationIndex], 3));
+			gradeList.add(UsdmUtils.getAlignedSriStr((String)queryMap.get("geologygrade"), sriArray[geologyIndex], 1));
+			
+			// 대표BSRI의 index
+			sourceIndex = gradeList.indexOf(Collections.max(gradeList));
+			
+			// grid의 대표SRI와 등급 update
+			SNSriGridVO updateGridVo = new SNSriGridVO();
+			
+			updateGridVo.setCellID((int)queryMap.get("cellid"));
+			updateGridVo.setSri(sriArray[sourceIndex]);
+			updateGridVo.setGrade(gradeArray[sourceIndex]);
+			updateGridVo.setLastUpdate(System.currentTimeMillis());
+			
+			update("mwsInterfaceDAO.updateSriGridAll", updateGridVo);
+		}
 	}
 	
 	public void insertBinaryValue(SNSensingValueVO vo) throws Exception {
@@ -1113,6 +1209,26 @@ public class MWSInterfaceDAO extends EgovAbstractDAO {
 		update("mwsInterfaceDAO.updateNodeGeoID", vo);
 		
 		return 0;
+	}
+	
+	// RabbitMQ 메세지가 전송될 때 event 기록을 저장한다
+	public void insertEvent(MessageQueueVO messageVO) throws Exception {
+		long eventTime = 0;
+		
+		if (messageVO.getTimestamp() != null) {
+			eventTime = UsdmUtils.convertStrToDate(messageVO.getTimestamp(), "yyyyMMdd'T'HHmmss");
+		}
+		else {
+			eventTime = System.currentTimeMillis();
+		}
+		
+		EventVO vo = new EventVO();
+		vo.setEventName(messageVO.getEventName());
+		vo.setResourceID(messageVO.getResourceID());
+		vo.setEventValue(messageVO.getValue());
+		vo.setEventTime(eventTime);
+		
+		insert("mwsInterfaceDAO.insertEvent", vo);
 	}
 
 }

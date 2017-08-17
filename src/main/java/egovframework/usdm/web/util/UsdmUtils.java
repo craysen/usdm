@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.lang.String;
+import java.text.DecimalFormat;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -38,7 +40,20 @@ import egovframework.com.cmm.EgovProperties;
 import egovframework.rte.psl.dataaccess.util.EgovMap;
 
 public final class UsdmUtils {
+	// int와 double 타입의 null로 간주할 값
+	static final public int 	NULL_INT 	= -999999;
+	static final public double	NULL_DOUBLE = -999999;
 
+	// MQ 메세지명
+	static final public String MQ_REBOOT 			= EgovProperties.getProperty("message.mqReboot");
+	static final public String MQ_SHUTDOWN 			= EgovProperties.getProperty("message.mqShutdown");
+	static final public String MQ_SRICHANGED 		= EgovProperties.getProperty("message.mqSriChanged");
+	static final public String MQ_LEAKOCCURED 		= EgovProperties.getProperty("message.mqLeakOccured");
+	static final public String MQ_ACCIDENTOCCURED 	= EgovProperties.getProperty("message.mqAccidentOccured");
+	static final public String MQ_RFIDSTATECHANGED 	= EgovProperties.getProperty("message.mqRfidChanged");
+	static final public String MQ_LOWBATTERY 		= EgovProperties.getProperty("message.mqLowBattery");
+	static final public String MQ_LOWUARTACTIVITY 	= EgovProperties.getProperty("message.mqLowUartActivity");
+	
 	// 동영상 파일 다운로드 경로
 	static final String sewerVideoDownloadPath  = EgovProperties.getProperty("downloadPath.sewerVideo");
 	static final String subwayVideoDownloadPath = EgovProperties.getProperty("downloadPath.subwayVideo");
@@ -124,6 +139,9 @@ public final class UsdmUtils {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Object> map = new HashMap<String, Object>();
 		
+		if (json == null || json.equals(""))
+			throw new InvalidParameterException("empty JSON string");
+		
 		try {
 			map = mapper.readValue(json, new TypeReference<HashMap<String, Object>>() {});
 		
@@ -153,6 +171,71 @@ public final class UsdmUtils {
 		}
 		
 		return json;
+	}
+	
+	// Object를 int값으로 읽어들인다.
+	public static int getIntegerValue(Map<String,Object> map, String name) throws Exception {
+		return getIntegerValue(map, name, true);
+	}
+	public static int getIntegerValue(Map<String,Object> map, String name, boolean notNull) throws Exception {
+		int returnValue = NULL_INT;
+		Object obj = map.get(name);
+		
+		if (obj == null) {
+			if (notNull) throw new InvalidParameterException("parameter '" + name + "' has no value");
+		}
+		else {
+			if (obj.getClass().getName().equals("java.lang.Integer"))
+				returnValue = (int)obj;
+			else
+				throw new InvalidParameterException("parameter '" + name + "' has wrong type (expects Integer)");
+		}
+		
+		return returnValue;
+	}
+	
+	// Object를 double값으로 읽어들인다.
+	public static double getDoubleValue(Map<String,Object> map, String name) throws Exception {
+		return getDoubleValue(map, name, true);
+	}
+	public static double getDoubleValue(Map<String,Object> map, String name, boolean notNull) throws Exception {
+		double returnValue = NULL_DOUBLE;
+		Object obj = map.get(name);
+		
+		if (obj == null) {
+			if (notNull) throw new InvalidParameterException("parameter '" + name + "' has no value");
+		}
+		else {
+			if (obj.getClass().getName().equals("java.lang.Integer"))
+				returnValue = (int)obj;
+			else if (obj.getClass().getName().equals("java.lang.Double"))
+				returnValue = (double)obj;
+			else
+				throw new InvalidParameterException("parameter '" + name + "' has wrong type (expects Double)");
+		}
+		
+		return returnValue;
+	}
+	
+	// Object를 String값으로 읽어들인다.
+	public static String getStringValue(Map<String,Object> map, String name) throws Exception {
+		return getStringValue(map, name, true);
+	}
+	public static String getStringValue(Map<String,Object> map, String name, boolean notNull) throws Exception {
+		String returnValue = null;
+		Object obj = map.get(name);
+		
+		if (obj == null) {
+			if (notNull) throw new InvalidParameterException("parameter '" + name + "' has no value");
+		}			
+		else {
+			if (obj.getClass().getName().equals("java.lang.String"))
+				returnValue = (String)obj;
+			else
+				throw new InvalidParameterException("parameter '" + name + "' has wrong type (expects String)");
+		}
+		
+		return returnValue;
 	}
 	
 	// 주소에서 자원ID 추출
@@ -191,7 +274,7 @@ public final class UsdmUtils {
 		
 		try {
 			Date dt = new Date((long)originDate);
-			SimpleDateFormat sf = new SimpleDateFormat(format);
+			DateFormat sf = new SimpleDateFormat(format);
         
 			convertedStr = sf.format(dt);
 					
@@ -533,27 +616,32 @@ public final class UsdmUtils {
 		return tableName;
 	}
 	
-	// geo-object 유형을 입력받아 사고정보 테이블명을 반환한다.
-	public static String getAccidentTableName(String type) throws InvalidParameterException {
+	// geo-object 유형을 입력받아 SRI 테이블명을 반환한다.
+	public static String getSRITableName(String type) throws InvalidParameterException {
 		String tableName;
 		
 		if (type.equals("")) return "";
 		
 		switch (type) {
 		case "water":		// 상수관
-			tableName = "sdm_wateraccident";
+			tableName = "sdm_waterpipesri";
 			break;
 		case "sewer":		// 하수관
-			tableName = "sdm_drainaccident";
+			tableName = "sdm_drainpipesri";
 			break;
-		case "w_manhole":	// 상수맨홀(TBD)
-		case "s_manhole":	// 하수맨홀(TBD)
-		case "subway":		// 지하철로(TBD)
-		case "subway_s":	// 지하철역사(TBD)
+		case "subway":		// 지하철로
+			tableName = "sdm_subwaylinesri";
+			break;
+		case "subway_s":	// 지하철역사
+			tableName = "sdm_subwaystationsri";
+			break;
 		case "geology":		// 지반(TBD)
 		case "groundwater":	// 지하수(TBD)
+		case "s_manhole":	// 하수맨홀
+		case "w_manhole":	// 상수맨홀
 		default:
-			throw new InvalidParameterException("unsupported accident type");
+			//throw new InvalidParameterException("unsupported geometry type");
+			tableName = "";
 		}
 		
 		return tableName;
@@ -561,11 +649,11 @@ public final class UsdmUtils {
 	
 	// 문자열 List를 SQL의 IN 절에 사용가능한 문자열로 변환한다.
 	// ["a","b","c"] => "'a','b','c'"
-	public static String getInOperatorString(List<String> strList)
+	public static String getInOperatorString(List<?> strList)
 	{
 		String str = "";
 		
-		if (!strList.isEmpty()) {
+		if (strList != null && !strList.isEmpty()) {
 			for (int i=0; i<strList.size(); i++) {
 				str += "'" + strList.get(i) + "'";
 				
@@ -580,7 +668,7 @@ public final class UsdmUtils {
 	{
 		String str = "";
 		
-		if (!mapList.isEmpty()) {
+		if (mapList != null && !mapList.isEmpty()) {
 			for (int i=0; i<mapList.size(); i++) {
 				str += "'" + mapList.get(i).get(name) + "'";
 				
@@ -595,12 +683,14 @@ public final class UsdmUtils {
 	// MQ에 메세지를 전송한다.
 	public static void sendMessageMQ(MessageQueueVO messageVo) throws Exception {
 		try {
-			messageVo.setTimestamp(convertDateToStr(System.currentTimeMillis(), "yyyyMMdd'T'hhmmss"));
+			if (messageVo.getTimestamp() == null || messageVo.getTimestamp().equals(""))
+				messageVo.setTimestamp(convertDateToStr(System.currentTimeMillis(), "yyyyMMdd'T'HHmmss"));
 
 			String message = convertObjToJson(messageVo);
 			
 			// MQ에 전송
 			RabbitMQManager.sendMessage(message);
+			
 			// 로그생성
 			writeLog("Notice", message);
 			
@@ -808,50 +898,75 @@ public final class UsdmUtils {
 		return accidentDescName;
 	}
 	
-	/*
-	public static String getConfig(String configName) throws Exception
+	public static String getWaterSRIGrade(double sri)
 	{
-		String configValue = "";
-
-		try {
-			System.out.println(REAL_PATH + CONFIG_FILE);
-			
-			File file = new File(REAL_PATH + CONFIG_FILE);
-
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.parse(file);
-			 
-			doc.getDocumentElement().normalize();
-
-			NodeList nodeList = doc.getElementsByTagName(configName);
-			Element	configElement = (Element)nodeList.item(0);
-			
-			configValue = getCharacterDataFromElement(configElement);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-			
-		return configValue;
+		String grade = "";
+		
+		if      (sri >= 55) grade = "A";
+		else if (sri >= 25)	grade = "B";
+		else 				grade = "C";
+		
+		return grade;
 	}
-
-	private static String getCharacterDataFromElement(Element e)
+	
+	public static String getSewerSRIGrade(double sri)
 	{
-		NodeList list = e.getChildNodes();
-		String data;
+		String grade = "";
 		
-		for (int index = 0; index < list.getLength(); index++) {
-			if (list.item(index) instanceof CharacterData) {
-				CharacterData child = (CharacterData) list.item(index);
-				data = child.getData();
-				
-				if (data != null && data.trim().length() > 0)
-					return child.getData();
-			}
-		}
+		if      (sri >= 55) grade = "A";
+		else if (sri >= 25)	grade = "B";
+		else 				grade = "C";
 		
-		return "";
+		return grade;
 	}
-	*/
+	
+	public static String getSubwayLineSRIGrade(double sri)
+	{
+		String grade = "";
+		
+		if      (sri > 60)	grade = "A";
+		else if (sri > 30)	grade = "B";
+		else 				grade = "C";
+		
+		return grade;
+	}
+	
+	public static String getSubwayStationSRIGrade(double sri)
+	{
+		String grade = "";
+		
+		if      (sri > 60)	grade = "A";
+		else if (sri > 30)	grade = "B";
+		else 				grade = "C";
+		
+		return grade;
+	}
+	
+	public static String getAlignedSriStr(String grade, double value, int priority) throws Exception
+	{
+		DecimalFormat df = new DecimalFormat("000.00");
+		String newGrade  = "";
+		String resultStr = "";
+
+		if (grade.equals("A"))
+			newGrade = "C";
+		else if (grade.equals("C"))
+	        newGrade = "A";
+		else
+			newGrade = grade;
+		
+	    resultStr = newGrade + priority + df.format(value);
+		
+	    return resultStr;
+	}
+	
+	// List<String>에 특정 문자열의 포함여부를 확인한다 (case insensitive)
+	public static boolean containsIgnoreCase(List<String> list, String str) {
+        for (String s : list ) {
+            if (s.equalsIgnoreCase(str))
+            	return true;
+        }
+        
+        return false;
+    }
 }

@@ -31,6 +31,7 @@ public class SNSriGridVO extends UsdmDefaultVO {
 	private long 	lastUpdate;
 	private double 	minValue;
 	private String	cellIDList;
+	private String	additionalCondition;
 	
 	public int getCellID() {
 		return cellID;
@@ -115,6 +116,12 @@ public class SNSriGridVO extends UsdmDefaultVO {
 	}
 	public void setGrade(String grade) {
 		this.grade = grade;
+	}
+	public String getAdditionalCondition() {
+		return additionalCondition;
+	}
+	public void setAdditionalCondition(String additionalCondition) {
+		this.additionalCondition = additionalCondition;
 	}
 
 }

@@ -43,6 +43,10 @@ public class SNSensingValueVO extends UsdmDefaultVO {
 	
 	private String	geoIDList;
 	
+	private String	query;
+	private String	topCondition;
+	private String	orderCondition;
+	
 	public String getSnGID() {
 		return snGID;
 	}
@@ -180,6 +184,24 @@ public class SNSensingValueVO extends UsdmDefaultVO {
 	}
 	public void setCounter(int counter) {
 		this.counter = counter;
+	}
+	public String getQuery() {
+		return query;
+	}
+	public void setQuery(String query) {
+		this.query = query;
+	}
+	public String getTopCondition() {
+		return topCondition;
+	}
+	public void setTopCondition(String topCondition) {
+		this.topCondition = topCondition;
+	}
+	public String getOrderCondition() {
+		return orderCondition;
+	}
+	public void setOrderCondition(String orderCondition) {
+		this.orderCondition = orderCondition;
 	}
 	
 }

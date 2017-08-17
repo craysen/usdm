@@ -27,15 +27,13 @@ public class SNAccidentVO {
 	private String 	address3;
 	private String 	address4;
 	private double	accidentTime;
-	private double	accidentDepth;
-	private String	accidentDegree;
 	private String	accidentType;
 	private String	accidentShape;
 	private String	accidentDesc;
 	private String 	X;
 	private String 	Y;
+	private String	geoType;
 	private String	geoTable;
-	private String	accidentTable;
 	private String	spatialCondition;
 	
 	public String getFtrCde() {
@@ -98,18 +96,6 @@ public class SNAccidentVO {
 	public void setAccidentTime(double accidentTime) {
 		this.accidentTime = accidentTime;
 	}
-	public double getAccidentDepth() {
-		return accidentDepth;
-	}
-	public void setAccidentDepth(double accidentDepth) {
-		this.accidentDepth = accidentDepth;
-	}
-	public String getAccidentDegree() {
-		return accidentDegree;
-	}
-	public void setAccidentDegree(String accidentDegree) {
-		this.accidentDegree = accidentDegree;
-	}
 	public String getAccidentType() {
 		return accidentType;
 	}
@@ -140,17 +126,17 @@ public class SNAccidentVO {
 	public void setY(String y) {
 		Y = y;
 	}
+	public String getGeoType() {
+		return geoType;
+	}
+	public void setGeoType(String geoType) {
+		this.geoType = geoType;
+	}
 	public String getGeoTable() {
 		return geoTable;
 	}
 	public void setGeoTable(String geoTable) {
 		this.geoTable = geoTable;
-	}
-	public String getAccidentTable() {
-		return accidentTable;
-	}
-	public void setAccidentTable(String accidentTable) {
-		this.accidentTable = accidentTable;
 	}
 	public String getSpatialCondition() {
 		return spatialCondition;
